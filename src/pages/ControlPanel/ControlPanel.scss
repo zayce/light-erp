@@ -1,9 +1,9 @@
 .ControlPaner-Wrapper {
   background-color: #f9fafb;
   .ControlPanel-Inner {
-    width: 1150px;
+    width: 1200px;
     margin: 0;
-    padding: 0 20px;
+    padding: 20px 20px;
     .ControlPanel-Titles {
       display: block;
       .ControlPanel-Title {
@@ -20,7 +20,7 @@
     }
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(265px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
       .card {
         background: #ffffff;

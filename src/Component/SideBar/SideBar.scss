@@ -1,0 +1,129 @@
+.sidebar {
+  width: 460px;
+  height: 150hv;
+  background: #ffffff;
+  border-right: 1px solid #eef0f3;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 40px;
+}
+
+.sidebar__logo {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 70px;
+
+  .logo-icon {
+    color: #2563eb;
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-title {
+    font-size: 40px;
+    font-weight: 600;
+    color: #2563eb;
+  }
+
+  .logo-subtitle {
+    font-size: 32px;
+    color: #6b7280;
+  }
+}
+
+.sidebar__menu {
+  flex: 1;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    color: #374151;
+    cursor: pointer;
+    margin-bottom: 30px;
+
+    transition:
+      background 0.25s ease,
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      color 0.25s ease;
+
+    .Menu-item-text {
+      font-size: 30px;
+      transition: color 0.25s ease;
+    }
+
+    svg {
+      transition:
+        color 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    /* 🟦 HOVER */
+    &:hover {
+      background: linear-gradient(90deg, #eef4ff, #f8fbff);
+      transform: translateX(6px);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+      color: #2563eb;
+
+      svg {
+        color: #2563eb;
+        transform: scale(1.1);
+      }
+
+      .Menu-item-text {
+        color: #2563eb;
+      }
+    }
+
+    // /* 🔵 ACTIVE */
+    // &.active {
+    //   background: #eef4ff;
+    //   color: #2563eb;
+    //   font-weight: 500;
+
+    //   svg {
+    //     color: #2563eb;
+    //   }
+    // }
+  }
+}
+
+.sidebar__user {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid #eef0f3;
+
+  .user-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: #e0ecff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+
+  .user-name {
+    font-size: 34px;
+    font-weight: 500;
+  }
+
+  .user-email {
+    font-size: 22px;
+    color: #6b7280;
+  }
+}

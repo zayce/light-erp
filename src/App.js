@@ -1,16 +1,23 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Header } from "./Component/Header/Header";
-import { ControlPanel } from "./pages/ControlPanel/ControlPanel";
 import { SideBar } from "./Component/SideBar/SideBar";
-import "./App.scss";
 
+import { ControlPanel } from "./pages/ControlPanel/ControlPanel";
+import { Home } from "./pages/Home/Home";
+
+import { Anbar } from "./pages/Anbar/Anbar";
+import "./App.scss";
 const App = () => {
   return (
     <BrowserRouter>
       <div className="App-Wrapper">
-        <div className="App-Inner">
-          <SideBar />
-          <ControlPanel />
+        <SideBar />
+
+        <div className="App-Content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<ControlPanel />} />
+            <Route path="/warehouse" element={<Anbar />} />
+          </Routes>
         </div>
       </div>
     </BrowserRouter>

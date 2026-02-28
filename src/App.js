@@ -7,6 +7,8 @@ import { Home } from "./pages/Home/Home";
 import { Anbar } from "./pages/Anbar/Anbar";
 import "./App.scss";
 import { CashFlow } from "./pages/CashFlow/CashFlow";
+import { Welcome } from "./pages/Welcome/Welcome";
+import { Report } from "./pages/Reports/Report";
 const App = () => {
   return (
     <BrowserRouter>
@@ -15,10 +17,11 @@ const App = () => {
 
         <div className="App-Content">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/report" element={<Report />} />
             <Route path="/dashboard" element={<ControlPanel />} />
             <Route path="/warehouse" element={<Anbar />} />
             <Route path="/cashflow" element={<CashFlow />} />
+            <Route path="/" element={<Welcome />} />
           </Routes>
         </div>
       </div>

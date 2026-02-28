@@ -51,7 +51,7 @@ export const SideBar = () => {
           </li>
 
           <li className="menu-item">
-            <NavLink to="/reports" className="menu-item">
+            <NavLink to="/report" className="menu-item">
               <FileText size={40} />
               <div className="Menu-item-text">Hesabatlar</div>
             </NavLink>

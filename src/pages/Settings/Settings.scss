@@ -1,0 +1,352 @@
+.Settings-Wrapper {
+  background-color: #f9fafb;
+  .Settings-Inner {
+    width: 1200px;
+    margin: 0;
+    padding: 20px 20px;
+    .Settings-Titles {
+      margin-bottom: 40px;
+      .Settings-Title {
+        font-size: 48px;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 24px;
+      }
+      .Settings-Name {
+        font-size: 25px;
+        color: #6b7280;
+      }
+    }
+    .CardShell {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 22px rgba(17, 24, 39, 0.06);
+    }
+
+    .CardHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+
+      padding: 18px 18px;
+      border-bottom: 1px solid #e5e7eb;
+
+      .CardHeader-Left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .CardHeader-Icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: #f3f4f6;
+        display: grid;
+        place-items: center;
+        color: #374151;
+      }
+
+      .CardHeader-Title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #111827;
+      }
+    }
+
+    .CardBody {
+      padding: 18px;
+    }
+
+    /* ===== Form ===== */
+    .ProfileForm {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .Grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+
+      @media (max-width: 780px) {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .Field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .Label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .Input {
+      height: 54px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      padding: 0 16px;
+      font-size: 16px;
+      color: #111827;
+      outline: none;
+      transition:
+        border 0.2s ease,
+        box-shadow 0.2s ease;
+
+      &:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+      }
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+    }
+
+    /* ===== Buttons & states ===== */
+    .PrimaryBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+
+      background: #2563eb;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+
+      box-shadow: 0 10px 18px rgba(37, 99, 235, 0.22);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+      &:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 14px 22px rgba(37, 99, 235, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 10px 18px rgba(37, 99, 235, 0.22);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    .LoadingState {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #374151;
+      font-weight: 600;
+      padding: 12px 2px;
+    }
+
+    .Alert {
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+
+      &.error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+      }
+
+      &.success {
+        background: #ecfdf5;
+        border: 1px solid #bbf7d0;
+        color: #065f46;
+      }
+    }
+
+    .Spin {
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    .TopAlert {
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+
+      &.error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+      }
+
+      &.success {
+        background: #ecfdf5;
+        border: 1px solid #bbf7d0;
+        color: #065f46;
+      }
+    }
+
+    /* ===== Notifications list ===== */
+    .NotifList {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .NotifRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+
+      padding: 18px 2px;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid #e5e7eb;
+      }
+    }
+
+    .NotifText {
+      min-width: 0;
+    }
+
+    .NotifTitle {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+
+    .NotifDesc {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.3;
+    }
+
+    /* ===== Switch (как на скрине) ===== */
+    .Switch {
+      width: 56px;
+      height: 32px;
+      border-radius: 999px;
+      border: 2px solid #d1d5db;
+      background: #e5e7eb;
+      padding: 0;
+      position: relative;
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+      flex: 0 0 auto;
+
+      .Knob {
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: #fff;
+        position: absolute;
+        top: 50%;
+        left: 3px;
+        transform: translateY(-50%);
+        transition: left 0.2s ease;
+        box-shadow: 0 8px 16px rgba(17, 24, 39, 0.12);
+      }
+
+      &.on {
+        background: #2563eb;
+        border-color: #2563eb;
+
+        .Knob {
+          left: 27px;
+        }
+      }
+    }
+
+    /* ===== Select styling ===== */
+    .Select {
+      height: 54px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      padding: 0 14px;
+      font-size: 16px;
+      color: #111827;
+      outline: none;
+      background: #fff;
+      transition:
+        border 0.2s ease,
+        box-shadow 0.2s ease;
+
+      &:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+      }
+    }
+
+    /* footer button position like screenshot */
+    .SystemFooter {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+
+    .SaveBigBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+
+      border: none;
+      border-radius: 14px;
+      padding: 14px 18px;
+
+      background: #2563eb;
+      color: #fff;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+
+      box-shadow: 0 12px 20px rgba(37, 99, 235, 0.22);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+      &:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 16px 28px rgba(37, 99, 235, 0.32);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 10px 18px rgba(37, 99, 235, 0.22);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+}

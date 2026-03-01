@@ -86,7 +86,7 @@ export const Anbar = () => {
       stockMin: 12,
       price: 320,
     },
-    
+
   ];
 
   const getStatus = (current, min) => {
@@ -187,7 +187,6 @@ export const Anbar = () => {
               </select>
             </div>
           </div>
-          
           <div className="Anbar-Objects-Saves">
             {/* HEADER */}
             <div className="row header">

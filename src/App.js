@@ -9,6 +9,7 @@ import "./App.scss";
 import { CashFlow } from "./pages/CashFlow/CashFlow";
 import { Welcome } from "./pages/Welcome/Welcome";
 import { Report } from "./pages/Reports/Report";
+import { Settings } from "./pages/Settings/Settings";
 const App = () => {
   return (
     <BrowserRouter>
@@ -17,6 +18,7 @@ const App = () => {
 
         <div className="App-Content">
           <Routes>
+            <Route path="/settings" element={<Settings />} />
             <Route path="/report" element={<Report />} />
             <Route path="/dashboard" element={<ControlPanel />} />
             <Route path="/warehouse" element={<Anbar />} />

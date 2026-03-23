@@ -3,8 +3,7 @@ export const Home = () => {
     <>
       <div className="Wrapper-Home">
         <div className="Inner-Home">
-
-            <div className="SideBar-Context-Home"></div>
+          <div className="SideBar-Context-Home"></div>
         </div>
       </div>
     </>

@@ -1,295 +1,415 @@
 .CashFlow-Wrapper {
   background-color: #f9fafb;
+
   .CashFlow-Inner {
     width: 1200px;
     margin: 0;
     padding: 20px 20px;
-    .CashFlow-Header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 50px;
-      .CashFlow-Header-Text {
-        .CashFlow-Header-Name {
-          font-size: 38px;
-          font-weight: 600;
-          color: #1f2937; /* тёмно-серый */
-          margin-bottom: 4px;
-        }
-        .CashFlow-Header-Desc {
-          font-size: 25px;
-          color: #6b7280; /* серый */
-          margin-bottom: 24px;
-        }
-      }
-      .CashFlow-Header-Button {
-        .button-opis {
-          display: flex;
-          align-items: center;
-          gap: 10px;
+  }
 
-          padding: 24px;
-          background: #2563eb;
-          color: #ffffff;
+  .CashFlow-Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 50px;
+  }
 
-          border: none;
-          border-radius: 14px;
+  .CashFlow-Header-Name {
+    font-size: 38px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+  }
 
-          font-size: 18px;
-          font-weight: 500;
+  .CashFlow-Header-Desc {
+    font-size: 25px;
+    color: #6b7280;
+    margin-bottom: 24px;
+  }
 
-          cursor: pointer;
-          outline: none;
+  .button-opis {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 24px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    transition:
+      background 0.25s ease,
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
 
-          box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
-          transition:
-            background 0.25s ease,
-            transform 0.2s ease,
-            box-shadow 0.2s ease;
-
-          /* HOVER */
-          &:hover {
-            background: #1d4ed8;
-            transform: translateY(-1px);
-            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
-          }
-
-          /* ACTIVE (klik) */
-          &:active {
-            transform: translateY(0);
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
-          }
-          .plus {
-            font-size: 22px;
-            font-weight: 600;
-            line-height: 1;
-          }
-          .button-text {
-            font-size: 20px;
-          }
-        }
-      }
-    }
-    .CashFlow-Counts {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      .CashFlow-Count {
-        background: #fff;
-        border-radius: 14px;
-        padding: 20px 22px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-        .CashFlow-Count-Title {
-          font-size: 28px;
-          color: #8a8a8a;
-          margin-bottom: 6px;
-        }
-        .CashFlow-Count-Price {
-          font-size: 40px;
-          font-weight: 700;
-        }
-        .CashFlow-Icon {
-          width: 54px;
-          height: 54px;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-      }
+    &:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
     }
 
-    /* VARIANTS */
-    .income {
-      .CashFlow-Count-Price {
-        color: #16a34a;
-      }
-
-      .CashFlow-Icon {
-        background: #dcfce7;
-        color: #16a34a;
-      }
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
     }
 
-    .expense {
-      .CashFlow-Count-Price {
-        color: #dc2626;
-      }
-
-      .CashFlow-Icon {
-        background: #fee2e2;
-        color: #dc2626;
-      }
+    .plus {
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1;
     }
 
-    .balance {
-      .CashFlow-Count-Price {
-        color: #2563eb;
-      }
+    .button-text {
+      font-size: 20px;
+    }
+  }
 
-      .CashFlow-Icon {
-        background: #dbeafe;
-        color: #2563eb;
-      }
+  .CashFlow-Counts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .CashFlow-Count {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  }
+
+  .CashFlow-Count-Title {
+    font-size: 28px;
+    color: #8a8a8a;
+    margin-bottom: 6px;
+  }
+
+  .CashFlow-Count-Price {
+    font-size: 40px;
+    font-weight: 700;
+  }
+
+  .CashFlow-Icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .CashFlow-Count.income {
+    .CashFlow-Count-Price {
+      color: #16a34a;
     }
 
-    .CashFlow-Statics {
-      margin-top: 50px;
-      background: #fff;
-      border-radius: 16px;
-      padding: 20px 24px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-      .CashFlow-Statics-Title {
-        font-size: 28px;
-        font-weight: 500;
-        margin-bottom: 26px;
-      }
-      /* TOOLTIP */
-      .Chart-Tooltip {
-        background: #fff;
-        padding: 12px 14px;
-        border-radius: 10px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-        font-size: 20px;
-      }
+    .CashFlow-Icon {
+      background: #dcfce7;
+      color: #16a34a;
+    }
+  }
 
-      .Tooltip-Title {
-        font-weight: 600;
-        margin-bottom: 6px;
-      }
-
-      .Tooltip-Income {
-        color: #10b981;
-        margin-bottom: 4px;
-      }
-
-      .Tooltip-Expense {
-        color: #ef4444;
-      }
+  .CashFlow-Count.expense {
+    .CashFlow-Count-Price {
+      color: #dc2626;
     }
 
-    .CashFlow-CashCount {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-      overflow: hidden;
+    .CashFlow-Icon {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+  }
+
+  .CashFlow-Count.balance {
+    .CashFlow-Count-Price {
+      color: #2563eb;
     }
 
-    /* HEADER */
-    .CashFlow-CashCount-Header {
-      padding: 18px 22px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e5e7eb;
-
-      .CashFlow-CashCount-Title {
-        font-size: 28px;
-        font-weight: 500;
-      }
-
-      .Actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-
-        &:focus-within {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-        }
-        select {
-          padding: 17px;
-          min-width: 120px;
-          border-radius: 14px;
-          background: #ffffff;
-          font-size: 16px;
-          font-weight: 500;
-          color: #111827;
-          cursor: pointer;
-          outline: none;
-          transition: box-shadow 0.2s ease;
-          &:focus-within {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-          }
-          &:focus {
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-          }
-        }
-      }
+    .CashFlow-Icon {
+      background: #dbeafe;
+      color: #2563eb;
     }
+  }
 
-    /* GRID STRUCTURE */
-    .CashFlow-Table {
-      display: grid;
-      grid-template-columns: 140px 160px 1fr 120px 140px;
-      padding: 14px 22px;
+  .CashFlow-Statics {
+    margin-top: 50px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  }
+
+  .CashFlow-Statics-Title {
+    font-size: 28px;
+    font-weight: 500;
+    margin-bottom: 26px;
+  }
+
+  .CashFlow-CashCount {
+    margin-top: 30px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .CashFlow-CashCount-Header {
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+    gap: 16px;
+  }
+
+  .CashFlow-CashCount-Title {
+    font-size: 28px;
+    font-weight: 500;
+  }
+
+  .CashFlow-Controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .SearchBox {
+    min-width: 240px;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #6b7280;
+
+    input {
+      border: none;
+      outline: none;
+      width: 100%;
       font-size: 14px;
-      align-items: center;
-      .CashFlow-Table-Name {
-        font-size: 20px;
-        font-weight: 400;
-      }
+      background: transparent;
+      color: #111827;
+    }
+  }
+
+  .Actions {
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #6b7280;
+
+    &:focus-within {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
     }
 
-    .CashFlow-Table.Head {
+    select {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 14px;
+      color: #111827;
+      cursor: pointer;
+      min-width: 120px;
+    }
+  }
+
+  .CashFlow-Table {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr 1.6fr 0.8fr 0.8fr 0.8fr;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 22px;
+  }
+
+  .CashFlow-Table-Name {
+    font-size: 20px;
+    font-weight: 400;
+  }
+
+  .CashFlow-Table.Head {
+    background: #f9fafb;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .CashFlow-Table.Row {
+    border-top: 1px solid #e5e7eb;
+    transition: background 0.2s;
+
+    &:hover {
       background: #f9fafb;
-      font-size: 13px;
-      color: #6b7280;
-      font-weight: 500;
+    }
+  }
+
+  .CashFlow-Table-Body-title {
+    font-size: 22px;
+  }
+
+  .Right {
+    text-align: right;
+  }
+
+  .Type {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+
+    &.income {
+      background: #dcfce7;
+      color: #15803d;
     }
 
-    .CashFlow-Table-Body .Row {
-      border-top: 1px solid #e5e7eb;
-      transition: background 0.2s;
+    &.expense {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+  }
+
+  .Amount {
+    font-weight: 700;
+
+    &.income {
+      color: #16a34a;
+    }
+
+    &.expense {
+      color: #dc2626;
+    }
+  }
+
+  .Row-Actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+
+    button {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .Edit {
+      background: #e0f2fe;
+      color: #0284c7;
 
       &:hover {
-        background: #f9fafb;
-      }
-
-      .CashFlow-Table-Body-title {
-        font-size: 22px;
+        background: #bae6fd;
       }
     }
 
-    /* ALIGN */
+    .Delete {
+      background: #fee2e2;
+      color: #dc2626;
+
+      &:hover {
+        background: #fecaca;
+      }
+    }
+  }
+
+  .EmptyState {
+    padding: 28px 16px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 15px;
+  }
+
+  .Chart-Tooltip {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+  }
+
+  .Tooltip-Title {
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+  }
+
+  .Tooltip-Income {
+    color: #16a34a;
+    font-size: 14px;
+  }
+
+  .Tooltip-Expense {
+    color: #dc2626;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .CashFlow-Wrapper {
+    .CashFlow-Inner {
+      width: 100%;
+    }
+
+    .CashFlow-Table {
+      grid-template-columns: 1fr 1fr 1.4fr 1fr 1fr 1fr;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .CashFlow-Wrapper {
+    .CashFlow-CashCount-Header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+
+    .CashFlow-Controls {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .SearchBox,
+    .Actions {
+      width: 100%;
+    }
+
+    .CashFlow-Table {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
     .Right {
-      text-align: right;
+      text-align: left;
     }
 
-    /* TYPE BADGE */
-    .Type {
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 22px;
-      font-weight: 500;
-
-      &.income {
-        background: #dcfce7;
-        color: #16a34a;
-      }
-
-      &.expense {
-        background: #fee2e2;
-        color: #dc2626;
-      }
-    }
-
-    /* AMOUNT */
-    .Amount {
-      font-weight: 600;
-      font-size: 22px;
-
-      &.income {
-        color: #16a34a;
-      }
-
-      &.expense {
-        color: #dc2626;
-      }
+    .Row-Actions {
+      justify-content: flex-start;
     }
   }
 }

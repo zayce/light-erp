@@ -19,6 +19,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { ClashFlowModal } from "../../Component/CashFlowModal/ClashFlowModal";
+import { useApp } from "../../AppContext";
 
 export const CashFlow = () => {
   const [openClashFlow, setOpenClashFlow] = useState(false);
@@ -41,91 +42,23 @@ export const CashFlow = () => {
     "Dekabr",
   ];
 
-  const [operations, setOperations] = useState([
-    {
-      id: 1,
-      date: "2024-12-26",
-      category: "Satış",
-      desc: "Məhsul satışı #1234",
-      type: "income",
-      amount: "+₼2 450",
-    },
-    {
-      id: 2,
-      date: "2024-12-25",
-      category: "Təchizat",
-      desc: "Təchizat alışı - ABC Şirkəti",
-      type: "expense",
-      amount: "-₼1 200",
-    },
-    {
-      id: 3,
-      date: "2024-12-25",
-      category: "Satış",
-      desc: "Məhsul satışı #1233",
-      type: "income",
-      amount: "+₼3 200",
-    },
-    {
-      id: 4,
-      date: "2024-12-24",
-      category: "Əmək haqqı",
-      desc: "Dekabr əmək haqqı",
-      type: "expense",
-      amount: "-₼5 500",
-    },
-    {
-      id: 5,
-      date: "2024-12-24",
-      category: "Satış",
-      desc: "Məhsul satışı #1232",
-      type: "income",
-      amount: "+₼1 850",
-    },
-    {
-      id: 6,
-      date: "2024-12-23",
-      category: "Kommunal",
-      desc: "Elektrik və su",
-      type: "expense",
-      amount: "-₼450",
-    },
-    {
-      id: 7,
-      date: "2024-12-23",
-      category: "Xidmət",
-      desc: "Konsultasiya xidməti",
-      type: "income",
-      amount: "+₼800",
-    },
-    {
-      id: 8,
-      date: "2024-12-22",
-      category: "İcarə",
-      desc: "Ofis icarəsi",
-      type: "expense",
-      amount: "-₼2 000",
-    },
-  ]);
-
-  const parseAmount = (value) => {
-    return Number(String(value).replace(/[^\d]/g, ""));
-  };
+  const { state, dispatch } = useApp();
+  const operations = state.cashflow;
 
   const formatMoney = (value) => {
-    return `₼${value.toLocaleString("ru-RU")}`;
+    return `₼${Number(value || 0).toLocaleString("az-AZ")}`;
   };
 
   const totalIncome = useMemo(() => {
     return operations
       .filter((op) => op.type === "income")
-      .reduce((sum, op) => sum + parseAmount(op.amount), 0);
+      .reduce((sum, op) => sum + Number(op.amountRaw || 0), 0);
   }, [operations]);
 
   const totalExpense = useMemo(() => {
     return operations
       .filter((op) => op.type === "expense")
-      .reduce((sum, op) => sum + parseAmount(op.amount), 0);
+      .reduce((sum, op) => sum + Number(op.amountRaw || 0), 0);
   }, [operations]);
 
   const balance = totalIncome - totalExpense;
@@ -145,10 +78,11 @@ export const CashFlow = () => {
       const term = searchTerm.toLowerCase();
       result = result.filter(
         (op) =>
-          op.category.toLowerCase().includes(term) ||
-          op.desc.toLowerCase().includes(term) ||
-          op.date.toLowerCase().includes(term) ||
-          (op.type === "income" ? "gəlir" : "xərc").includes(term),
+          String(op.category || "").toLowerCase().includes(term) ||
+          String(op.desc || "").toLowerCase().includes(term) ||
+          String(op.date || "").toLowerCase().includes(term) ||
+          (op.type === "income" ? "gəlir" : "xərc").includes(term) ||
+          String(op.source || "").toLowerCase().includes(term)
       );
     }
 
@@ -170,7 +104,7 @@ export const CashFlow = () => {
 
       if (monthIndex < 0 || monthIndex > 11) return;
 
-      const numericAmount = parseAmount(op.amount);
+      const numericAmount = Number(op.amountRaw || 0);
 
       if (op.type === "income") {
         initialData[monthIndex].gelir += numericAmount;
@@ -184,20 +118,26 @@ export const CashFlow = () => {
 
   const handleAddOrUpdateOperation = (operationData) => {
     if (editOperation) {
-      setOperations((prev) =>
-        prev.map((item) =>
-          item.id === editOperation.id
-            ? { ...item, ...operationData, id: editOperation.id }
-            : item,
-        ),
-      );
+      dispatch({
+        type: "UPDATE_CASHFLOW_ITEM",
+        payload: {
+          id: editOperation.id,
+          data: {
+            ...operationData,
+            amountRaw: Number(operationData.amountRaw ?? operationData.amount ?? 0),
+          },
+        },
+      });
     } else {
-      const newOperation = {
-        ...operationData,
-        id: Date.now(),
-      };
-
-      setOperations((prev) => [newOperation, ...prev]);
+      dispatch({
+        type: "ADD_CASHFLOW_ITEM",
+        payload: {
+          ...operationData,
+          amountRaw: Number(operationData.amountRaw ?? operationData.amount ?? 0),
+          source: "manual",
+          sourceId: null,
+        },
+      });
     }
 
     setOpenClashFlow(false);
@@ -205,11 +145,17 @@ export const CashFlow = () => {
   };
 
   const handleDeleteOperation = (id) => {
-    setOperations((prev) => prev.filter((item) => item.id !== id));
+    dispatch({
+      type: "DELETE_CASHFLOW_ITEM",
+      payload: { id },
+    });
   };
 
   const handleEditOperation = (operation) => {
-    setEditOperation(operation);
+    setEditOperation({
+      ...operation,
+      amount: Number(operation.amountRaw || 0),
+    });
     setOpenClashFlow(true);
   };
 
@@ -224,10 +170,10 @@ export const CashFlow = () => {
         <div className="Chart-Tooltip">
           <div className="Tooltip-Title">{label}</div>
           <div className="Tooltip-Income">
-            Gəlir : {formatMoney(payload[0].value)}
+            Gəlir : {formatMoney(payload[0]?.value || 0)}
           </div>
           <div className="Tooltip-Expense">
-            Xərc : {formatMoney(payload[1].value)}
+            Xərc : {formatMoney(payload[1]?.value || 0)}
           </div>
         </div>
       );
@@ -358,19 +304,35 @@ export const CashFlow = () => {
                 <div className="CashFlow-Table Row" key={op.id}>
                   <div className="CashFlow-Table-Body-title">{op.date}</div>
                   <div className="CashFlow-Table-Body-title">{op.category}</div>
-                  <div className="CashFlow-Table-Body-title">{op.desc}</div>
+
+                  <div className="CashFlow-Table-Body-title">
+                    {op.desc}
+                    {op.source === "report" && (
+                      <span className="SourceTag">Report</span>
+                    )}
+                  </div>
+
                   <div>
                     <span className={`Type ${op.type}`}>
                       {op.type === "income" ? "Gəlir" : "Xərc"}
                     </span>
                   </div>
-                  <div className={`Amount ${op.type} Right`}>{op.amount}</div>
+
+                  <div className={`Amount ${op.type} Right`}>
+                    {op.amount}
+                  </div>
 
                   <div className="Row-Actions">
                     <button
                       className="Edit"
                       type="button"
                       onClick={() => handleEditOperation(op)}
+                      disabled={op.source === "report"}
+                      title={
+                        op.source === "report"
+                          ? "Bu əməliyyat Report səhifəsindən idarə olunur"
+                          : "Redaktə et"
+                      }
                     >
                       <Pencil size={16} />
                     </button>
@@ -378,7 +340,13 @@ export const CashFlow = () => {
                     <button
                       className="Delete"
                       type="button"
+                      disabled={op.source === "report"}
                       onClick={() => handleDeleteOperation(op.id)}
+                      title={
+                        op.source === "report"
+                          ? "Bu əməliyyat Report səhifəsindən idarə olunur"
+                          : "Sil"
+                      }
                     >
                       <Trash2 size={16} />
                     </button>

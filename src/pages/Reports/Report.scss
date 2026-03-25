@@ -381,3 +381,103 @@
 .KpiCard.orange {
   background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
 }
+
+.Report-Toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0 18px 0;
+  flex-wrap: wrap;
+}
+
+.Report-Search {
+  position: relative;
+  min-width: 280px;
+  flex: 1;
+
+  svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+  }
+
+  input {
+    width: 100%;
+    height: 46px;
+    border: 1px solid #d7deea;
+    border-radius: 12px;
+    padding: 0 14px 0 42px;
+    outline: none;
+    font-size: 15px;
+    background: #fff;
+
+    &:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+  }
+}
+
+.Report-Filter {
+  height: 46px;
+  min-width: 220px;
+  border: 1px solid #d7deea;
+  border-radius: 12px;
+  padding: 0 14px;
+  outline: none;
+  font-size: 15px;
+  background: #fff;
+  cursor: pointer;
+
+  &:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+}
+
+.Td.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.edit-btn {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+  }
+}
+
+.delete-btn {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: translateY(-1px);
+  }
+}
+
+.Empty-State {
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 16px;
+  color: #64748b;
+}

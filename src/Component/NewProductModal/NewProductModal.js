@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { X, Upload, Image as ImageIcon, Save } from "lucide-react";
-import "./NewProductModal.scss";
+import "../NewProductModal/NewProductModal.scss";
 
 const initial = {
   name: "",

@@ -1,137 +1,20 @@
-import { useEffect, useMemo, useState } from "react";
-import { NewProductModal } from "../NewProductModal/NewProductModal";
+import { useMemo, useState } from "react";
 import { Trash2 } from "lucide-react";
+import { NewProductModal } from "../../Component/NewProductModal/NewProductModal";
+import { useApp } from "../../AppContext";
 import "./Anbar.scss";
 
-const STORAGE_KEY = "anbar_products_v1";
-
-const CAT_KEY = "anbar_categories_v1";
-
 export const Anbar = () => {
+  const { state, dispatch } = useApp();
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [openNewProduct, setOpenNewProduct] = useState(false);
-  const defaultCategories = ["Elektronika", "Geyim", "Qida", "Mebel", "Digər"];
-  const initialProducts = [
-    {
-      sku: "ELEC-001",
-      name: 'MacBook Pro 16"',
-      category: "Elektronika",
-      stockCurrent: 15,
-      stockMin: 10,
-      price: 100,
-    },
-    {
-      sku: "ELEC-002",
-      name: "iPhone 15 Pro",
-      category: "Elektronika",
-      stockCurrent: 8,
-      stockMin: 15,
-      price: 180,
-    },
-    {
-      sku: "ELEC-003",
-      name: "Samsung S24",
-      category: "Elektronika",
-      stockCurrent: 22,
-      stockMin: 10,
-      price: 140,
-    },
-    {
-      sku: "GEYIM-001",
-      name: "Köynək (XL)",
-      category: "Geyim",
-      stockCurrent: 45,
-      stockMin: 20,
-      price: 35,
-    },
-    {
-      sku: "GEYIM-002",
-      name: "Jeans",
-      category: "Geyim",
-      stockCurrent: 12,
-      stockMin: 15,
-      price: 65,
-    },
-    {
-      sku: "QIDA-001",
-      name: "Qəhvə (1kg)",
-      category: "Qida",
-      stockCurrent: 120,
-      stockMin: 50,
-      price: 18,
-    },
-    {
-      sku: "QIDA-002",
-      name: "Çay (500g)",
-      category: "Qida",
-      stockCurrent: 3,
-      stockMin: 30,
-      price: 12,
-    },
-    {
-      sku: "MEBEL-001",
-      name: "Ofis Stolu",
-      category: "Mebel",
-      stockCurrent: 18,
-      stockMin: 8,
-      price: 280,
-    },
-    {
-      sku: "MEBEL-002",
-      name: "Ofis Oturacağı",
-      category: "Mebel",
-      stockCurrent: 6,
-      stockMin: 10,
-      price: 150,
-    },
-    {
-      sku: "ELEC-004",
-      name: 'Monitor 27"',
-      category: "Elektronika",
-      stockCurrent: 9,
-      stockMin: 12,
-      price: 320,
-    },
-  ];
+  const [deletingSku, setDeletingSku] = useState(null);
+  const [editing, setEditing] = useState(null);
 
-const [deletingSku, setDeletingSku] = useState(null);
-
-const deleteProduct = (sku) => {
-  setDeletingSku(sku);
-  setTimeout(() => {
-    setProducts((prev) => prev.filter((p) => p.sku !== sku));
-    setDeletingSku(null);
-  }, 220);
-};
-
-  const [categories, setCategories] = useState(() => {
-    try {
-      const saved = localStorage.getItem(CAT_KEY);
-      return saved ? JSON.parse(saved) : defaultCategories;
-    } catch {
-      return defaultCategories;
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem(CAT_KEY, JSON.stringify(categories));
-  }, [categories]);
-
-  // ✅ ВОТ ГЛАВНОЕ: products теперь state
-  const [products, setProducts] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : initialProducts;
-    } catch {
-      return initialProducts;
-    }
-  });
-
-  // ✅ Автосохранение
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  }, [products]);
+  const products = state.anbar;
+  const categories = state.categories;
 
   const getStatus = (current, min) => {
     if (current <= min * 0.3) return "kritik";
@@ -140,26 +23,27 @@ const deleteProduct = (sku) => {
     return "normal";
   };
 
-  const totalStockValue = useMemo(
-    () =>
-      products.reduce((sum, item) => sum + item.stockCurrent * item.price, 0),
-    [products],
-  );
+  const totalStockValue = useMemo(() => {
+    return products.reduce(
+      (sum, item) =>
+        sum + Number(item.stockCurrent || 0) * Number(item.price || 0),
+      0,
+    );
+  }, [products]);
 
-  const lowStockCount = useMemo(
-    () =>
-      products.filter((item) =>
-        ["asagi", "kritik"].includes(
-          getStatus(item.stockCurrent, item.stockMin),
-        ),
-      ).length,
-    [products],
-  );
+  const lowStockCount = useMemo(() => {
+    return products.filter((item) =>
+      ["asagi", "kritik"].includes(
+        getStatus(Number(item.stockCurrent || 0), Number(item.stockMin || 0)),
+      ),
+    ).length;
+  }, [products]);
 
   const totalProductsCount = products.length;
 
   const filteredProducts = useMemo(() => {
     const search = searchTerm.toLowerCase();
+
     return products.filter((item) => {
       const matchesSearch =
         item.sku.toLowerCase().includes(search) ||
@@ -172,9 +56,7 @@ const deleteProduct = (sku) => {
     });
   }, [products, searchTerm, selectedCategory]);
 
-  // ✅ ДОБАВЛЕНИЕ ИЗ МОДАЛКИ
   const addProduct = (data) => {
-    // data приходит из модалки: { name, sku, category, price, stock, minStock, ... }
     const newItem = {
       sku: data.sku.trim(),
       name: data.name.trim(),
@@ -182,74 +64,84 @@ const deleteProduct = (sku) => {
       stockCurrent: Number(data.stock || 0),
       stockMin: Number(data.minStock || 0),
       price: Number(data.price || 0),
-      // можешь сохранить доп поля:
       supplier: data.supplier || "",
       cost: Number(data.cost || 0),
       status: data.status || "Normal",
       desc: data.desc || "",
-      image: data.image ? data.image.name : "", // пока просто имя файла
+      image: data.image ? data.image.name : "",
       createdAt: Date.now(),
     };
 
-    // простая защита от одинакового SKU
-    const exists = products.some(
-      (p) => p.sku.toLowerCase() === newItem.sku.toLowerCase(),
-    );
-    if (exists) {
-      alert("Bu SKU artıq mövcuddur!");
-      return;
-    }
+    dispatch({
+      type: "ADD_ANBAR_ITEM",
+      payload: newItem,
+    });
 
-    setProducts((prev) => [newItem, ...prev]); // добавляем в начало таблицы
     setOpenNewProduct(false);
   };
 
-  // какое поле редактируем сейчас
-  const [editing, setEditing] = useState(null);
-  // editing = { sku: "ELEC-001", field: "name", value: "..." }
+  const deleteProduct = (sku) => {
+    setDeletingSku(sku);
+
+    setTimeout(() => {
+      dispatch({
+        type: "DELETE_ANBAR_ITEM",
+        payload: { sku },
+      });
+      setDeletingSku(null);
+    }, 220);
+  };
 
   const startEdit = (sku, field, currentValue) => {
-    setEditing({ sku, field, value: String(currentValue ?? "") });
+    setEditing({
+      sku,
+      field,
+      value: String(currentValue ?? ""),
+    });
   };
 
   const stopEdit = () => setEditing(null);
 
-  const isEditing = (sku, field) =>
-    editing && editing.sku === sku && editing.field === field;
-
-  const setEditValue = (v) => setEditing((p) => ({ ...p, value: v }));
+  const setEditValue = (value) => {
+    setEditing((prev) => ({ ...prev, value }));
+  };
 
   const commitEdit = () => {
     if (!editing) return;
+
     const { sku, field, value } = editing;
 
-    setProducts((prev) =>
-      prev.map((p) => {
-        if (p.sku !== sku) return p;
+    let normalizedValue = value;
 
-        // нормализация по типам
-        if (field === "price") return { ...p, price: Number(value || 0) };
-        if (field === "stockCurrent")
-          return { ...p, stockCurrent: Number(value || 0) };
-        if (field === "stockMin") return { ...p, stockMin: Number(value || 0) };
+    if (field === "price" || field === "stockCurrent" || field === "stockMin") {
+      normalizedValue = Number(value || 0);
+    }
 
-        // текстовые поля
-        const trimmed = field === "sku" ? value.trim() : value;
-        return { ...p, [field]: trimmed };
-      }),
-    );
+    if (field === "sku") {
+      normalizedValue = value.trim();
+    }
+
+    dispatch({
+      type: "UPDATE_ANBAR_ITEM",
+      payload: {
+        sku,
+        data: {
+          [field]: normalizedValue,
+        },
+      },
+    });
 
     stopEdit();
   };
 
   const cancelEdit = () => stopEdit();
 
-  // Enter сохранить / Esc отменить
   const onEditKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       commitEdit();
     }
+
     if (e.key === "Escape") {
       e.preventDefault();
       cancelEdit();
@@ -266,13 +158,11 @@ const deleteProduct = (sku) => {
     startEdit,
     setEditValue,
     commitEdit,
-    cancelEdit,
     onEditKeyDown,
     className = "",
   }) => {
     const active = editing && editing.sku === sku && editing.field === field;
 
-    // если select
     if (active && options?.length) {
       return (
         <select
@@ -292,7 +182,6 @@ const deleteProduct = (sku) => {
       );
     }
 
-    // если input
     if (active) {
       return (
         <input
@@ -307,7 +196,6 @@ const deleteProduct = (sku) => {
       );
     }
 
-    // обычный режим
     return (
       <div
         className={`EC-Text ${className}`}
@@ -322,7 +210,6 @@ const deleteProduct = (sku) => {
   return (
     <div className="Anbar-Wrapper">
       <div className="Anbar-Inner">
-        {/* ...твой header */}
         <div className="Anbar-Header">
           <div className="Anbar-Header-Text">
             <div className="Anbar-Header-Name">Anbar idarəetməsi</div>
@@ -342,7 +229,6 @@ const deleteProduct = (sku) => {
           </div>
         </div>
 
-        {/* ...stats */}
         <div className="Stats">
           <div className="Stats-Card">
             <div className="Stats-Icon blue">📦</div>
@@ -371,8 +257,27 @@ const deleteProduct = (sku) => {
           </div>
         </div>
 
-        {/* ...поиск/фильтр */}
-        {/* ...таблица */}
+        <div className="Anbar-Filters">
+          <input
+            type="text"
+            placeholder="SKU və ya məhsul adı ilə axtar..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <option value="all">Bütün kateqoriyalar</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="Anbar-Objects-Saves">
           <div className="row header">
             <div className="row-Title">SKU</div>
@@ -385,8 +290,12 @@ const deleteProduct = (sku) => {
           </div>
 
           {filteredProducts.map((item) => {
-            const total = item.stockCurrent * item.price;
-            const status = getStatus(item.stockCurrent, item.stockMin);
+            const total =
+              Number(item.stockCurrent || 0) * Number(item.price || 0);
+            const status = getStatus(
+              Number(item.stockCurrent || 0),
+              Number(item.stockMin || 0),
+            );
 
             const isDeleting = deletingSku === item.sku;
 
@@ -395,7 +304,6 @@ const deleteProduct = (sku) => {
                 className={`row body ${isDeleting ? "is-deleting" : ""}`}
                 key={item.sku}
               >
-                {/* SKU */}
                 <EditableCell
                   sku={item.sku}
                   field="sku"
@@ -404,12 +312,10 @@ const deleteProduct = (sku) => {
                   startEdit={startEdit}
                   setEditValue={setEditValue}
                   commitEdit={commitEdit}
-                  cancelEdit={cancelEdit}
                   onEditKeyDown={onEditKeyDown}
                   className="cell sku"
                 />
 
-                {/* NAME */}
                 <EditableCell
                   sku={item.sku}
                   field="name"
@@ -418,12 +324,10 @@ const deleteProduct = (sku) => {
                   startEdit={startEdit}
                   setEditValue={setEditValue}
                   commitEdit={commitEdit}
-                  cancelEdit={cancelEdit}
                   onEditKeyDown={onEditKeyDown}
                   className="cell name"
                 />
 
-                {/* CATEGORY (select) */}
                 <EditableCell
                   sku={item.sku}
                   field="category"
@@ -433,12 +337,10 @@ const deleteProduct = (sku) => {
                   startEdit={startEdit}
                   setEditValue={setEditValue}
                   commitEdit={commitEdit}
-                  cancelEdit={cancelEdit}
                   onEditKeyDown={onEditKeyDown}
                   className="cell category"
                 />
 
-                {/* STOCK current / min (два inline поля) */}
                 <div className="cell stock">
                   <EditableCell
                     sku={item.sku}
@@ -449,10 +351,11 @@ const deleteProduct = (sku) => {
                     startEdit={startEdit}
                     setEditValue={setEditValue}
                     commitEdit={commitEdit}
-                    cancelEdit={cancelEdit}
                     onEditKeyDown={onEditKeyDown}
                     className={
-                      item.stockCurrent < item.stockMin ? "EC-Danger" : ""
+                      Number(item.stockCurrent) < Number(item.stockMin)
+                        ? "EC-Danger"
+                        : ""
                     }
                   />
                   <span className="min"> / </span>
@@ -465,12 +368,10 @@ const deleteProduct = (sku) => {
                     startEdit={startEdit}
                     setEditValue={setEditValue}
                     commitEdit={commitEdit}
-                    cancelEdit={cancelEdit}
                     onEditKeyDown={onEditKeyDown}
                   />
                 </div>
 
-                {/* PRICE */}
                 <EditableCell
                   sku={item.sku}
                   field="price"
@@ -480,12 +381,10 @@ const deleteProduct = (sku) => {
                   startEdit={startEdit}
                   setEditValue={setEditValue}
                   commitEdit={commitEdit}
-                  cancelEdit={cancelEdit}
                   onEditKeyDown={onEditKeyDown}
                   className="cell price"
                 />
 
-                {/* STATUS (оставь как было) */}
                 <div className="cell">
                   <span className={`status ${status}`}>
                     {status === "normal" && "Normal"}
@@ -495,10 +394,8 @@ const deleteProduct = (sku) => {
                   </span>
                 </div>
 
-                {/* TOTAL */}
-                <div className="cell total">${total.toLocaleString()}</div>
+                <div className="cell total">₼{total.toLocaleString()}</div>
 
-                {/* TRASH */}
                 <button
                   type="button"
                   className="row-delete"
@@ -521,15 +418,9 @@ const deleteProduct = (sku) => {
         onSubmit={addProduct}
         categories={categories}
         onAddCategory={(cat) => {
-          const name = cat.trim();
-          if (!name) return;
-
-          setCategories((prev) => {
-            const exists = prev.some(
-              (c) => c.toLowerCase() === name.toLowerCase(),
-            );
-            if (exists) return prev;
-            return [name, ...prev];
+          dispatch({
+            type: "ADD_CATEGORY",
+            payload: cat,
           });
         }}
       />

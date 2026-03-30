@@ -10,6 +10,7 @@ import { CashFlow } from "./pages/CashFlow/CashFlow";
 import { Welcome } from "./pages/Welcome/Welcome";
 import { Report } from "./pages/Reports/Report";
 import { Settings } from "./pages/Settings/Settings";
+import { UserProfile } from "./pages/Useprofile/UserProfile";
 const App = () => {
   return (
     <AppProvider>
@@ -19,6 +20,7 @@ const App = () => {
 
           <div className="App-Content">
             <Routes>
+              <Route path="/usepanels" element={<UserProfile />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/report" element={<Report />} />
               <Route path="/dashboard" element={<ControlPanel />} />

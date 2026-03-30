@@ -65,16 +65,15 @@ export const SideBar = () => {
           </li>
         </ul>
       </nav>
-      {/* USER */}{" "}
-      <div className="sidebar__user">
-        {" "}
-        <div className="user-avatar">İ</div>{" "}
+      {/* USER */}
+      <NavLink to={"/usepanels"} className="sidebar__user">
+        <div className="user-avatar">İ</div>
         <div className="user-info">
           {" "}
           <div className="user-name">İstifadəçi</div>{" "}
           <div className="user-email">admin@hesabla.az</div>{" "}
-        </div>{" "}
-      </div>
+        </div>
+      </NavLink>
     </aside>
   );
 };

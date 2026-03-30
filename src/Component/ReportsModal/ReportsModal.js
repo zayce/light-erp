@@ -17,7 +17,6 @@ export const ReportsModal = ({
   editOperation,
 }) => {
   const { state } = useApp();
-
   const [product, setProduct] = useState("");
   const [category, setCategory] = useState("");
   const [operationType, setOperationType] = useState("Satış");

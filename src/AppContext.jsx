@@ -5,6 +5,7 @@ const AppContext = createContext(null);
 const initialState = {
   report: [],
   cashflow: [],
+  users: [],
   anbar: [
     {
       sku: "ELEC-001",
@@ -158,15 +159,29 @@ const safeParse = (value, fallback) => {
   }
 };
 
+const normalizeState = (data) => {
+  return {
+    report: Array.isArray(data?.report) ? data.report : [],
+    cashflow: Array.isArray(data?.cashflow) ? data.cashflow : [],
+    users: Array.isArray(data?.users) ? data.users : [],
+    anbar: Array.isArray(data?.anbar) ? data.anbar : initialState.anbar,
+    categories: Array.isArray(data?.categories)
+      ? data.categories
+      : initialState.categories,
+  };
+};
+
 const formatCashflowAmount = (type, value) => {
   const numeric = Number(value || 0);
   return `${type === "income" ? "+" : "-"}₼${numeric.toLocaleString("az-AZ")}`;
 };
 
 const calcPerformance = (revenue, list, editingId = null) => {
+  const safeList = Array.isArray(list) ? list : [];
+
   const filtered = editingId
-    ? list.filter((item) => item.id !== editingId)
-    : list;
+    ? safeList.filter((item) => item.id !== editingId)
+    : safeList;
 
   const maxRevenue = filtered.length
     ? Math.max(
@@ -184,9 +199,14 @@ const calcPerformance = (revenue, list, editingId = null) => {
 };
 
 const reducer = (state, action) => {
+  const safeState = normalizeState(state);
+
   switch (action.type) {
     case "SET_DATA":
-      return action.payload;
+      return normalizeState({
+        ...safeState,
+        ...action.payload,
+      });
 
     case "ADD_REPORT_ITEM": {
       const revenue = Number(action.payload.amount || 0);
@@ -202,7 +222,7 @@ const reducer = (state, action) => {
         name: action.payload.product,
         salesCount,
         revenue,
-        performance: calcPerformance(revenue, state.report),
+        performance: calcPerformance(revenue, safeState.report),
         category: action.payload.category,
         operationType,
         date: action.payload.date,
@@ -222,7 +242,7 @@ const reducer = (state, action) => {
         sourceId: reportId,
       };
 
-      const updatedAnbar = state.anbar.map((item) => {
+      const updatedAnbar = safeState.anbar.map((item) => {
         if (item.name === action.payload.product && operationType !== "Xərc") {
           return {
             ...item,
@@ -236,9 +256,9 @@ const reducer = (state, action) => {
       });
 
       return {
-        ...state,
-        report: [newReportItem, ...state.report],
-        cashflow: [newCashflowItem, ...state.cashflow],
+        ...safeState,
+        report: [newReportItem, ...safeState.report],
+        cashflow: [newCashflowItem, ...safeState.cashflow],
         anbar: updatedAnbar,
       };
     }
@@ -247,15 +267,15 @@ const reducer = (state, action) => {
       const revenue = Number(action.payload.data.amount || 0);
       const salesCount = Number(action.payload.data.salesCount || 0);
 
-      const oldReportItem = state.report.find(
+      const oldReportItem = safeState.report.find(
         (item) => item.id === action.payload.id,
       );
-      if (!oldReportItem) return state;
+      if (!oldReportItem) return safeState;
 
       const cashflowType =
         action.payload.data.operationType === "Xərc" ? "expense" : "income";
 
-      const updatedReport = state.report.map((item) =>
+      const updatedReport = safeState.report.map((item) =>
         item.id === action.payload.id
           ? {
               ...item,
@@ -264,7 +284,7 @@ const reducer = (state, action) => {
               revenue,
               performance: calcPerformance(
                 revenue,
-                state.report,
+                safeState.report,
                 action.payload.id,
               ),
               category: action.payload.data.category,
@@ -275,7 +295,7 @@ const reducer = (state, action) => {
           : item,
       );
 
-      const updatedCashflow = state.cashflow.map((cf) =>
+      const updatedCashflow = safeState.cashflow.map((cf) =>
         cf.id === oldReportItem.linkedCashflowId
           ? {
               ...cf,
@@ -291,7 +311,7 @@ const reducer = (state, action) => {
           : cf,
       );
 
-      let updatedAnbar = [...state.anbar];
+      let updatedAnbar = [...safeState.anbar];
 
       if (oldReportItem.operationType !== "Xərc") {
         updatedAnbar = updatedAnbar.map((item) => {
@@ -323,7 +343,7 @@ const reducer = (state, action) => {
       }
 
       return {
-        ...state,
+        ...safeState,
         report: updatedReport,
         cashflow: updatedCashflow,
         anbar: updatedAnbar,
@@ -331,14 +351,14 @@ const reducer = (state, action) => {
     }
 
     case "DELETE_REPORT_ITEM": {
-      const reportItem = state.report.find(
+      const reportItem = safeState.report.find(
         (item) => item.id === action.payload.id,
       );
-      if (!reportItem) return state;
+      if (!reportItem) return safeState;
 
       const updatedAnbar =
         reportItem.operationType !== "Xərc"
-          ? state.anbar.map((item) => {
+          ? safeState.anbar.map((item) => {
               if (item.name === reportItem.name) {
                 return {
                   ...item,
@@ -349,12 +369,14 @@ const reducer = (state, action) => {
               }
               return item;
             })
-          : state.anbar;
+          : safeState.anbar;
 
       return {
-        ...state,
-        report: state.report.filter((item) => item.id !== action.payload.id),
-        cashflow: state.cashflow.filter(
+        ...safeState,
+        report: safeState.report.filter(
+          (item) => item.id !== action.payload.id,
+        ),
+        cashflow: safeState.cashflow.filter(
           (cf) => cf.id !== reportItem.linkedCashflowId,
         ),
         anbar: updatedAnbar,
@@ -376,15 +398,15 @@ const reducer = (state, action) => {
       };
 
       return {
-        ...state,
-        cashflow: [newItem, ...state.cashflow],
+        ...safeState,
+        cashflow: [newItem, ...safeState.cashflow],
       };
     }
 
     case "UPDATE_CASHFLOW_ITEM":
       return {
-        ...state,
-        cashflow: state.cashflow.map((item) => {
+        ...safeState,
+        cashflow: safeState.cashflow.map((item) => {
           if (item.id !== action.payload.id) return item;
 
           const raw = Number(
@@ -404,31 +426,35 @@ const reducer = (state, action) => {
 
     case "DELETE_CASHFLOW_ITEM":
       return {
-        ...state,
-        cashflow: state.cashflow.filter(
+        ...safeState,
+        cashflow: safeState.cashflow.filter(
           (item) => item.id !== action.payload.id,
         ),
       };
 
     case "ADD_ANBAR_ITEM": {
-      const exists = state.anbar.some(
+      const anbar = safeState.anbar || [];
+
+      const exists = anbar.some(
         (item) =>
-          item.sku.toLowerCase() === action.payload.sku.toLowerCase() ||
-          item.name.toLowerCase() === action.payload.name.toLowerCase(),
+          String(item.sku).toLowerCase() ===
+            String(action.payload.sku).toLowerCase() ||
+          String(item.name).toLowerCase() ===
+            String(action.payload.name).toLowerCase(),
       );
 
-      if (exists) return state;
+      if (exists) return safeState;
 
       return {
-        ...state,
-        anbar: [action.payload, ...state.anbar],
+        ...safeState,
+        anbar: [action.payload, ...anbar],
       };
     }
 
     case "UPDATE_ANBAR_ITEM":
       return {
-        ...state,
-        anbar: state.anbar.map((item) =>
+        ...safeState,
+        anbar: safeState.anbar.map((item) =>
           item.sku === action.payload.sku
             ? { ...item, ...action.payload.data }
             : item,
@@ -437,27 +463,52 @@ const reducer = (state, action) => {
 
     case "DELETE_ANBAR_ITEM":
       return {
-        ...state,
-        anbar: state.anbar.filter((item) => item.sku !== action.payload.sku),
+        ...safeState,
+        anbar: safeState.anbar.filter(
+          (item) => item.sku !== action.payload.sku,
+        ),
       };
 
     case "ADD_CATEGORY": {
       const name = String(action.payload || "").trim();
-      if (!name) return state;
+      if (!name) return safeState;
 
-      const exists = state.categories.some(
-        (cat) => cat.toLowerCase() === name.toLowerCase(),
+      const categories = safeState.categories || [];
+
+      const exists = categories.some(
+        (cat) => String(cat).toLowerCase() === name.toLowerCase(),
       );
-      if (exists) return state;
+
+      if (exists) return safeState;
 
       return {
-        ...state,
-        categories: [name, ...state.categories],
+        ...safeState,
+        categories: [name, ...categories],
       };
     }
 
+    case "ADD_USER":
+      return {
+        ...safeState,
+        users: [action.payload, ...safeState.users],
+      };
+
+    case "UPDATE_USER":
+      return {
+        ...safeState,
+        users: safeState.users.map((user) =>
+          user.id === action.payload.id ? action.payload : user,
+        ),
+      };
+
+    case "DELETE_USER":
+      return {
+        ...safeState,
+        users: safeState.users.filter((user) => user.id !== action.payload.id),
+      };
+
     default:
-      return state;
+      return safeState;
   }
 };
 
@@ -467,7 +518,8 @@ export const AppProvider = ({ children }) => {
     initialState,
     (defaultState) => {
       const saved = localStorage.getItem("global-data");
-      return safeParse(saved, defaultState);
+      const parsed = safeParse(saved, defaultState);
+      return normalizeState(parsed);
     },
   );
 

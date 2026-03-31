@@ -13,8 +13,8 @@ export const Anbar = () => {
   const [deletingSku, setDeletingSku] = useState(null);
   const [editing, setEditing] = useState(null);
 
-  const products = state.anbar;
-  const categories = state.categories;
+  const products = state?.anbar || [];
+  const categories = state?.categories || [];
 
   const getStatus = (current, min) => {
     if (current <= min * 0.3) return "kritik";
@@ -24,17 +24,15 @@ export const Anbar = () => {
   };
 
   const totalStockValue = useMemo(() => {
-    return products.reduce(
-      (sum, item) =>
-        sum + Number(item.stockCurrent || 0) * Number(item.price || 0),
-      0,
-    );
+    return products.reduce((sum, item) => {
+      return sum + Number(item?.stockCurrent || 0) * Number(item?.price || 0);
+    }, 0);
   }, [products]);
 
   const lowStockCount = useMemo(() => {
     return products.filter((item) =>
       ["asagi", "kritik"].includes(
-        getStatus(Number(item.stockCurrent || 0), Number(item.stockMin || 0)),
+        getStatus(Number(item?.stockCurrent || 0), Number(item?.stockMin || 0)),
       ),
     ).length;
   }, [products]);
@@ -42,15 +40,16 @@ export const Anbar = () => {
   const totalProductsCount = products.length;
 
   const filteredProducts = useMemo(() => {
-    const search = searchTerm.toLowerCase();
+    const search = searchTerm.toLowerCase().trim();
 
     return products.filter((item) => {
-      const matchesSearch =
-        item.sku.toLowerCase().includes(search) ||
-        item.name.toLowerCase().includes(search);
+      const sku = String(item?.sku || "").toLowerCase();
+      const name = String(item?.name || "").toLowerCase();
+      const category = String(item?.category || "");
 
+      const matchesSearch = sku.includes(search) || name.includes(search);
       const matchesCategory =
-        selectedCategory === "all" || item.category === selectedCategory;
+        selectedCategory === "all" || category === selectedCategory;
 
       return matchesSearch && matchesCategory;
     });
@@ -58,19 +57,21 @@ export const Anbar = () => {
 
   const addProduct = (data) => {
     const newItem = {
-      sku: data.sku.trim(),
-      name: data.name.trim(),
-      category: data.category,
-      stockCurrent: Number(data.stock || 0),
-      stockMin: Number(data.minStock || 0),
-      price: Number(data.price || 0),
-      supplier: data.supplier || "",
-      cost: Number(data.cost || 0),
-      status: data.status || "Normal",
-      desc: data.desc || "",
-      image: data.image ? data.image.name : "",
+      sku: String(data?.sku || "").trim(),
+      name: String(data?.name || "").trim(),
+      category: data?.category || "",
+      stockCurrent: Number(data?.stock || 0),
+      stockMin: Number(data?.minStock || 0),
+      price: Number(data?.price || 0),
+      supplier: data?.supplier || "",
+      cost: Number(data?.cost || 0),
+      status: data?.status || "Normal",
+      desc: data?.desc || "",
+      image: data?.image ? data.image.name : "",
       createdAt: Date.now(),
     };
+
+    if (!newItem.sku || !newItem.name) return;
 
     dispatch({
       type: "ADD_ANBAR_ITEM",
@@ -88,6 +89,7 @@ export const Anbar = () => {
         type: "DELETE_ANBAR_ITEM",
         payload: { sku },
       });
+
       setDeletingSku(null);
     }, 220);
   };
@@ -103,7 +105,10 @@ export const Anbar = () => {
   const stopEdit = () => setEditing(null);
 
   const setEditValue = (value) => {
-    setEditing((prev) => ({ ...prev, value }));
+    setEditing((prev) => ({
+      ...prev,
+      value,
+    }));
   };
 
   const commitEdit = () => {
@@ -113,12 +118,23 @@ export const Anbar = () => {
 
     let normalizedValue = value;
 
-    if (field === "price" || field === "stockCurrent" || field === "stockMin") {
+    if (
+      field === "price" ||
+      field === "stockCurrent" ||
+      field === "stockMin" ||
+      field === "cost"
+    ) {
       normalizedValue = Number(value || 0);
     }
 
-    if (field === "sku") {
-      normalizedValue = value.trim();
+    if (
+      field === "sku" ||
+      field === "name" ||
+      field === "category" ||
+      field === "supplier" ||
+      field === "desc"
+    ) {
+      normalizedValue = String(value || "").trim();
     }
 
     dispatch({
@@ -233,7 +249,7 @@ export const Anbar = () => {
           <div className="Stats-Card">
             <div className="Stats-Icon blue">📦</div>
             <div className="Stats-Text">
-              <div className="Stats-Title">Ümumi Məhsul</div>
+              <div className="Stats-Title">Məhsul Novleri</div>
               <div className="Stats-Value">{totalProductsCount}</div>
             </div>
           </div>
@@ -289,126 +305,131 @@ export const Anbar = () => {
             <div className="row-Title">DƏYƏR</div>
           </div>
 
-          {filteredProducts.map((item) => {
-            const total =
-              Number(item.stockCurrent || 0) * Number(item.price || 0);
-            const status = getStatus(
-              Number(item.stockCurrent || 0),
-              Number(item.stockMin || 0),
-            );
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((item) => {
+              const total =
+                Number(item?.stockCurrent || 0) * Number(item?.price || 0);
 
-            const isDeleting = deletingSku === item.sku;
+              const status = getStatus(
+                Number(item?.stockCurrent || 0),
+                Number(item?.stockMin || 0),
+              );
 
-            return (
-              <div
-                className={`row body ${isDeleting ? "is-deleting" : ""}`}
-                key={item.sku}
-              >
-                <EditableCell
-                  sku={item.sku}
-                  field="sku"
-                  value={item.sku}
-                  editing={editing}
-                  startEdit={startEdit}
-                  setEditValue={setEditValue}
-                  commitEdit={commitEdit}
-                  onEditKeyDown={onEditKeyDown}
-                  className="cell sku"
-                />
+              const isDeleting = deletingSku === item?.sku;
 
-                <EditableCell
-                  sku={item.sku}
-                  field="name"
-                  value={item.name}
-                  editing={editing}
-                  startEdit={startEdit}
-                  setEditValue={setEditValue}
-                  commitEdit={commitEdit}
-                  onEditKeyDown={onEditKeyDown}
-                  className="cell name"
-                />
-
-                <EditableCell
-                  sku={item.sku}
-                  field="category"
-                  value={item.category}
-                  options={categories}
-                  editing={editing}
-                  startEdit={startEdit}
-                  setEditValue={setEditValue}
-                  commitEdit={commitEdit}
-                  onEditKeyDown={onEditKeyDown}
-                  className="cell category"
-                />
-
-                <div className="cell stock">
-                  <EditableCell
-                    sku={item.sku}
-                    field="stockCurrent"
-                    value={item.stockCurrent}
-                    type="number"
-                    editing={editing}
-                    startEdit={startEdit}
-                    setEditValue={setEditValue}
-                    commitEdit={commitEdit}
-                    onEditKeyDown={onEditKeyDown}
-                    className={
-                      Number(item.stockCurrent) < Number(item.stockMin)
-                        ? "EC-Danger"
-                        : ""
-                    }
-                  />
-                  <span className="min"> / </span>
-                  <EditableCell
-                    sku={item.sku}
-                    field="stockMin"
-                    value={item.stockMin}
-                    type="number"
-                    editing={editing}
-                    startEdit={startEdit}
-                    setEditValue={setEditValue}
-                    commitEdit={commitEdit}
-                    onEditKeyDown={onEditKeyDown}
-                  />
-                </div>
-
-                <EditableCell
-                  sku={item.sku}
-                  field="price"
-                  value={item.price}
-                  type="number"
-                  editing={editing}
-                  startEdit={startEdit}
-                  setEditValue={setEditValue}
-                  commitEdit={commitEdit}
-                  onEditKeyDown={onEditKeyDown}
-                  className="cell price"
-                />
-
-                <div className="cell">
-                  <span className={`status ${status}`}>
-                    {status === "normal" && "Normal"}
-                    {status === "asagi" && "Aşağı"}
-                    {status === "kritik" && "Kritik"}
-                    {status === "yuksek" && "Yüksək"}
-                  </span>
-                </div>
-
-                <div className="cell total">₼{total.toLocaleString()}</div>
-
-                <button
-                  type="button"
-                  className="row-delete"
-                  onClick={() => deleteProduct(item.sku)}
-                  aria-label="delete"
-                  title="Sil"
-                  disabled={isDeleting}
+              return (
+                <div
+                  className={`row body ${isDeleting ? "is-deleting" : ""}`}
+                  key={item?.sku}
                 >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            );
-          })}
+                  <EditableCell
+                    sku={item?.sku}
+                    field="sku"
+                    value={item?.sku}
+                    editing={editing}
+                    startEdit={startEdit}
+                    setEditValue={setEditValue}
+                    commitEdit={commitEdit}
+                    onEditKeyDown={onEditKeyDown}
+                    className="cell sku"
+                  />
+
+                  <EditableCell
+                    sku={item?.sku}
+                    field="name"
+                    value={item?.name}
+                    editing={editing}
+                    startEdit={startEdit}
+                    setEditValue={setEditValue}
+                    commitEdit={commitEdit}
+                    onEditKeyDown={onEditKeyDown}
+                    className="cell name"
+                  />
+
+                  <EditableCell
+                    sku={item?.sku}
+                    field="category"
+                    value={item?.category}
+                    options={categories}
+                    editing={editing}
+                    startEdit={startEdit}
+                    setEditValue={setEditValue}
+                    commitEdit={commitEdit}
+                    onEditKeyDown={onEditKeyDown}
+                    className="cell category"
+                  />
+
+                  <div className="cell stock">
+                    <EditableCell
+                      sku={item?.sku}
+                      field="stockCurrent"
+                      value={item?.stockCurrent}
+                      type="number"
+                      editing={editing}
+                      startEdit={startEdit}
+                      setEditValue={setEditValue}
+                      commitEdit={commitEdit}
+                      onEditKeyDown={onEditKeyDown}
+                      className={
+                        Number(item?.stockCurrent) < Number(item?.stockMin)
+                          ? "EC-Danger"
+                          : ""
+                      }
+                    />
+                    <span className="min"> / </span>
+                    <EditableCell
+                      sku={item?.sku}
+                      field="stockMin"
+                      value={item?.stockMin}
+                      type="number"
+                      editing={editing}
+                      startEdit={startEdit}
+                      setEditValue={setEditValue}
+                      commitEdit={commitEdit}
+                      onEditKeyDown={onEditKeyDown}
+                    />
+                  </div>
+
+                  <EditableCell
+                    sku={item?.sku}
+                    field="price"
+                    value={item?.price}
+                    type="number"
+                    editing={editing}
+                    startEdit={startEdit}
+                    setEditValue={setEditValue}
+                    commitEdit={commitEdit}
+                    onEditKeyDown={onEditKeyDown}
+                    className="cell price"
+                  />
+
+                  <div className="cell">
+                    <span className={`status ${status}`}>
+                      {status === "normal" && "Normal"}
+                      {status === "asagi" && "Aşağı"}
+                      {status === "kritik" && "Kritik"}
+                      {status === "yuksek" && "Yüksək"}
+                    </span>
+                  </div>
+
+                  <div className="cell total">₼{total.toLocaleString()}</div>
+
+                  <button
+                    type="button"
+                    className="row-delete"
+                    onClick={() => deleteProduct(item?.sku)}
+                    aria-label="delete"
+                    title="Sil"
+                    disabled={isDeleting}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              );
+            })
+          ) : (
+            <div className="Anbar-Empty">Məhsul tapılmadı</div>
+          )}
         </div>
       </div>
 

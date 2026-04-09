@@ -11,6 +11,7 @@ const initialState = {
       sku: "ELEC-001",
       name: 'MacBook Pro 16"',
       category: "Elektronika",
+      subcategory: "Komputer",
       stockCurrent: 15,
       stockMin: 10,
       price: 100,
@@ -25,6 +26,7 @@ const initialState = {
       sku: "ELEC-002",
       name: "iPhone 15 Pro",
       category: "Elektronika",
+      subcategory: "Telefon",
       stockCurrent: 8,
       stockMin: 5,
       price: 180,
@@ -39,6 +41,7 @@ const initialState = {
       sku: "ELEC-003",
       name: "Samsung S24",
       category: "Elektronika",
+      subcategory: "Telefon",
       stockCurrent: 22,
       stockMin: 10,
       price: 140,
@@ -53,6 +56,7 @@ const initialState = {
       sku: "GEYIM-001",
       name: "Köynək (XL)",
       category: "Geyim",
+      subcategory: "Köynək",
       stockCurrent: 45,
       stockMin: 20,
       price: 35,
@@ -64,23 +68,10 @@ const initialState = {
       createdAt: Date.now(),
     },
     {
-      sku: "GEYIM-002",
-      name: "Jeans",
-      category: "Geyim",
-      stockCurrent: 12,
-      stockMin: 15,
-      price: 65,
-      supplier: "",
-      cost: 0,
-      status: "Normal",
-      desc: "",
-      image: "",
-      createdAt: Date.now(),
-    },
-    {
       sku: "QIDA-001",
       name: "Qəhvə (1kg)",
       category: "Qida",
+      subcategory: "İçki",
       stockCurrent: 120,
       stockMin: 50,
       price: 18,
@@ -91,64 +82,42 @@ const initialState = {
       image: "",
       createdAt: Date.now(),
     },
+  ],
+  categories: [
     {
-      sku: "QIDA-002",
-      name: "Çay (500g)",
-      category: "Qida",
-      stockCurrent: 3,
-      stockMin: 30,
-      price: 12,
-      supplier: "",
-      cost: 0,
-      status: "Normal",
-      desc: "",
-      image: "",
-      createdAt: Date.now(),
+      id: 1,
+      name: "Elektronika",
+      subcategories: [
+        { id: 11, name: "Komputer" },
+        { id: 12, name: "Telefon" },
+        { id: 13, name: "Televizor" },
+      ],
     },
     {
-      sku: "MEBEL-001",
-      name: "Ofis Stolu",
-      category: "Mebel",
-      stockCurrent: 18,
-      stockMin: 8,
-      price: 280,
-      supplier: "",
-      cost: 0,
-      status: "Normal",
-      desc: "",
-      image: "",
-      createdAt: Date.now(),
+      id: 2,
+      name: "Geyim",
+      subcategories: [
+        { id: 21, name: "Köynək" },
+        { id: 22, name: "Şalvar" },
+      ],
     },
     {
-      sku: "MEBEL-002",
-      name: "Ofis Oturacağı",
-      category: "Mebel",
-      stockCurrent: 6,
-      stockMin: 10,
-      price: 150,
-      supplier: "",
-      cost: 0,
-      status: "Normal",
-      desc: "",
-      image: "",
-      createdAt: Date.now(),
+      id: 3,
+      name: "Qida",
+      subcategories: [
+        { id: 31, name: "İçki" },
+        { id: 32, name: "Şirniyyat" },
+      ],
     },
     {
-      sku: "ELEC-004",
-      name: 'Monitor 27"',
-      category: "Elektronika",
-      stockCurrent: 9,
-      stockMin: 12,
-      price: 320,
-      supplier: "",
-      cost: 0,
-      status: "Normal",
-      desc: "",
-      image: "",
-      createdAt: Date.now(),
+      id: 4,
+      name: "Mebel",
+      subcategories: [
+        { id: 41, name: "Stol" },
+        { id: 42, name: "Stul" },
+      ],
     },
   ],
-  categories: ["Elektronika", "Geyim", "Qida", "Mebel", "Digər"],
 };
 
 const safeParse = (value, fallback) => {
@@ -159,15 +128,52 @@ const safeParse = (value, fallback) => {
   }
 };
 
+const normalizeCategories = (categories) => {
+  if (!Array.isArray(categories)) return initialState.categories;
+
+  // old format: ["Elektronika", "Qida"]
+  if (categories.every((item) => typeof item === "string")) {
+    return categories.map((name, index) => ({
+      id: Date.now() + index,
+      name,
+      subcategories: [],
+    }));
+  }
+
+  // new format
+  return categories.map((cat, index) => ({
+    id: Number(cat?.id) || Date.now() + index,
+    name: String(cat?.name || "").trim(),
+    subcategories: Array.isArray(cat?.subcategories)
+      ? cat.subcategories.map((sub, subIndex) => ({
+          id: Number(sub?.id) || Date.now() + index + subIndex + 1000,
+          name: String(sub?.name || "").trim(),
+        }))
+      : [],
+  }));
+};
+
+const normalizeAnbar = (anbar) => {
+  if (!Array.isArray(anbar)) return initialState.anbar;
+
+  return anbar.map((item) => ({
+    ...item,
+    category: String(item?.category || "").trim(),
+    subcategory: String(item?.subcategory || "").trim(),
+    stockCurrent: Number(item?.stockCurrent || 0),
+    stockMin: Number(item?.stockMin || 0),
+    price: Number(item?.price || 0),
+    cost: Number(item?.cost || 0),
+  }));
+};
+
 const normalizeState = (data) => {
   return {
     report: Array.isArray(data?.report) ? data.report : [],
     cashflow: Array.isArray(data?.cashflow) ? data.cashflow : [],
     users: Array.isArray(data?.users) ? data.users : [],
-    anbar: Array.isArray(data?.anbar) ? data.anbar : initialState.anbar,
-    categories: Array.isArray(data?.categories)
-      ? data.categories
-      : initialState.categories,
+    anbar: normalizeAnbar(data?.anbar),
+    categories: normalizeCategories(data?.categories),
   };
 };
 
@@ -470,20 +476,55 @@ const reducer = (state, action) => {
       };
 
     case "ADD_CATEGORY": {
-      const name = String(action.payload || "").trim();
+      const name = String(action.payload?.name || "").trim();
       if (!name) return safeState;
 
-      const categories = safeState.categories || [];
-
-      const exists = categories.some(
-        (cat) => String(cat).toLowerCase() === name.toLowerCase(),
+      const exists = safeState.categories.some(
+        (cat) => cat.name.toLowerCase() === name.toLowerCase(),
       );
 
       if (exists) return safeState;
 
+      const newCategory = {
+        id: Date.now(),
+        name,
+        subcategories: [],
+      };
+
       return {
         ...safeState,
-        categories: [name, ...categories],
+        categories: [newCategory, ...safeState.categories],
+      };
+    }
+
+    case "ADD_SUBCATEGORY": {
+      const categoryId = Number(action.payload?.categoryId);
+      const name = String(action.payload?.name || "").trim();
+
+      if (!categoryId || !name) return safeState;
+
+      return {
+        ...safeState,
+        categories: safeState.categories.map((cat) => {
+          if (cat.id !== categoryId) return cat;
+
+          const exists = cat.subcategories.some(
+            (sub) => sub.name.toLowerCase() === name.toLowerCase(),
+          );
+
+          if (exists) return cat;
+
+          return {
+            ...cat,
+            subcategories: [
+              ...cat.subcategories,
+              {
+                id: Date.now(),
+                name,
+              },
+            ],
+          };
+        }),
       };
     }
 

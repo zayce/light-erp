@@ -9,12 +9,55 @@ export const Anbar = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   const [openNewProduct, setOpenNewProduct] = useState(false);
   const [deletingSku, setDeletingSku] = useState(null);
   const [editing, setEditing] = useState(null);
 
-  const products = state?.anbar || [];
-  const categories = state?.categories || [];
+  const products = Array.isArray(state?.anbar) ? state.anbar : [];
+  const rawCategories = Array.isArray(state?.categories)
+    ? state.categories
+    : [];
+
+  // Нормализуем категории: и строки, и объекты приводим к одному виду
+  const categories = useMemo(() => {
+    return rawCategories.map((cat, index) => {
+      if (typeof cat === "string") {
+        return {
+          id: `legacy-${index}`,
+          name: cat,
+          subcategories: [],
+        };
+      }
+
+      return {
+        id: cat?.id ?? `cat-${index}`,
+        name: String(cat?.name || "").trim(),
+        subcategories: Array.isArray(cat?.subcategories)
+          ? cat.subcategories.map((sub, subIndex) => {
+              if (typeof sub === "string") {
+                return {
+                  id: `legacy-sub-${index}-${subIndex}`,
+                  name: sub,
+                };
+              }
+
+              return {
+                id: sub?.id ?? `sub-${index}-${subIndex}`,
+                name: String(sub?.name || "").trim(),
+              };
+            })
+          : [],
+      };
+    });
+  }, [rawCategories]);
+
+  const selectedCategoryObj = useMemo(() => {
+    if (selectedCategory === "all") return null;
+    return categories.find((cat) => cat.name === selectedCategory) || null;
+  }, [categories, selectedCategory]);
+
+  const visibleSubcategories = selectedCategoryObj?.subcategories || [];
 
   const getStatus = (current, min) => {
     if (current <= min * 0.3) return "kritik";
@@ -46,27 +89,37 @@ export const Anbar = () => {
       const sku = String(item?.sku || "").toLowerCase();
       const name = String(item?.name || "").toLowerCase();
       const category = String(item?.category || "");
+      const subcategory = String(item?.subcategory || "");
 
-      const matchesSearch = sku.includes(search) || name.includes(search);
+      const matchesSearch =
+        sku.includes(search) ||
+        name.includes(search) ||
+        category.toLowerCase().includes(search) ||
+        subcategory.toLowerCase().includes(search);
+
       const matchesCategory =
         selectedCategory === "all" || category === selectedCategory;
 
-      return matchesSearch && matchesCategory;
+      const matchesSubcategory =
+        selectedSubcategory === "all" || subcategory === selectedSubcategory;
+
+      return matchesSearch && matchesCategory && matchesSubcategory;
     });
-  }, [products, searchTerm, selectedCategory]);
+  }, [products, searchTerm, selectedCategory, selectedSubcategory]);
 
   const addProduct = (data) => {
     const newItem = {
       sku: String(data?.sku || "").trim(),
       name: String(data?.name || "").trim(),
-      category: data?.category || "",
+      category: String(data?.category || "").trim(),
+      subcategory: String(data?.subcategory || "").trim(),
       stockCurrent: Number(data?.stock || 0),
       stockMin: Number(data?.minStock || 0),
       price: Number(data?.price || 0),
-      supplier: data?.supplier || "",
+      supplier: String(data?.supplier || "").trim(),
       cost: Number(data?.cost || 0),
       status: data?.status || "Normal",
-      desc: data?.desc || "",
+      desc: String(data?.desc || "").trim(),
       image: data?.image ? data.image.name : "",
       createdAt: Date.now(),
     };
@@ -95,6 +148,16 @@ export const Anbar = () => {
   };
 
   const startEdit = (sku, field, currentValue) => {
+    const nonEditableFields = [
+      "category",
+      "subcategory",
+      "stockCurrent",
+      "stockMin",
+      "price",
+    ];
+
+    if (nonEditableFields.includes(field)) return;
+
     setEditing({
       sku,
       field,
@@ -131,6 +194,7 @@ export const Anbar = () => {
       field === "sku" ||
       field === "name" ||
       field === "category" ||
+      field === "subcategory" ||
       field === "supplier" ||
       field === "desc"
     ) {
@@ -169,7 +233,6 @@ export const Anbar = () => {
     field,
     value,
     type = "text",
-    options,
     editing,
     startEdit,
     setEditValue,
@@ -178,25 +241,6 @@ export const Anbar = () => {
     className = "",
   }) => {
     const active = editing && editing.sku === sku && editing.field === field;
-
-    if (active && options?.length) {
-      return (
-        <select
-          className={`EC-Input ${className}`}
-          value={editing.value}
-          onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={onEditKeyDown}
-          onBlur={commitEdit}
-          autoFocus
-        >
-          {options.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
-      );
-    }
 
     if (active) {
       return (
@@ -249,7 +293,7 @@ export const Anbar = () => {
           <div className="Stats-Card">
             <div className="Stats-Icon blue">📦</div>
             <div className="Stats-Text">
-              <div className="Stats-Title">Məhsul Novleri</div>
+              <div className="Stats-Title">Məhsul Növləri</div>
               <div className="Stats-Value">{totalProductsCount}</div>
             </div>
           </div>
@@ -276,19 +320,35 @@ export const Anbar = () => {
         <div className="Anbar-Filters">
           <input
             type="text"
-            placeholder="SKU və ya məhsul adı ilə axtar..."
+            placeholder="SKU, məhsul adı, kateqoriya ilə axtar..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
           <select
             value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setSelectedSubcategory("all");
+            }}
           >
             <option value="all">Bütün kateqoriyalar</option>
             {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedSubcategory}
+            onChange={(e) => setSelectedSubcategory(e.target.value)}
+            disabled={selectedCategory === "all"}
+          >
+            <option value="all">Bütün alt kateqoriyalar</option>
+            {visibleSubcategories.map((sub) => (
+              <option key={sub.id} value={sub.name}>
+                {sub.name}
               </option>
             ))}
           </select>
@@ -298,7 +358,8 @@ export const Anbar = () => {
           <div className="row header">
             <div className="row-Title">SKU</div>
             <div className="row-Title">MƏHSUL ADI</div>
-            <div className="row-Title">KATEQORIYA</div>
+            <div className="row-Title">KATEQORİYA</div>
+            <div className="row-Title">ALT KATEQORİYA</div>
             <div className="row-Title">STOK</div>
             <div className="row-Title">QIYMƏT</div>
             <div className="row-Title">STATUS</div>
@@ -346,62 +407,26 @@ export const Anbar = () => {
                     className="cell name"
                   />
 
-                  <EditableCell
-                    sku={item?.sku}
-                    field="category"
-                    value={item?.category}
-                    options={categories}
-                    editing={editing}
-                    startEdit={startEdit}
-                    setEditValue={setEditValue}
-                    commitEdit={commitEdit}
-                    onEditKeyDown={onEditKeyDown}
-                    className="cell category"
-                  />
+                  <div className="cell category">{item?.category}</div>
+                  <div className="cell category">
+                    {item?.subcategory || "—"}
+                  </div>
 
                   <div className="cell stock">
-                    <EditableCell
-                      sku={item?.sku}
-                      field="stockCurrent"
-                      value={item?.stockCurrent}
-                      type="number"
-                      editing={editing}
-                      startEdit={startEdit}
-                      setEditValue={setEditValue}
-                      commitEdit={commitEdit}
-                      onEditKeyDown={onEditKeyDown}
+                    <span
                       className={
                         Number(item?.stockCurrent) < Number(item?.stockMin)
                           ? "EC-Danger"
                           : ""
                       }
-                    />
+                    >
+                      {item?.stockCurrent}
+                    </span>
                     <span className="min"> / </span>
-                    <EditableCell
-                      sku={item?.sku}
-                      field="stockMin"
-                      value={item?.stockMin}
-                      type="number"
-                      editing={editing}
-                      startEdit={startEdit}
-                      setEditValue={setEditValue}
-                      commitEdit={commitEdit}
-                      onEditKeyDown={onEditKeyDown}
-                    />
+                    <span>{item?.stockMin}</span>
                   </div>
 
-                  <EditableCell
-                    sku={item?.sku}
-                    field="price"
-                    value={item?.price}
-                    type="number"
-                    editing={editing}
-                    startEdit={startEdit}
-                    setEditValue={setEditValue}
-                    commitEdit={commitEdit}
-                    onEditKeyDown={onEditKeyDown}
-                    className="cell price"
-                  />
+                  <div className="cell price">{item?.price}</div>
 
                   <div className="cell">
                     <span className={`status ${status}`}>
@@ -438,10 +463,16 @@ export const Anbar = () => {
         onClose={() => setOpenNewProduct(false)}
         onSubmit={addProduct}
         categories={categories}
-        onAddCategory={(cat) => {
+        onAddCategory={(name) => {
           dispatch({
             type: "ADD_CATEGORY",
-            payload: cat,
+            payload: { name },
+          });
+        }}
+        onAddSubcategory={(categoryId, name) => {
+          dispatch({
+            type: "ADD_SUBCATEGORY",
+            payload: { categoryId, name },
           });
         }}
       />

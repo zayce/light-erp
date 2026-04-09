@@ -5,7 +5,8 @@ import "../NewProductModal/NewProductModal.scss";
 const initial = {
   name: "",
   sku: "",
-  category: "Elektronika",
+  category: "",
+  subcategory: "",
   supplier: "",
   price: "",
   cost: "",
@@ -23,42 +24,68 @@ export const NewProductModal = ({
   onSubmit,
   categories = [],
   onAddCategory,
+  onAddSubcategory,
 }) => {
   const [form, setForm] = useState(initial);
   const [addingCat, setAddingCat] = useState(false);
+  const [addingSubcat, setAddingSubcat] = useState(false);
   const [newCat, setNewCat] = useState("");
-  const [file, setFile] = useState(null); // File
-  const [preview, setPreview] = useState(""); // objectURL
+  const [newSubcat, setNewSubcat] = useState("");
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState("");
   const [drag, setDrag] = useState(false);
 
   const inputRef = useRef(null);
 
-  const addCategory = () => {
-    const name = newCat.trim();
-    if (!name) return;
+  // Нормализуем categories, чтобы и строки, и объекты работали одинаково
+  const normalizedCategories = useMemo(() => {
+    if (!Array.isArray(categories)) return [];
 
-    const exists = categories.some(
-      (c) => c.toLowerCase() === name.toLowerCase(),
+    return categories.map((cat, index) => {
+      if (typeof cat === "string") {
+        return {
+          id: `legacy-${index}`,
+          name: cat,
+          subcategories: [],
+        };
+      }
+
+      return {
+        id: cat?.id ?? `cat-${index}`,
+        name: String(cat?.name || "").trim(),
+        subcategories: Array.isArray(cat?.subcategories)
+          ? cat.subcategories.map((sub, subIndex) => {
+              if (typeof sub === "string") {
+                return {
+                  id: `legacy-sub-${index}-${subIndex}`,
+                  name: sub,
+                };
+              }
+
+              return {
+                id: sub?.id ?? `sub-${index}-${subIndex}`,
+                name: String(sub?.name || "").trim(),
+              };
+            })
+          : [],
+      };
+    });
+  }, [categories]);
+
+  const selectedCategoryObj = useMemo(() => {
+    return (
+      normalizedCategories.find((cat) => cat.name === form.category) || null
     );
-    if (exists) {
-      alert("Bu kateqoriya artıq mövcuddur!");
-      return;
-    }
+  }, [normalizedCategories, form.category]);
 
-    onAddCategory?.(name);
-    setForm((p) => ({ ...p, category: name })); // сразу выбрать её
-    setNewCat("");
-    setAddingCat(false);
-  };
+  const availableSubcategories = selectedCategoryObj?.subcategories || [];
 
-  // value = stock * price
   const valueAZN = useMemo(() => {
     const p = Number(form.price || 0);
     const s = Number(form.stock || 0);
     return p * s;
   }, [form.price, form.stock]);
 
-  // close on ESC + lock scroll
   useEffect(() => {
     if (!open) return;
 
@@ -74,21 +101,31 @@ export const NewProductModal = ({
       document.body.style.overflow = "";
     };
   }, [open, onClose]);
+
   useEffect(() => {
     if (!open) return;
-    setForm(initial);
+
+    const firstCategory = normalizedCategories[0];
+    const firstSubcategory = firstCategory?.subcategories?.[0]?.name || "";
+
+    setForm({
+      ...initial,
+      category: firstCategory?.name || "",
+      subcategory: firstSubcategory,
+    });
+
     setFile(null);
+
     if (preview) URL.revokeObjectURL(preview);
     setPreview("");
+
     setDrag(false);
-
     setAddingCat(false);
+    setAddingSubcat(false);
     setNewCat("");
+    setNewSubcat("");
+  }, [open, normalizedCategories]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  // cleanup objectURL
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
@@ -98,15 +135,80 @@ export const NewProductModal = ({
   if (!open) return null;
 
   const change = (key) => (e) => {
-    setForm((p) => ({ ...p, [key]: e.target.value }));
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
+  };
+
+  const handleCategoryChange = (e) => {
+    const nextCategory = e.target.value;
+
+    const found = normalizedCategories.find((cat) => cat.name === nextCategory);
+
+    setForm((prev) => ({
+      ...prev,
+      category: nextCategory,
+      subcategory: found?.subcategories?.[0]?.name || "",
+    }));
+
+    setAddingSubcat(false);
+    setNewSubcat("");
+  };
+
+  const addCategory = () => {
+    const name = newCat.trim();
+    if (!name) return;
+
+    const exists = normalizedCategories.some(
+      (cat) => String(cat?.name || "").toLowerCase() === name.toLowerCase(),
+    );
+
+    if (exists) {
+      alert("Bu kateqoriya artıq mövcuddur!");
+      return;
+    }
+
+    onAddCategory?.(name);
+
+    setForm((prev) => ({
+      ...prev,
+      category: name,
+      subcategory: "",
+    }));
+
+    setNewCat("");
+    setAddingCat(false);
+  };
+
+  const addSubcategory = () => {
+    const name = newSubcat.trim();
+    if (!name || !selectedCategoryObj) return;
+
+    const exists = availableSubcategories.some(
+      (sub) => String(sub?.name || "").toLowerCase() === name.toLowerCase(),
+    );
+
+    if (exists) {
+      alert("Bu alt kateqoriya artıq mövcuddur!");
+      return;
+    }
+
+    onAddSubcategory?.(selectedCategoryObj.id, name);
+
+    setForm((prev) => ({
+      ...prev,
+      subcategory: name,
+    }));
+
+    setNewSubcat("");
+    setAddingSubcat(false);
   };
 
   const pickFile = (f) => {
     if (!f) return;
     if (!f.type.startsWith("image/")) return;
-    if (f.size > 5 * 1024 * 1024) return; // 5MB
+    if (f.size > 5 * 1024 * 1024) return;
 
     setFile(f);
+
     const url = URL.createObjectURL(f);
     setPreview((old) => {
       if (old) URL.revokeObjectURL(old);
@@ -124,14 +226,20 @@ export const NewProductModal = ({
 
   const submit = (e) => {
     e.preventDefault();
-    // тут позже сделаешь FormData для backend
-    onSubmit?.({ ...form, image: file });
+
+    if (!form.name.trim() || !form.sku.trim()) return;
+    if (!form.category.trim()) return;
+    if (!form.subcategory.trim()) return;
+
+    onSubmit?.({
+      ...form,
+      image: file,
+    });
   };
 
   return (
     <div className="NPM-Overlay" onMouseDown={onClose}>
       <div className="NPM-Modal" onMouseDown={(e) => e.stopPropagation()}>
-        {/* header */}
         <div className="NPM-Header">
           <div className="NPM-HeaderTitle">Yeni Məhsul</div>
           <button className="NPM-Close" type="button" onClick={onClose}>
@@ -139,9 +247,7 @@ export const NewProductModal = ({
           </button>
         </div>
 
-        {/* content */}
         <form className="NPM-Content" onSubmit={submit}>
-          {/* LEFT */}
           <div className="NPM-Left">
             <div
               className={`NPM-Drop ${drag ? "drag" : ""} ${preview ? "has" : ""}`}
@@ -187,7 +293,6 @@ export const NewProductModal = ({
               />
             </div>
 
-            {/* VALUE CARD */}
             <div className="NPM-ValueCard">
               <div className="NPM-ValueLeft">
                 <div className="NPM-Thumb">
@@ -202,7 +307,12 @@ export const NewProductModal = ({
 
                 <div className="NPM-ThumbText">
                   <div className="NPM-ThumbName">
-                    {form.name?.trim() ? form.name : "MacBook Pro 16''"}
+                    {form.name?.trim() ? form.name : "Yeni məhsul"}
+                  </div>
+                  <div className="NPM-ThumbName">
+                    {form.category && form.subcategory
+                      ? `${form.category} / ${form.subcategory}`
+                      : "Kateqoriya seçin"}
                   </div>
                 </div>
               </div>
@@ -215,7 +325,6 @@ export const NewProductModal = ({
             </div>
           </div>
 
-          {/* RIGHT */}
           <div className="NPM-Right">
             <div className="NPM-Grid2">
               <div className="NPM-Field">
@@ -240,7 +349,7 @@ export const NewProductModal = ({
             <div className="NPM-Grid2">
               <div className="NPM-Field">
                 <div className="NPM-LabelRow">
-                  <label>Kateqoriya</label>
+                  <label>Əsas Kateqoriya</label>
 
                   <button
                     type="button"
@@ -251,23 +360,13 @@ export const NewProductModal = ({
                   </button>
                 </div>
 
-                <select value={form.category} onChange={change("category")}>
-                  {categories.length ? (
-                    categories.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))
-                  ) : (
-                    <>
-                      {/* fallback если categories не передали */}
-                      <option value="Elektronika">Elektronika</option>
-                      <option value="Geyim">Geyim</option>
-                      <option value="Qida">Qida</option>
-                      <option value="Mebel">Mebel</option>
-                      <option value="Digər">Digər</option>
-                    </>
-                  )}
+                <select value={form.category} onChange={handleCategoryChange}>
+                  <option value="">Kateqoriya seçin</option>
+                  {normalizedCategories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
 
                 {addingCat ? (
@@ -275,7 +374,7 @@ export const NewProductModal = ({
                     <input
                       value={newCat}
                       onChange={(e) => setNewCat(e.target.value)}
-                      placeholder="Məs: Aksesuarlar"
+                      placeholder="Məs: Elektronika"
                     />
 
                     <button
@@ -301,6 +400,65 @@ export const NewProductModal = ({
               </div>
 
               <div className="NPM-Field">
+                <div className="NPM-LabelRow">
+                  <label>Alt Kateqoriya</label>
+
+                  <button
+                    type="button"
+                    className="NPM-LinkBtn"
+                    onClick={() => setAddingSubcat((v) => !v)}
+                    disabled={!form.category}
+                  >
+                    + Yeni alt kateqoriya
+                  </button>
+                </div>
+
+                <select
+                  value={form.subcategory}
+                  onChange={change("subcategory")}
+                  disabled={!form.category}
+                >
+                  <option value="">Alt kateqoriya seçin</option>
+                  {availableSubcategories.map((sub) => (
+                    <option key={sub.id} value={sub.name}>
+                      {sub.name}
+                    </option>
+                  ))}
+                </select>
+
+                {addingSubcat ? (
+                  <div className="NPM-AddCatRow">
+                    <input
+                      value={newSubcat}
+                      onChange={(e) => setNewSubcat(e.target.value)}
+                      placeholder="Məs: Telefon"
+                    />
+
+                    <button
+                      type="button"
+                      className="NPM-AddCatBtn"
+                      onClick={addSubcategory}
+                    >
+                      Əlavə et
+                    </button>
+
+                    <button
+                      type="button"
+                      className="NPM-CancelMini"
+                      onClick={() => {
+                        setNewSubcat("");
+                        setAddingSubcat(false);
+                      }}
+                    >
+                      Ləğv
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="NPM-Grid2">
+              <div className="NPM-Field">
                 <label>Təchizatçı</label>
                 <input
                   value={form.supplier}
@@ -308,53 +466,7 @@ export const NewProductModal = ({
                   placeholder="İxtiyari"
                 />
               </div>
-            </div>
 
-            <div className="NPM-Grid2">
-              <div className="NPM-Field">
-                <label>Qiymət-Aliş (₼)</label>
-                <input
-                  type="number"
-                  value={form.cost}
-                  onChange={change("cost")}
-                  placeholder="₼"
-                />
-              </div>
-
-              <div className="NPM-Field">
-                <label>Qiymət-Satiş (₼)</label>
-                <input
-                  type="number"
-                  value={form.price}
-                  onChange={change("price")}
-                  placeholder="₼"
-                />
-              </div>
-            </div>
-
-            <div className="NPM-Grid2">
-              <div className="NPM-Field">
-                <label>Stok (mövcud)</label>
-                <input
-                  type="number"
-                  value={form.stock}
-                  onChange={change("stock")}
-                  placeholder=""
-                />
-              </div>
-
-              <div className="NPM-Field">
-                <label>Maksimum stok</label>
-                <input
-                  type="number"
-                  value={form.minStock}
-                  onChange={change("minStock")}
-                  placeholder="10"
-                />
-              </div>
-            </div>
-
-            <div className="NPM-Grid2">
               <div className="NPM-Field">
                 <label>Status</label>
                 <div className="NPM-StatusRow">
@@ -379,19 +491,62 @@ export const NewProductModal = ({
                   </span>
                 </div>
               </div>
+            </div>
+
+            <div className="NPM-Grid2">
+              <div className="NPM-Field">
+                <label>Qiymət-Aliş (₼)</label>
+                <input
+                  type="number"
+                  value={form.cost}
+                  onChange={change("cost")}
+                  placeholder="₼"
+                />
+              </div>
 
               <div className="NPM-Field">
-                <label>Təsvir</label>
-                <textarea
-                  value={form.desc}
-                  onChange={change("desc")}
-                  placeholder="Məhsul haqqında qısa təsvir yazın"
+                <label>Qiymət-Satış (₼)</label>
+                <input
+                  type="number"
+                  value={form.price}
+                  onChange={change("price")}
+                  placeholder="₼"
                 />
               </div>
             </div>
+
+            <div className="NPM-Grid2">
+              <div className="NPM-Field">
+                <label>Stok (mövcud)</label>
+                <input
+                  type="number"
+                  value={form.stock}
+                  onChange={change("stock")}
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="NPM-Field">
+                <label>Minimum stok</label>
+                <input
+                  type="number"
+                  value={form.minStock}
+                  onChange={change("minStock")}
+                  placeholder="10"
+                />
+              </div>
+            </div>
+
+            <div className="NPM-Field">
+              <label>Təsvir</label>
+              <textarea
+                value={form.desc}
+                onChange={change("desc")}
+                placeholder="Məhsul haqqında qısa təsvir yazın"
+              />
+            </div>
           </div>
 
-          {/* footer */}
           <div className="NPM-Footer">
             <button className="NPM-Cancel" type="button" onClick={onClose}>
               Ləğv et
@@ -399,7 +554,7 @@ export const NewProductModal = ({
 
             <button className="NPM-Save" type="submit">
               <Save size={18} />
-              <span>Dəyişiklikləri Yadda Saxla</span>
+              <span>Yadda Saxla</span>
             </button>
           </div>
         </form>

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { SideBar } from "./Component/SideBar/SideBar";
 
 import { ControlPanel } from "./pages/ControlPanel/ControlPanel";
@@ -11,25 +11,38 @@ import { Welcome } from "./pages/Welcome/Welcome";
 import { Report } from "./pages/Reports/Report";
 import { Settings } from "./pages/Settings/Settings";
 import { UserProfile } from "./pages/Useprofile/UserProfile";
+
+// 👉 отдельный layout внутри
+const Layout = () => {
+  const location = useLocation();
+
+  const isWelcomePage = location.pathname === "/";
+
+  return (
+    <div className="App-Wrapper">
+      {/* ❌ скрываем sidebar на welcome */}
+      {!isWelcomePage && <SideBar />}
+
+      <div className={isWelcomePage ? "FullScreen" : "App-Content"}>
+        <Routes>
+          <Route path="/usepanels" element={<UserProfile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/report" element={<Report />} />
+          <Route path="/dashboard" element={<ControlPanel />} />
+          <Route path="/warehouse" element={<Anbar />} />
+          <Route path="/cashflow" element={<CashFlow />} />
+          <Route path="/" element={<Welcome />} />
+        </Routes>
+      </div>
+    </div>
+  );
+};
+
 const App = () => {
   return (
     <AppProvider>
       <BrowserRouter>
-        <div className="App-Wrapper">
-          <SideBar />
-
-          <div className="App-Content">
-            <Routes>
-              <Route path="/usepanels" element={<UserProfile />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/report" element={<Report />} />
-              <Route path="/dashboard" element={<ControlPanel />} />
-              <Route path="/warehouse" element={<Anbar />} />
-              <Route path="/cashflow" element={<CashFlow />} />
-              <Route path="/" element={<Welcome />} />
-            </Routes>
-          </div>
-        </div>
+        <Layout />
       </BrowserRouter>
     </AppProvider>
   );

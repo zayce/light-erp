@@ -8,23 +8,23 @@ export const LandingPage = () => {
   const features = [
     {
       icon: <Package />,
-      title: "Anbar İdarəetməsi",
-      desc: "Məhsulları asanlıqla izləyin, stok səviyyələrini idarə edin və təchizat zəncirini optimallaşdırın.",
+      title: t("inventory_title"),
+      desc: t("inventory_desc"),
     },
     {
       icon: <TrendingUp />,
-      title: "Pul Axını",
-      desc: "Gəlir və xərclərinizi real vaxt rejimində izləyin və maliyyə vəziyyətinizə nəzarət edin.",
+      title: t("cashflow_title"),
+      desc: t("cashflow_desc"),
     },
     {
       icon: <BarChart3 />,
-      title: "Hesabatlar",
-      desc: "Ətraflı analitika və hesabatlarla biznəsinizin performansını qiymətləndirin.",
+      title: t("reports_title"),
+      desc: t("reports_desc"),
     },
     {
       icon: <Shield />,
-      title: "Təhlükəsizlik",
-      desc: "Məlumatlarınız tam təhlükəsizlik altındadır və hər zaman əlçatandır.",
+      title: t("security_title"),
+      desc: t("security_desc"),
     },
   ];
 
@@ -36,24 +36,22 @@ export const LandingPage = () => {
           <div className="Welcome-Inner">
             <div className="Welcome-Top-Block">
               <div className="Welcome-Small-Title">
-                <Package /> Professional Anbar və Maliyyə Həlli
+                <Package /> {t("WelcomeBadge")}
               </div>
 
               <h1 className="Welcome-Title">
-                Biznesinizi <span>Hesabla</span> ilə idarə edin
+                {t("titleWelcome").split("Hesabla")[0]}
+                <span>Hesabla</span>
+                {t("titleWelcome").split("Hesabla")[1]}
               </h1>
 
-              <p className="Welcome-Desc">
-                Anbar idarəetməsi və pul axını izləməsi üçün güclü, istifadəsi
-                asan platforma. Maliyyə proseslərini sadələşdirin və biznəsinizi
-                böyüdün.
-              </p>
+              <p className="Welcome-Desc">{t("descWelcome")}</p>
 
               <div className="Welcome-Buttons">
                 <NavLink to="/dashboard">
-                  <button className="primary">Başlayın</button>
+                  <button className="primary">{t("startWelcome")}</button>
                 </NavLink>
-                <button className="secondary">Daha ətraflı</button>
+                <button className="secondary">{t("moreWelcome")}</button>
               </div>
 
               <div className="flags">
@@ -101,9 +99,9 @@ export const LandingPage = () => {
       {/* CTA */}
       <section className="CTA">
         <div className="container">
-          <h2>Hazırsınız?</h2>
-          <p>İndi başlayın və biznesinizi böyüdün</p>
-          <button>Qeydiyyat</button>
+          <h2>{t("titleCta")}?</h2>
+          <p>{t("descCta")}</p>
+          <button>{t("buttonCta")}</button>
         </div>
       </section>
     </div>

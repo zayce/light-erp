@@ -7,6 +7,8 @@ import {
   ArrowDownLeft,
 } from "lucide-react";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "../../i18n";
 import {
   LineChart,
   Line,
@@ -24,6 +26,7 @@ import "./ControlPanel.scss";
 const PIE_COLORS = ["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
 
 export const ControlPanel = () => {
+  const { t } = useTranslation();
   const { state } = useApp();
 
   const parseAmount = (value) => {
@@ -183,7 +186,7 @@ export const ControlPanel = () => {
     <div className="ControlPaner-Wrapper">
       <div className="ControlPanel-Inner">
         <div className="ControlPanel-Titles">
-          <div className="ControlPanel-Title">İdarə Paneli</div>
+          <div className="ControlPanel-Title">{t("controlPanel")}</div>
           <div className="ControlPanel-Title-Desc">
             Biznesinizin ümumi vəziyyətinə baxış
           </div>

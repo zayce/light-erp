@@ -1,1 +1,25 @@
-{}
+{
+  "inventory_title": "Inventory Management",
+  "inventory_desc": "Easily track products, manage stock levels efficiently, and optimize your supply chain.",
+
+  "cashflow_title": "Cash Flow Management",
+  "cashflow_desc": "Monitor income and expenses in real time and maintain full control over your finances.",
+
+  "reports_title": "Advanced Analytics",
+  "reports_desc": "Evaluate business performance with detailed analytics and comprehensive reports.",
+
+  "security_title": "Security & Reliability",
+  "security_desc": "Your data is securely protected and always accessible whenever you need it.",
+
+  "WelcomeBadge": "Professional Inventory & Finance Solution",
+  "titleWelcome": "Manage your business with Hesabla",
+  "descWelcome": "A powerful and easy-to-use platform for inventory and cash flow management. Simplify financial processes and grow your business.",
+  "startWelcome": "Get Started",
+  "moreWelcome": "Learn More",
+
+  "titleCta": "Ready to get started?",
+  "descCta": "Start now and grow your business",
+  "buttonCta": "Sign Up",
+
+  "controlPanel": "Control Panel"
+}

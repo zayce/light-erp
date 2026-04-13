@@ -1,1 +1,25 @@
-{}
+{
+  "inventory_title": "Anbar İdarəetməsi",
+  "inventory_desc": "Məhsulları asanlıqla izləyin, stok səviyyələrini effektiv şəkildə idarə edin və təchizat zəncirini optimallaşdırın.",
+
+  "cashflow_title": "Pul Axınının İdarə Edilməsi",
+  "cashflow_desc": "Gəlir və xərclərinizi real vaxt rejimində izləyin və maliyyə vəziyyətinizə tam nəzarət edin.",
+
+  "reports_title": "Analitik Hesabatlar",
+  "reports_desc": "Ətraflı analitika və hesabatlar vasitəsilə biznesinizin performansını dərin şəkildə təhlil edin.",
+
+  "security_title": "Təhlükəsizlik və Etibarlılıq",
+  "security_desc": "Məlumatlarınız yüksək səviyyədə qorunur və istənilən vaxt təhlükəsiz şəkildə əlçatandır.",
+
+  "WelcomeBadge": "Professional Anbar və Maliyyə Həlli",
+  "titleWelcome": "Biznesinizi Hesabla idarə edin",
+  "descWelcome": "Anbar idarəetməsi və pul axını izləməsi üçün güclü və istifadəsi asan platforma. Maliyyə proseslərini sadələşdirin və biznesinizi böyüdün.",
+  "startWelcome": "Başlayın",
+  "moreWelcome": "Daha ətraflı",
+
+  "titleCta": "Hazırsınız?",
+  "descCta": "İndi başlayın və biznesinizi böyüdün",
+  "buttonCta": "Qeydiyyat",
+
+  "controlPanel": "İdarə Paneli"
+}

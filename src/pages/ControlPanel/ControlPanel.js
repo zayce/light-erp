@@ -187,9 +187,7 @@ export const ControlPanel = () => {
       <div className="ControlPanel-Inner">
         <div className="ControlPanel-Titles">
           <div className="ControlPanel-Title">{t("controlPanel")}</div>
-          <div className="ControlPanel-Title-Desc">
-            Biznesinizin ümumi vəziyyətinə baxış
-          </div>
+          <div className="ControlPanel-Title-Desc">{t("controlPanelDesc")}</div>
         </div>
 
         <div className="cards-grid">
@@ -243,7 +241,7 @@ export const ControlPanel = () => {
           </div>
 
           <div className="chart-card">
-            <div className="chart-title">Kateqoriya üzrə Bölgü</div>
+            <div className="chart-title">{t("controlPanelKatalogType")}</div>
 
             <div className="chart-body pie-center">
               <ResponsiveContainer width="100%" height={260}>

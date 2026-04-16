@@ -120,6 +120,9 @@ const initialState = {
   ],
 };
 
+// Scaner
+
+
 const safeParse = (value, fallback) => {
   try {
     return value ? JSON.parse(value) : fallback;
@@ -547,6 +550,40 @@ const reducer = (state, action) => {
         ...safeState,
         users: safeState.users.filter((user) => user.id !== action.payload.id),
       };
+
+    case "SCAN_PRODUCT": {
+      const code = String(action.payload).toLowerCase();
+
+      let found = false;
+
+      const updatedAnbar = safeState.anbar.map((item) => {
+        const match =
+          String(item.sku).toLowerCase() === code ||
+          String(item.barcode || "").toLowerCase() === code ||
+          String(item.name).toLowerCase() === code;
+
+        if (match) {
+          found = true;
+
+          return {
+            ...item,
+            stockCurrent: Number(item.stockCurrent || 0) + 1,
+          };
+        }
+
+        return item;
+      });
+
+      if (!found) {
+        alert("Товар не найден ❌");
+        return safeState;
+      }
+
+      return {
+        ...safeState,
+        anbar: updatedAnbar,
+      };
+    }
 
     default:
       return safeState;

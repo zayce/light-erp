@@ -21,5 +21,8 @@
   "descCta": "Start now and grow your business",
   "buttonCta": "Sign Up",
 
-  "controlPanel": "Control Panel"
+  "controlPanel": "Control Panel",
+  "controlPanelDesc": "Overview of your business status",
+
+  "controlPanelKatalogType": "Revenue and Expense Dynamics"
 }

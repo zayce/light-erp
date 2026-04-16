@@ -3,7 +3,7 @@ import { Trash2 } from "lucide-react";
 import { NewProductModal } from "../../Component/NewProductModal/NewProductModal";
 import { useApp } from "../../AppContext";
 import "./Anbar.scss";
-
+import { CameraScanner } from "../../Component/CameraScaner/CameraScaner";
 export const Anbar = () => {
   const { state, dispatch } = useApp();
 
@@ -13,6 +13,19 @@ export const Anbar = () => {
   const [openNewProduct, setOpenNewProduct] = useState(false);
   const [deletingSku, setDeletingSku] = useState(null);
   const [editing, setEditing] = useState(null);
+
+  // Scaner Function
+  const [lastScanned, setLastScanned] = useState(null);
+
+  const [flash, setFlash] = useState(false);
+  const handleScan = (code) => {
+    setLastScanned(code);
+
+    dispatch({
+      type: "SCAN_PRODUCT",
+      payload: code,
+    });
+  };
 
   const products = Array.isArray(state?.anbar) ? state.anbar : [];
   const rawCategories = Array.isArray(state?.categories)
@@ -455,6 +468,25 @@ export const Anbar = () => {
           ) : (
             <div className="Anbar-Empty">Məhsul tapılmadı</div>
           )}
+        </div>
+
+        <div className={`scanner-box ${flash ? "scan-success" : ""}`}>
+          <div className="scanner-header">
+            <div className="scanner-title">📷 Scanner</div>
+            <div className="scanner-status">Active</div>
+          </div>
+
+          <div className="scanner-content">
+            <CameraScanner onScan={handleScan} />
+          </div>
+
+          {lastScanned && (
+            <div className="scanner-result">
+              Son kod: <b>{lastScanned}</b>
+            </div>
+          )}
+
+          <button className="scanner-btn">Kamera icazə ver</button>
         </div>
       </div>
 

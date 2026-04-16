@@ -21,5 +21,8 @@
   "descCta": "İndi başlayın və biznesinizi böyüdün",
   "buttonCta": "Qeydiyyat",
 
-  "controlPanel": "İdarə Paneli"
+  "controlPanel": "İdarə Paneli",
+  "controlPanelDesc": "Biznesinizin ümumi vəziyyətinə baxış",
+
+  "controlPanelKatalogType": "Kateqoriya üzrə Bölgü"
 }

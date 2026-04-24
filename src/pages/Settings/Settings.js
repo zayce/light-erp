@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { User, Save, Loader2, Bell, Lock, Database } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import i18n from "../../i18n";
 import "./Settings.scss";
 
 /* ===== Initials (лучше снаружи компонента) ===== */
@@ -29,6 +31,7 @@ const initialSystem = {
 };
 
 export const Settings = () => {
+  const { t } = useTranslation();
   // profile
   const [profile, setProfile] = useState(initialProfile);
   const [profileInitial, setProfileInitial] = useState(initialProfile);
@@ -609,10 +612,24 @@ export const Settings = () => {
                     value={system.language}
                     onChange={onSystemChange("language")}
                   >
-                    <option value="az">Azərbaycan dili</option>
-                    <option value="ru">Русский</option>
-                    <option value="en">English</option>
-                    <option value="tr">Türkçe</option>
+                    <option
+                      className={i18n.language === "az" ? "active" : ""}
+                      onClick={() => i18n.changeLanguage("az")}
+                    >
+                      Azərbaycan dili
+                    </option>
+                    <option
+                      className={i18n.language === "ru" ? "active" : ""}
+                      onClick={() => i18n.changeLanguage("ru")}
+                    >
+                      Русский
+                    </option>
+                    <option
+                      className={i18n.language === "en" ? "active" : ""}
+                      onClick={() => i18n.changeLanguage("en")}
+                    >
+                      English
+                    </option>
                   </select>
                 </div>
 

@@ -1,0 +1,309 @@
+@charset "UTF-8";
+.Settings-Wrapper {
+  background-color: #f9fafb;
+}
+.Settings-Wrapper .Settings-Inner {
+  width: 1200px;
+  margin: 0;
+  padding: 20px 20px;
+}
+.Settings-Wrapper .Settings-Inner .Settings-Titles {
+  margin-bottom: 40px;
+}
+.Settings-Wrapper .Settings-Inner .Settings-Titles .Settings-Title {
+  font-size: 48px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 24px;
+}
+.Settings-Wrapper .Settings-Inner .Settings-Titles .Settings-Name {
+  font-size: 25px;
+  color: #6b7280;
+}
+.Settings-Wrapper .Settings-Inner .CardShell {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 22px rgba(17, 24, 39, 0.06);
+}
+.Settings-Wrapper .Settings-Inner .CardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.Settings-Wrapper .Settings-Inner .CardHeader .CardHeader-Left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.Settings-Wrapper .Settings-Inner .CardHeader .CardHeader-Icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  display: grid;
+  place-items: center;
+  color: #374151;
+}
+.Settings-Wrapper .Settings-Inner .CardHeader .CardHeader-Title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+.Settings-Wrapper .Settings-Inner .CardBody {
+  padding: 18px;
+}
+.Settings-Wrapper .Settings-Inner {
+  /* ===== Form ===== */
+}
+.Settings-Wrapper .Settings-Inner .ProfileForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.Settings-Wrapper .Settings-Inner .Grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 780px) {
+  .Settings-Wrapper .Settings-Inner .Grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+.Settings-Wrapper .Settings-Inner .Field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.Settings-Wrapper .Settings-Inner .Label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+}
+.Settings-Wrapper .Settings-Inner .Input {
+  height: 54px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  padding: 0 16px;
+  font-size: 16px;
+  color: #111827;
+  outline: none;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+.Settings-Wrapper .Settings-Inner .Input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+}
+.Settings-Wrapper .Settings-Inner .Input::-moz-placeholder {
+  color: #9ca3af;
+}
+.Settings-Wrapper .Settings-Inner .Input::placeholder {
+  color: #9ca3af;
+}
+.Settings-Wrapper .Settings-Inner {
+  /* ===== Buttons & states ===== */
+}
+.Settings-Wrapper .Settings-Inner .PrimaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.Settings-Wrapper .Settings-Inner .PrimaryBtn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 22px rgba(37, 99, 235, 0.3);
+}
+.Settings-Wrapper .Settings-Inner .PrimaryBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.22);
+}
+.Settings-Wrapper .Settings-Inner .PrimaryBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.Settings-Wrapper .Settings-Inner .LoadingState {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #374151;
+  font-weight: 600;
+  padding: 12px 2px;
+}
+.Settings-Wrapper .Settings-Inner .Alert {
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.Settings-Wrapper .Settings-Inner .Alert.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+.Settings-Wrapper .Settings-Inner .Alert.success {
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #065f46;
+}
+.Settings-Wrapper .Settings-Inner .Spin {
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.Settings-Wrapper .Settings-Inner .TopAlert {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+}
+.Settings-Wrapper .Settings-Inner .TopAlert.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+.Settings-Wrapper .Settings-Inner .TopAlert.success {
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #065f46;
+}
+.Settings-Wrapper .Settings-Inner {
+  /* ===== Notifications list ===== */
+}
+.Settings-Wrapper .Settings-Inner .NotifList {
+  display: flex;
+  flex-direction: column;
+}
+.Settings-Wrapper .Settings-Inner .NotifRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 2px;
+}
+.Settings-Wrapper .Settings-Inner .NotifRow:not(:last-child) {
+  border-bottom: 1px solid #e5e7eb;
+}
+.Settings-Wrapper .Settings-Inner .NotifText {
+  min-width: 0;
+}
+.Settings-Wrapper .Settings-Inner .NotifTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
+}
+.Settings-Wrapper .Settings-Inner .NotifDesc {
+  font-size: 15px;
+  color: #6b7280;
+  line-height: 1.3;
+}
+.Settings-Wrapper .Settings-Inner {
+  /* ===== Switch (как на скрине) ===== */
+}
+.Settings-Wrapper .Settings-Inner .Switch {
+  width: 56px;
+  height: 32px;
+  border-radius: 999px;
+  border: 2px solid #d1d5db;
+  background: #e5e7eb;
+  padding: 0;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  flex: 0 0 auto;
+}
+.Settings-Wrapper .Settings-Inner .Switch .Knob {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #fff;
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  transform: translateY(-50%);
+  transition: left 0.2s ease;
+  box-shadow: 0 8px 16px rgba(17, 24, 39, 0.12);
+}
+.Settings-Wrapper .Settings-Inner .Switch.on {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+.Settings-Wrapper .Settings-Inner .Switch.on .Knob {
+  left: 27px;
+}
+.Settings-Wrapper .Settings-Inner {
+  /* ===== Select styling ===== */
+}
+.Settings-Wrapper .Settings-Inner .Select {
+  height: 54px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  padding: 0 14px;
+  font-size: 16px;
+  color: #111827;
+  outline: none;
+  background: #fff;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+.Settings-Wrapper .Settings-Inner .Select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.18);
+}
+.Settings-Wrapper .Settings-Inner {
+  /* footer button position like screenshot */
+}
+.Settings-Wrapper .Settings-Inner .SystemFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+.Settings-Wrapper .Settings-Inner .SaveBigBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 18px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 12px 20px rgba(37, 99, 235, 0.22);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.Settings-Wrapper .Settings-Inner .SaveBigBtn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 28px rgba(37, 99, 235, 0.32);
+}
+.Settings-Wrapper .Settings-Inner .SaveBigBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.22);
+}
+.Settings-Wrapper .Settings-Inner .SaveBigBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}/*# sourceMappingURL=Settings.css.map */

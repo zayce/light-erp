@@ -35,17 +35,14 @@ export const ClashFlowModal = ({
   const handleSubmit = () => {
     if (!date || !category || !desc || !amount) return;
 
-    const formattedAmount =
-      type === "income"
-        ? `+₼${Number(amount).toLocaleString("ru-RU")}`
-        : `-₼${Number(amount).toLocaleString("ru-RU")}`;
+    const numericAmount = Number(amount);
 
     const operationData = {
       date,
       category,
       desc,
       type,
-      amount: formattedAmount,
+      amount: numericAmount, // ТОЛЬКО число
     };
 
     onSubmitOperation(operationData);

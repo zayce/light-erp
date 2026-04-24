@@ -1,35 +1,65 @@
-import { Html5QrcodeScanner } from "html5-qrcode";
-import { useEffect } from "react";
-import { useApp } from "../../AppContext"; // путь поправь
+import { useRef, useState } from "react";
+import { Html5Qrcode } from "html5-qrcode";
 
-export const CameraScanner = () => {
-  const { dispatch } = useApp();
+export const CameraScanner = ({ onScan }) => {
+  const scannerRef = useRef(null);
+  const [isRunning, setIsRunning] = useState(false);
 
-  useEffect(() => {
-    const scanner = new Html5QrcodeScanner(
-      "reader",
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 150 },
-      },
-      false,
-    );
+  const startScanner = async () => {
+    const scanner = new Html5Qrcode("reader");
+    scannerRef.current = scanner;
 
-    scanner.render(
-      (decodedText) => {
-        // 🔥 вот здесь скан → отправка в reducer
-        dispatch({ type: "SCAN_PRODUCT", payload: decodedText });
+    try {
+      await scanner.start(
+        { facingMode: "environment" }, // 🔥 главное изменение
+        {
+          fps: 10,
+          qrbox: 250,
+        },
+        (decodedText) => {
+          onScan?.(decodedText);
 
-        // 🔊 звук (по желанию)
-        new Audio("/beep.mp3").play();
-      },
-      () => {},
-    );
+          // 🔊 звук
+          new Audio("/beep.mp3").play();
+        },
+      );
 
-    return () => {
-      scanner.clear().catch(() => {});
-    };
-  }, []);
+      setIsRunning(true);
+    } catch (err) {
+      console.error("START ERROR:", err);
+    }
+  };
 
-  return <div id="reader"></div>;
+  const stopScanner = async () => {
+    if (!scannerRef.current) return;
+
+    try {
+      await scannerRef.current.stop();
+      await scannerRef.current.clear();
+      setIsRunning(false);
+    } catch (err) {
+      console.log("STOP ERROR:", err);
+    }
+  };
+
+  return (
+    <div>
+      <div
+        id="reader"
+        style={{
+          width: "100%",
+          height: "300px",
+          background: "#000",
+          borderRadius: "12px",
+          overflow: "hidden",
+        }}
+      />
+
+      {!isRunning ? (
+        <button onClick={startScanner}>Kamera icazə ver / Start</button>
+      ) : (
+        <button onClick={stopScanner}>Stop Kamera</button>
+      )}
+    </div>
+  );
 };

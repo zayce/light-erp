@@ -1,0 +1,354 @@
+.CashFlow-Wrapper {
+  background-color: #f9fafb;
+}
+.CashFlow-Wrapper .CashFlow-Inner {
+  width: 1200px;
+  margin: 0;
+  padding: 20px 20px;
+}
+.CashFlow-Wrapper .CashFlow-Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 50px;
+}
+.CashFlow-Wrapper .CashFlow-Header-Name {
+  font-size: 38px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+.CashFlow-Wrapper .CashFlow-Header-Desc {
+  font-size: 25px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+.CashFlow-Wrapper .button-opis {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 24px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.CashFlow-Wrapper .button-opis:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+}
+.CashFlow-Wrapper .button-opis:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+.CashFlow-Wrapper .button-opis .plus {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+}
+.CashFlow-Wrapper .button-opis .button-text {
+  font-size: 20px;
+}
+.CashFlow-Wrapper .CashFlow-Counts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.CashFlow-Wrapper .CashFlow-Count {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+.CashFlow-Wrapper .CashFlow-Count-Title {
+  font-size: 28px;
+  color: #8a8a8a;
+  margin-bottom: 6px;
+}
+.CashFlow-Wrapper .CashFlow-Count-Price {
+  font-size: 40px;
+  font-weight: 700;
+}
+.CashFlow-Wrapper .CashFlow-Icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.CashFlow-Wrapper .CashFlow-Count.income .CashFlow-Count-Price {
+  color: #16a34a;
+}
+.CashFlow-Wrapper .CashFlow-Count.income .CashFlow-Icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.CashFlow-Wrapper .CashFlow-Count.expense .CashFlow-Count-Price {
+  color: #dc2626;
+}
+.CashFlow-Wrapper .CashFlow-Count.expense .CashFlow-Icon {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.CashFlow-Wrapper .CashFlow-Count.balance .CashFlow-Count-Price {
+  color: #2563eb;
+}
+.CashFlow-Wrapper .CashFlow-Count.balance .CashFlow-Icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.CashFlow-Wrapper .CashFlow-Statics {
+  margin-top: 50px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+.CashFlow-Wrapper .CashFlow-Statics-Title {
+  font-size: 28px;
+  font-weight: 500;
+  margin-bottom: 26px;
+}
+.CashFlow-Wrapper .CashFlow-CashCount {
+  margin-top: 30px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+.CashFlow-Wrapper .CashFlow-CashCount-Header {
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  gap: 16px;
+}
+.CashFlow-Wrapper .CashFlow-CashCount-Title {
+  font-size: 28px;
+  font-weight: 500;
+}
+.CashFlow-Wrapper .CashFlow-Controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.CashFlow-Wrapper .SearchBox {
+  min-width: 240px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6b7280;
+}
+.CashFlow-Wrapper .SearchBox input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  background: transparent;
+  color: #111827;
+}
+.CashFlow-Wrapper .Actions {
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6b7280;
+}
+.CashFlow-Wrapper .Actions:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+.CashFlow-Wrapper .Actions select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+  min-width: 120px;
+}
+.CashFlow-Wrapper .CashFlow-Table {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1.6fr 0.8fr 0.8fr 0.8fr;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 22px;
+}
+.CashFlow-Wrapper .CashFlow-Table-Name {
+  font-size: 20px;
+  font-weight: 400;
+}
+.CashFlow-Wrapper .CashFlow-Table.Head {
+  background: #f9fafb;
+  color: #6b7280;
+  font-weight: 500;
+}
+.CashFlow-Wrapper .CashFlow-Table.Row {
+  border-top: 1px solid #e5e7eb;
+  transition: background 0.2s;
+}
+.CashFlow-Wrapper .CashFlow-Table.Row:hover {
+  background: #f9fafb;
+}
+.CashFlow-Wrapper .CashFlow-Table-Body-title {
+  font-size: 22px;
+}
+.CashFlow-Wrapper .Right {
+  text-align: right;
+}
+.CashFlow-Wrapper .Type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.CashFlow-Wrapper .Type.income {
+  background: #dcfce7;
+  color: #15803d;
+}
+.CashFlow-Wrapper .Type.expense {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.CashFlow-Wrapper .Amount {
+  font-weight: 700;
+}
+.CashFlow-Wrapper .Amount.income {
+  color: #16a34a;
+}
+.CashFlow-Wrapper .Amount.expense {
+  color: #dc2626;
+}
+.CashFlow-Wrapper .Row-Actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+.CashFlow-Wrapper .Row-Actions button {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+.CashFlow-Wrapper .Row-Actions .Edit {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+.CashFlow-Wrapper .Row-Actions .Edit:hover {
+  background: #bae6fd;
+}
+.CashFlow-Wrapper .Row-Actions .Delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.CashFlow-Wrapper .Row-Actions .Delete:hover {
+  background: #fecaca;
+}
+.CashFlow-Wrapper .EmptyState {
+  padding: 28px 16px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 15px;
+}
+.CashFlow-Wrapper .Chart-Tooltip {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+}
+.CashFlow-Wrapper .Tooltip-Title {
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+.CashFlow-Wrapper .Tooltip-Income {
+  color: #16a34a;
+  font-size: 14px;
+}
+.CashFlow-Wrapper .Tooltip-Expense {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+@media (max-width: 1100px) {
+  .CashFlow-Wrapper .CashFlow-Inner {
+    width: 100%;
+  }
+  .CashFlow-Wrapper .CashFlow-Table {
+    grid-template-columns: 1fr 1fr 1.4fr 1fr 1fr 1fr;
+  }
+}
+@media (max-width: 900px) {
+  .CashFlow-Wrapper .CashFlow-CashCount-Header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .CashFlow-Wrapper .CashFlow-Controls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .CashFlow-Wrapper .SearchBox,
+  .CashFlow-Wrapper .Actions {
+    width: 100%;
+  }
+  .CashFlow-Wrapper .CashFlow-Table {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .CashFlow-Wrapper .Right {
+    text-align: left;
+  }
+  .CashFlow-Wrapper .Row-Actions {
+    justify-content: flex-start;
+  }
+}
+.SourceTag {
+  margin-left: 8px;
+  font-size: 12px;
+  padding: 2px 6px;
+  background: #e0f2fe;
+  border-radius: 6px;
+  color: #0284c7;
+  font-weight: 600;
+}
+
+.Row-Actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}/*# sourceMappingURL=CashFlow.css.map */

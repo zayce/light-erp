@@ -1,0 +1,149 @@
+.Landing {
+  background: #f8fafc;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.Welcome {
+  padding: 100px 0 60px;
+  text-align: center;
+}
+.Welcome .Welcome-Top-Block {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.Welcome .Welcome-Small-Title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+.Welcome .Welcome-Title {
+  font-size: 52px;
+  font-weight: 700;
+  color: #0f172a;
+}
+.Welcome .Welcome-Title span {
+  color: #2563eb;
+}
+.Welcome .Welcome-Desc {
+  margin: 20px 0;
+  color: #475569;
+}
+.Welcome .Welcome-Buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+.Welcome .Welcome-Buttons button {
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.Welcome .Welcome-Buttons .primary {
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+.Welcome .Welcome-Buttons .secondary {
+  border: 1px solid #cbd5f5;
+  background: transparent;
+}
+
+.Features {
+  padding: 60px 0 100px;
+}
+
+.Features-Wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+}
+
+.Feature-Card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  transition: 0.3s;
+}
+.Feature-Card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+.Feature-Card .icon {
+  width: 48px;
+  height: 48px;
+  background: #e0e7ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  color: #2563eb;
+}
+
+.CTA {
+  background: #2563eb;
+  color: white;
+  text-align: center;
+  padding: 80px 0;
+}
+.CTA h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+.CTA button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: white;
+  color: #2563eb;
+  border: none;
+}
+
+.flags {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 25px;
+}
+.flags button {
+  border: 1px solid #e2e8f0;
+  background: white;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.flags button:hover {
+  transform: translateY(-2px);
+}
+.flags button .fi {
+  width: 24px;
+  height: 18px;
+  border-radius: 3px;
+}
+.flags .active {
+  border: 2px solid #a3a8ae;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+@media (max-width: 1024px) {
+  .Features-Wrapper {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .Features-Wrapper {
+    grid-template-columns: 1fr;
+  }
+  .Welcome-Title {
+    font-size: 36px;
+  }
+}/*# sourceMappingURL=Welcome.css.map */

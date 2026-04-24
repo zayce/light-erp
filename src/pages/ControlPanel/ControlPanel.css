@@ -1,0 +1,196 @@
+@charset "UTF-8";
+.ControlPaner-Wrapper {
+  background-color: #f9fafb;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner {
+  width: 1200px;
+  margin: 0;
+  padding: 20px 20px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .ControlPanel-Titles {
+  display: block;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .ControlPanel-Titles .ControlPanel-Title {
+  font-size: 38px;
+  font-weight: 600;
+  color: #1f2937; /* тёмно-серый */
+  margin-bottom: 4px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .ControlPanel-Titles .ControlPanel-Title-Desc {
+  font-size: 25px;
+  color: #6b7280; /* серый */
+  margin-bottom: 24px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .cards-grid .card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .cards-grid .card .card-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .cards-grid .card:hover {
+  transform: translateY(-3px);
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .green {
+  background: #22c55e;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .red {
+  background: #ef4444;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .blue {
+  background: #3b82f6;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .purple {
+  background: #8b5cf6;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .card-info {
+  display: flex;
+  flex-direction: column;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .card-info .card-title {
+  font-size: 18px;
+  color: #64748b;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .card-info .card-value {
+  font-size: 40px;
+  font-weight: 600;
+  margin: 4px 0;
+  padding: 10px 0;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .card-info .card-percent {
+  font-size: 16px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .positive {
+  color: #16a34a;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .negative {
+  color: #dc2626;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card .chart-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card .chart-card .chart-title {
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card .chart-card .chart-body {
+  width: 100%;
+  height: 320px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card .chart-card .pie-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card .chart-card .pie-legend {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 20px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card .chart-card .pie-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card .chart-card .pie-legend .legend-item .legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .Responsive-Chart-Card .chart-card .pie-legend .legend-item .legend-text {
+  font-size: 22px;
+  color: #111;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card {
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  margin-top: 50px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-title {
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list {
+  display: flex;
+  flex-direction: column;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item:last-child {
+  border-bottom: none;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-icon.income {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-icon.expense {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-info {
+  flex: 1;
+  margin-left: 16px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-info .operation-name {
+  font-size: 26px;
+  font-weight: 500;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-info .operation-date {
+  font-size: 17px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-amount {
+  font-size: 25px;
+  font-weight: 600;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-amount.income {
+  color: #16a34a;
+}
+.ControlPaner-Wrapper .ControlPanel-Inner .operations-card .operations-list .operation-item .operation-amount.expense {
+  color: #dc2626;
+}/*# sourceMappingURL=ControlPanel.css.map */

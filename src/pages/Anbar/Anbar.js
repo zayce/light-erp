@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import { NewProductModal } from "../../Component/NewProductModal/NewProductModal";
 import { useApp } from "../../AppContext";
 import "./Anbar.scss";
 import { CameraScanner } from "../../Component/CameraScaner/CameraScaner";
+import axios from "axios";
 export const Anbar = () => {
   const { state, dispatch } = useApp();
 
@@ -19,6 +20,11 @@ export const Anbar = () => {
 
   const [flash, setFlash] = useState(false);
   const handleScan = (code) => {
+    setFlash(true);
+
+    setTimeout(() => {
+      setFlash(false);
+    }, 300);
     setLastScanned(code);
 
     dispatch({
@@ -27,6 +33,19 @@ export const Anbar = () => {
     });
   };
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/products")
+      .then((res) => {
+        dispatch({
+          type: "SET_ANBAR",
+          payload: res.data,
+        });
+      })
+      .catch((err) => {
+        console.error("Ошибка загрузки:", err);
+      });
+  }, []);
   const products = Array.isArray(state?.anbar) ? state.anbar : [];
   const rawCategories = Array.isArray(state?.categories)
     ? state.categories
@@ -120,7 +139,7 @@ export const Anbar = () => {
     });
   }, [products, searchTerm, selectedCategory, selectedSubcategory]);
 
-  const addProduct = (data) => {
+  const addProduct = async (data) => {
     const newItem = {
       sku: String(data?.sku || "").trim(),
       name: String(data?.name || "").trim(),
@@ -139,9 +158,16 @@ export const Anbar = () => {
 
     if (!newItem.sku || !newItem.name) return;
 
+    // 🔥 ВОТ ЭТО ДОБАВЛЯЕМ
+    const res = await axios.post("http://localhost:5000/products", newItem);
+
+    // 👉 берём то что вернул сервер
+    const savedProduct = res.data;
+
+    // сохраняем в твой state
     dispatch({
       type: "ADD_ANBAR_ITEM",
-      payload: newItem,
+      payload: savedProduct,
     });
 
     setOpenNewProduct(false);

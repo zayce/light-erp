@@ -122,7 +122,6 @@ const initialState = {
 
 // Scaner
 
-
 const safeParse = (value, fallback) => {
   try {
     return value ? JSON.parse(value) : fallback;
@@ -459,6 +458,12 @@ const reducer = (state, action) => {
         anbar: [action.payload, ...anbar],
       };
     }
+
+    case "SET_ANBAR":
+      return {
+        ...state,
+        anbar: action.payload,
+      };
 
     case "UPDATE_ANBAR_ITEM":
       return {

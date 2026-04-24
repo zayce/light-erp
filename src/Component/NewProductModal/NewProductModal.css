@@ -1,0 +1,403 @@
+@charset "UTF-8";
+/* ===== Overlay + Modal ===== */
+.NPM-Overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  padding: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(17, 24, 39, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.NPM-Modal {
+  width: min(1200px, 100%);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(17, 24, 39, 0.25);
+}
+
+/* ===== Header ===== */
+.NPM-Header {
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.NPM-HeaderTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.NPM-Close {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  cursor: pointer;
+}
+.NPM-Close:hover {
+  background: #f3f4f6;
+}
+
+/* ===== Content Layout ===== */
+.NPM-Content {
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 18px;
+}
+@media (max-width: 980px) {
+  .NPM-Content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.NPM-Left {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.NPM-Right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.NPM-Grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 980px) {
+  .NPM-Grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Common form control focus ===== */
+:root {
+  --npm-focus: 0 0 0 4px rgba(37, 99, 235, 0.16);
+}
+
+.NPM-Field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.NPM-Field label {
+  font-size: 14px;
+  font-weight: 800;
+  color: #111827;
+}
+.NPM-Field input,
+.NPM-Field select,
+.NPM-Field textarea {
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+}
+.NPM-Field input:focus,
+.NPM-Field select:focus,
+.NPM-Field textarea:focus {
+  border-color: #2563eb;
+  box-shadow: var(--npm-focus);
+}
+.NPM-Field input,
+.NPM-Field select {
+  height: 46px;
+  padding: 0 14px;
+}
+.NPM-Field textarea {
+  height: 92px;
+  padding: 12px 14px;
+  resize: none;
+}
+
+/* ===== Dropzone ===== */
+.NPM-Drop {
+  min-height: 260px;
+  padding: 18px;
+  overflow: hidden;
+  text-align: center;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #d1d5db;
+  border-radius: 16px;
+  background: #f9fafb;
+  transition: 0.2s ease;
+}
+.NPM-Drop.drag {
+  border-color: #2563eb;
+  box-shadow: var(--npm-focus);
+  background: #eff6ff;
+}
+.NPM-Drop.has {
+  padding: 0;
+  background: #fff;
+  border-style: solid;
+}
+
+.NPM-PreviewImg {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.NPM-DropIcon {
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.NPM-DropTitle {
+  margin-bottom: 6px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.NPM-DropDesc {
+  margin-bottom: 14px;
+  color: #6b7280;
+}
+
+.NPM-PickBtn {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.25);
+}
+.NPM-PickBtn:hover {
+  background: #1d4ed8;
+}
+
+.NPM-DropHint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ===== Value Card ===== */
+.NPM-ValueCard {
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.NPM-ValueLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.NPM-Thumb {
+  width: 68px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  background: #f9fafb;
+}
+.NPM-Thumb img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.NPM-ThumbIcon {
+  color: #9ca3af;
+}
+
+.NPM-ThumbName {
+  font-weight: 800;
+  color: #111827;
+}
+
+.NPM-ValueRight {
+  text-align: right;
+}
+
+.NPM-ValueLabel {
+  font-size: 14px;
+  font-weight: 800;
+  color: #6b7280;
+}
+
+.NPM-ValueNum {
+  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.NPM-ValueSub {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* ===== Status Row ===== */
+.NPM-StatusRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.NPM-StatusInput {
+  flex: 1;
+  background: #fff;
+}
+
+.NPM-StatusSelect {
+  width: 160px;
+}
+
+.NPM-Badge {
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  border: 1px solid transparent;
+}
+.NPM-Badge.Normal {
+  background: #e0ecff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+.NPM-Badge.Aşağı {
+  background: #fff7ed;
+  color: #f97316;
+  border-color: #fed7aa;
+}
+.NPM-Badge.Kritik {
+  background: #fee2e2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+.NPM-Badge.Yüksək {
+  background: #dcfce7;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+
+/* ===== Footer ===== */
+.NPM-Footer {
+  grid-column: 1/-1;
+  margin-top: 4px;
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #e5e7eb;
+}
+
+.NPM-Cancel {
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 900;
+}
+.NPM-Cancel:hover {
+  background: #f9fafb;
+}
+
+.NPM-Save {
+  padding: 12px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 900;
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+}
+.NPM-Save:hover {
+  background: #1d4ed8;
+}
+
+/* ===== Add category UI ===== */
+.NPM-LabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.NPM-LinkBtn {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font-weight: 800;
+  cursor: pointer;
+}
+.NPM-LinkBtn:hover {
+  text-decoration: underline;
+}
+
+.NPM-AddCatRow {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.NPM-AddCatRow input {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+}
+
+.NPM-AddCatBtn {
+  height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+.NPM-AddCatBtn:hover {
+  background: #1d4ed8;
+}
+
+.NPM-CancelMini {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+.NPM-CancelMini:hover {
+  background: #f9fafb;
+}/*# sourceMappingURL=NewProductModal.css.map */

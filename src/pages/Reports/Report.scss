@@ -206,101 +206,128 @@
 
     /* REPORT MANY CARDS */
     .Report-Many-Cards {
-      margin-top: 40px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      padding: 16px;
+
       .Report-Many-Cards-Title {
-        font-size: 38px;
+        font-size: 20px;
         font-weight: 600;
-        color: #111827;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
       }
-      .Report-Many-Cards-Table {
-        margin-top: 65px;
-        .Report-Many-Cards-Table-Title {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 40px;
-        }
-        .Table-Head,
-        .Tr {
-          display: grid;
-          grid-template-columns: 120px 1.6fr 180px 180px 1.2fr;
-          align-items: center;
-        }
 
-        .Table-Head {
-          padding: 14px 18px;
+      .Table-Head,
+      .Tr {
+        display: grid;
+        grid-template-columns: 80px 2fr 140px 160px 1.2fr 120px;
+        align-items: center;
+      }
+
+      .Table-Head {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #9ca3af;
+        padding: 10px 12px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .Tr {
+        padding: 12px;
+        border-bottom: 1px solid #f1f5f9;
+        transition: 0.2s;
+
+        &:hover {
           background: #f9fafb;
-          border-bottom: 1px solid #e5e7eb;
+        }
+      }
 
-          .Th {
-            font-size: 20px;
-            letter-spacing: 0.06em;
-            font-weight: 700;
-            color: #6b7280;
-          }
+      .Td {
+        font-size: 14px;
+        color: #111827;
+
+        &.rank {
+          font-weight: 600;
+          color: #9ca3af;
         }
 
-        .Table-Body {
-          .Tr {
-            padding: 18px 18px;
-            border-bottom: 1px solid #e5e7eb;
-
-            &:last-child {
-              border-bottom: none;
-            }
-          }
-
-          .Td {
-            font-size: 22px;
-            color: #111827;
-
-            &.rank {
-              font-size: 28px;
-              font-weight: 700;
-              color: #9ca3af;
-            }
-
-            &.product {
-              font-weight: 600;
-            }
-
-            &.count {
-              color: #374151;
-              font-weight: 500;
-            }
-
-            &.revenue {
-              font-weight: 600;
-            }
-
-            &.perf {
-              display: flex;
-              align-items: center;
-              gap: 12px;
-            }
-          }
-
-          .PerfBar {
-            flex: 1;
-            height: 10px;
-            background: #e5e7eb;
-            border-radius: 999px;
-            overflow: hidden;
-          }
-
-          .PerfFill {
-            height: 100%;
-            background: #2563eb;
-            border-radius: 999px;
-          }
-
-          .PerfText {
-            width: 48px;
-            text-align: right;
-            font-weight: 600;
-            color: #374151;
-          }
+        &.product {
+          font-weight: 600;
         }
+
+        &.revenue {
+          font-weight: 600;
+        }
+
+        &.perf {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+      }
+
+      .PerfBar {
+        flex: 1;
+        height: 6px;
+        background: #e5e7eb;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .PerfFill {
+        height: 100%;
+        background: #2563eb;
+        border-radius: 999px;
+      }
+
+      .PerfText {
+        font-size: 12px;
+        color: #6b7280;
+        width: 40px;
+        text-align: right;
+      }
+
+      /* ACTION BUTTONS */
+      .Td.actions {
+        display: flex;
+        gap: 6px;
+      }
+
+      .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .edit-btn {
+        background: #eff6ff;
+        color: #2563eb;
+
+        &:hover {
+          background: #dbeafe;
+        }
+      }
+
+      .delete-btn {
+        background: #fef2f2;
+        color: #dc2626;
+
+        &:hover {
+          background: #fee2e2;
+        }
+      }
+
+      .Empty-State {
+        text-align: center;
+        padding: 20px;
+        font-size: 14px;
+        color: #9ca3af;
       }
     }
   }

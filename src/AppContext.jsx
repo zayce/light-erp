@@ -465,6 +465,24 @@ const reducer = (state, action) => {
         anbar: action.payload,
       };
 
+    // Server-dən gələn məhsulları əlavə edir, lokal məlumatları silmir
+    case "MERGE_ANBAR": {
+      const incoming = Array.isArray(action.payload) ? action.payload : [];
+      const known = new Set(
+        safeState.anbar.map((item) => String(item.sku).toLowerCase()),
+      );
+      const fresh = incoming.filter(
+        (item) => item?.sku && !known.has(String(item.sku).toLowerCase()),
+      );
+
+      if (!fresh.length) return safeState;
+
+      return {
+        ...safeState,
+        anbar: [...fresh, ...safeState.anbar],
+      };
+    }
+
     case "UPDATE_ANBAR_ITEM":
       return {
         ...safeState,
@@ -557,7 +575,7 @@ const reducer = (state, action) => {
       };
 
     case "SCAN_PRODUCT": {
-      const code = String(action.payload).toLowerCase();
+      const code = String(action.payload).trim().toLowerCase();
 
       let found = false;
 
@@ -579,10 +597,8 @@ const reducer = (state, action) => {
         return item;
       });
 
-      if (!found) {
-        alert("Товар не найден ❌");
-        return safeState;
-      }
+      // Bildiriş UI qatında göstərilir (reducer təmiz qalır)
+      if (!found) return safeState;
 
       return {
         ...safeState,

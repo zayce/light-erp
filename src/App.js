@@ -1,13 +1,19 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import { SideBar } from "./Component/SideBar/SideBar";
 import "flag-icons/css/flag-icons.min.css";
 import { ControlPanel } from "./pages/ControlPanel/ControlPanel";
-import { Home } from "./pages/Home/Home";
 import { AppProvider } from "./AppContext";
 import { Anbar } from "./pages/Anbar/Anbar";
 import "./App.scss";
 import { CashFlow } from "./pages/CashFlow/CashFlow";
-import { LandingPage, Welcome } from "./pages/Welcome/Welcome";
+import { LandingPage } from "./pages/Welcome/Welcome";
 import { Report } from "./pages/Reports/Report";
 import { Settings } from "./pages/Settings/Settings";
 import { UserProfile } from "./pages/Useprofile/UserProfile";
@@ -32,6 +38,7 @@ const Layout = () => {
           <Route path="/warehouse" element={<Anbar />} />
           <Route path="/cashflow" element={<CashFlow />} />
           <Route path="/" element={<LandingPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </div>
@@ -44,6 +51,7 @@ const App = () => {
       <BrowserRouter>
         <Layout />
       </BrowserRouter>
+      <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
     </AppProvider>
   );
 };

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { X, Upload, Image as ImageIcon, Save } from "lucide-react";
 import "../NewProductModal/NewProductModal.scss";
+import toast from "react-hot-toast";
 
 const initial = {
   name: "",
@@ -162,7 +163,7 @@ export const NewProductModal = ({
     );
 
     if (exists) {
-      alert("Bu kateqoriya artıq mövcuddur!");
+      toast.error("Bu kateqoriya artıq mövcuddur!");
       return;
     }
 
@@ -187,7 +188,7 @@ export const NewProductModal = ({
     );
 
     if (exists) {
-      alert("Bu alt kateqoriya artıq mövcuddur!");
+      toast.error("Bu alt kateqoriya artıq mövcuddur!");
       return;
     }
 

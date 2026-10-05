@@ -4,7 +4,8 @@ import { NewProductModal } from "../../Component/NewProductModal/NewProductModal
 import { useApp } from "../../AppContext";
 import "./Anbar.scss";
 import { CameraScanner } from "../../Component/CameraScaner/CameraScaner";
-import axios from "axios";
+import toast from "react-hot-toast";
+import { api } from "../../shared/api/axios";
 export const Anbar = () => {
   const { state, dispatch } = useApp();
 
@@ -20,6 +21,21 @@ export const Anbar = () => {
 
   const [flash, setFlash] = useState(false);
   const handleScan = (code) => {
+    const normalized = String(code || "")
+      .trim()
+      .toLowerCase();
+    const scanned = (state.anbar || []).find((item) =>
+      [item.sku, item.barcode, item.name].some(
+        (value) => String(value || "").toLowerCase() === normalized,
+      ),
+    );
+
+    if (scanned) {
+      toast.success(`${scanned.name}: stok +1`);
+    } else {
+      toast.error(`Məhsul tapılmadı: ${code}`);
+    }
+
     setFlash(true);
 
     setTimeout(() => {
@@ -34,18 +50,23 @@ export const Anbar = () => {
   };
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/products")
+    let cancelled = false;
+
+    api
+      .get("/products")
       .then((res) => {
-        dispatch({
-          type: "SET_ANBAR",
-          payload: res.data,
-        });
+        if (cancelled || !Array.isArray(res.data)) return;
+        // lokal məlumatı əvəz etmirik, yalnız yeni məhsulları əlavə edirik
+        dispatch({ type: "MERGE_ANBAR", payload: res.data });
       })
       .catch((err) => {
-        console.error("Ошибка загрузки:", err);
+        console.error("Server-dən yükləmə xətası:", err);
       });
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch]);
   const products = Array.isArray(state?.anbar) ? state.anbar : [];
   const rawCategories = Array.isArray(state?.categories)
     ? state.categories
@@ -158,13 +179,19 @@ export const Anbar = () => {
 
     if (!newItem.sku || !newItem.name) return;
 
-    // 🔥 ВОТ ЭТО ДОБАВЛЯЕМ
-    const res = await axios.post("http://localhost:5000/products", newItem);
+    let savedProduct = newItem;
 
-    // 👉 берём то что вернул сервер
-    const savedProduct = res.data;
+    try {
+      const res = await api.post("/products", newItem);
+      savedProduct = res.data;
+    } catch (err) {
+      if (err?.response?.status === 409) {
+        toast.error("Bu SKU artıq mövcuddur");
+        return;
+      }
+      toast.error("Server əlçatan deyil, məhsul yalnız lokal saxlanıldı");
+    }
 
-    // сохраняем в твой state
     dispatch({
       type: "ADD_ANBAR_ITEM",
       payload: savedProduct,
@@ -175,6 +202,10 @@ export const Anbar = () => {
 
   const deleteProduct = (sku) => {
     setDeletingSku(sku);
+
+    api.delete(`/products/${encodeURIComponent(sku)}`).catch(() => {
+      // server-də yoxdursa və ya əlçatan deyilsə, lokal silmə davam edir
+    });
 
     setTimeout(() => {
       dispatch({
@@ -249,6 +280,12 @@ export const Anbar = () => {
         },
       },
     });
+
+    api
+      .put(`/products/${encodeURIComponent(sku)}`, { [field]: normalizedValue })
+      .catch(() => {
+        // server-də yoxdursa və ya əlçatan deyilsə, lokal dəyişiklik qalır
+      });
 
     stopEdit();
   };

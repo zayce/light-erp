@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useApp } from "../../AppContext";
+import toast from "react-hot-toast";
 
 export const ReportsModal = ({
   open,
@@ -152,23 +153,23 @@ export const ReportsModal = ({
       !normalizedAmount ||
       !date
     ) {
-      alert("Bütün vacib sahələri doldurun");
+      toast.error("Bütün vacib sahələri doldurun");
       return;
     }
 
     if (operationType !== "Xərc") {
       if (!selectedProduct) {
-        alert("Məhsul anbardan seçilməlidir");
+        toast.error("Məhsul anbardan seçilməlidir");
         return;
       }
 
       if (!normalizedSalesCount || normalizedSalesCount <= 0) {
-        alert("Satış sayı düzgün daxil edilməlidir");
+        toast.error("Satış sayı düzgün daxil edilməlidir");
         return;
       }
 
       if (normalizedSalesCount > allowedStock) {
-        alert(`Stok kifayət deyil. Mövcud stok: ${allowedStock}`);
+        toast.error(`Stok kifayət deyil. Mövcud stok: ${allowedStock}`);
         return;
       }
     }

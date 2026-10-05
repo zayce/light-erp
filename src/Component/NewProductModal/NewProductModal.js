@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { X, Upload, Image as ImageIcon, Save } from "lucide-react";
 import "../NewProductModal/NewProductModal.scss";
 import toast from "react-hot-toast";
+import { useEscapeKey } from "../../hooks/useEscapeKey";
 
 const initial = {
   name: "",
@@ -27,6 +28,7 @@ export const NewProductModal = ({
   onAddCategory,
   onAddSubcategory,
 }) => {
+  useEscapeKey(open, onClose);
   const [form, setForm] = useState(initial);
   const [addingCat, setAddingCat] = useState(false);
   const [addingSubcat, setAddingSubcat] = useState(false);

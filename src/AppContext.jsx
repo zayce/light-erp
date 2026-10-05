@@ -1,4 +1,8 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
+import toast from "react-hot-toast";
+import { createId } from "./utils/id";
+import { formatSignedMoney } from "./utils/format";
+import { readStorage, writeStorage } from "./utils/storage";
 
 const AppContext = createContext(null);
 
@@ -136,7 +140,7 @@ const normalizeCategories = (categories) => {
   // old format: ["Elektronika", "Qida"]
   if (categories.every((item) => typeof item === "string")) {
     return categories.map((name, index) => ({
-      id: Date.now() + index,
+      id: createId(),
       name,
       subcategories: [],
     }));
@@ -144,11 +148,11 @@ const normalizeCategories = (categories) => {
 
   // new format
   return categories.map((cat, index) => ({
-    id: Number(cat?.id) || Date.now() + index,
+    id: Number(cat?.id) || createId(),
     name: String(cat?.name || "").trim(),
     subcategories: Array.isArray(cat?.subcategories)
       ? cat.subcategories.map((sub, subIndex) => ({
-          id: Number(sub?.id) || Date.now() + index + subIndex + 1000,
+          id: Number(sub?.id) || createId(),
           name: String(sub?.name || "").trim(),
         }))
       : [],
@@ -169,7 +173,7 @@ const normalizeAnbar = (anbar) => {
   }));
 };
 
-const normalizeState = (data) => {
+export const normalizeState = (data) => {
   return {
     report: Array.isArray(data?.report) ? data.report : [],
     cashflow: Array.isArray(data?.cashflow) ? data.cashflow : [],
@@ -179,9 +183,33 @@ const normalizeState = (data) => {
   };
 };
 
-const formatCashflowAmount = (type, value) => {
-  const numeric = Number(value || 0);
-  return `${type === "income" ? "+" : "-"}₼${numeric.toLocaleString("az-AZ")}`;
+const formatCashflowAmount = (type, value) => formatSignedMoney(type, value);
+
+const sameText = (a, b) =>
+  String(a ?? "")
+    .trim()
+    .toLowerCase() ===
+  String(b ?? "")
+    .trim()
+    .toLowerCase();
+
+// delta < 0 takes stock out (sale), delta > 0 puts it back.
+// Matches by SKU first; falls back to name for reports created before SKU was stored.
+const adjustStock = (anbar, ref, delta) => {
+  let index = ref?.sku ? anbar.findIndex((i) => sameText(i.sku, ref.sku)) : -1;
+  if (index === -1 && ref?.name) {
+    index = anbar.findIndex((i) => sameText(i.name, ref.name));
+  }
+  if (index === -1) return anbar;
+
+  return anbar.map((item, i) =>
+    i === index
+      ? {
+          ...item,
+          stockCurrent: Math.max(0, Number(item.stockCurrent || 0) + delta),
+        }
+      : item,
+  );
 };
 
 const calcPerformance = (revenue, list, editingId = null) => {
@@ -206,7 +234,7 @@ const calcPerformance = (revenue, list, editingId = null) => {
   );
 };
 
-const reducer = (state, action) => {
+export const reducer = (state, action) => {
   const safeState = normalizeState(state);
 
   switch (action.type) {
@@ -222,12 +250,13 @@ const reducer = (state, action) => {
       const operationType = action.payload.operationType;
       const cashflowType = operationType === "Xərc" ? "expense" : "income";
 
-      const reportId = Date.now();
-      const cashflowId = reportId + 1;
+      const reportId = createId();
+      const cashflowId = createId();
 
       const newReportItem = {
         id: reportId,
         name: action.payload.product,
+        sku: action.payload.sku || "",
         salesCount,
         revenue,
         performance: calcPerformance(revenue, safeState.report),
@@ -250,18 +279,14 @@ const reducer = (state, action) => {
         sourceId: reportId,
       };
 
-      const updatedAnbar = safeState.anbar.map((item) => {
-        if (item.name === action.payload.product && operationType !== "Xərc") {
-          return {
-            ...item,
-            stockCurrent: Math.max(
-              0,
-              Number(item.stockCurrent || 0) - salesCount,
-            ),
-          };
-        }
-        return item;
-      });
+      const updatedAnbar =
+        operationType !== "Xərc"
+          ? adjustStock(
+              safeState.anbar,
+              { sku: action.payload.sku, name: action.payload.product },
+              -salesCount,
+            )
+          : safeState.anbar;
 
       return {
         ...safeState,
@@ -288,6 +313,7 @@ const reducer = (state, action) => {
           ? {
               ...item,
               name: action.payload.data.product,
+              sku: action.payload.data.sku || item.sku || "",
               salesCount,
               revenue,
               performance: calcPerformance(
@@ -322,32 +348,22 @@ const reducer = (state, action) => {
       let updatedAnbar = [...safeState.anbar];
 
       if (oldReportItem.operationType !== "Xərc") {
-        updatedAnbar = updatedAnbar.map((item) => {
-          if (item.name === oldReportItem.name) {
-            return {
-              ...item,
-              stockCurrent:
-                Number(item.stockCurrent || 0) +
-                Number(oldReportItem.salesCount || 0),
-            };
-          }
-          return item;
-        });
+        updatedAnbar = adjustStock(
+          updatedAnbar,
+          { sku: oldReportItem.sku, name: oldReportItem.name },
+          Number(oldReportItem.salesCount || 0),
+        );
       }
 
       if (action.payload.data.operationType !== "Xərc") {
-        updatedAnbar = updatedAnbar.map((item) => {
-          if (item.name === action.payload.data.product) {
-            return {
-              ...item,
-              stockCurrent: Math.max(
-                0,
-                Number(item.stockCurrent || 0) - salesCount,
-              ),
-            };
-          }
-          return item;
-        });
+        updatedAnbar = adjustStock(
+          updatedAnbar,
+          {
+            sku: action.payload.data.sku,
+            name: action.payload.data.product,
+          },
+          -salesCount,
+        );
       }
 
       return {
@@ -366,17 +382,11 @@ const reducer = (state, action) => {
 
       const updatedAnbar =
         reportItem.operationType !== "Xərc"
-          ? safeState.anbar.map((item) => {
-              if (item.name === reportItem.name) {
-                return {
-                  ...item,
-                  stockCurrent:
-                    Number(item.stockCurrent || 0) +
-                    Number(reportItem.salesCount || 0),
-                };
-              }
-              return item;
-            })
+          ? adjustStock(
+              safeState.anbar,
+              { sku: reportItem.sku, name: reportItem.name },
+              Number(reportItem.salesCount || 0),
+            )
           : safeState.anbar;
 
       return {
@@ -397,7 +407,7 @@ const reducer = (state, action) => {
 
       const newItem = {
         ...action.payload,
-        id: Date.now(),
+        id: createId(),
         type,
         amountRaw: raw,
         amount: formatCashflowAmount(type, raw),
@@ -483,7 +493,10 @@ const reducer = (state, action) => {
       };
     }
 
-    case "UPDATE_ANBAR_ITEM":
+    case "UPDATE_ANBAR_ITEM": {
+      const newSku = action.payload.data?.sku;
+      const skuChanged = newSku !== undefined && newSku !== action.payload.sku;
+
       return {
         ...safeState,
         anbar: safeState.anbar.map((item) =>
@@ -491,7 +504,13 @@ const reducer = (state, action) => {
             ? { ...item, ...action.payload.data }
             : item,
         ),
+        report: skuChanged
+          ? safeState.report.map((r) =>
+              r.sku === action.payload.sku ? { ...r, sku: newSku } : r,
+            )
+          : safeState.report,
       };
+    }
 
     case "DELETE_ANBAR_ITEM":
       return {
@@ -512,7 +531,7 @@ const reducer = (state, action) => {
       if (exists) return safeState;
 
       const newCategory = {
-        id: Date.now(),
+        id: createId(),
         name,
         subcategories: [],
       };
@@ -545,7 +564,7 @@ const reducer = (state, action) => {
             subcategories: [
               ...cat.subcategories,
               {
-                id: Date.now(),
+                id: createId(),
                 name,
               },
             ],
@@ -616,14 +635,19 @@ export const AppProvider = ({ children }) => {
     reducer,
     initialState,
     (defaultState) => {
-      const saved = localStorage.getItem("global-data");
+      const saved = readStorage("global-data");
       const parsed = safeParse(saved, defaultState);
       return normalizeState(parsed);
     },
   );
 
   useEffect(() => {
-    localStorage.setItem("global-data", JSON.stringify(state));
+    const ok = writeStorage("global-data", JSON.stringify(state));
+    if (!ok) {
+      toast.error("Yaddaş doludur: dəyişikliklər brauzerdə saxlanıla bilmədi", {
+        id: "storage-full",
+      });
+    }
   }, [state]);
 
   return (

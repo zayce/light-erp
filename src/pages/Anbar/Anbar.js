@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Trash2 } from "lucide-react";
 import { NewProductModal } from "../../Component/NewProductModal/NewProductModal";
 import { useApp } from "../../AppContext";
@@ -6,6 +6,66 @@ import "./Anbar.scss";
 import { CameraScanner } from "../../Component/CameraScaner/CameraScaner";
 import toast from "react-hot-toast";
 import { api } from "../../shared/api/axios";
+import { formatMoney } from "../../utils/format";
+import { toCsv, downloadCsv } from "../../utils/csv";
+
+const sameText = (a, b) =>
+  String(a ?? "")
+    .trim()
+    .toLowerCase() ===
+  String(b ?? "")
+    .trim()
+    .toLowerCase();
+
+const SORT_OPTIONS = [
+  { value: "default", label: "Sıralama: standart" },
+  { value: "name", label: "Ada görə (A-Z)" },
+  { value: "stock", label: "Stok (azdan çoxa)" },
+  { value: "price", label: "Qiymət (bahadan ucuza)" },
+  { value: "value", label: "Ümumi dəyər (çoxdan aza)" },
+];
+
+// Defined at module level: when it lived inside Anbar it was re-created on every
+// render, so the input was remounted (and lost focus) on each keystroke.
+const EditableCell = ({
+  sku,
+  field,
+  value,
+  type = "text",
+  editing,
+  startEdit,
+  setEditValue,
+  commitEdit,
+  onEditKeyDown,
+  className = "",
+}) => {
+  const active = editing && editing.sku === sku && editing.field === field;
+
+  if (active) {
+    return (
+      <input
+        className={`EC-Input ${className}`}
+        value={editing.value}
+        type={type}
+        onChange={(e) => setEditValue(e.target.value)}
+        onKeyDown={onEditKeyDown}
+        onBlur={commitEdit}
+        autoFocus
+      />
+    );
+  }
+
+  return (
+    <div
+      className={`EC-Text ${className}`}
+      onClick={() => startEdit(sku, field, value)}
+      title="Click to edit"
+    >
+      {value}
+    </div>
+  );
+};
+
 export const Anbar = () => {
   const { state, dispatch } = useApp();
 
@@ -15,6 +75,12 @@ export const Anbar = () => {
   const [openNewProduct, setOpenNewProduct] = useState(false);
   const [deletingSku, setDeletingSku] = useState(null);
   const [editing, setEditing] = useState(null);
+  const [onlyLow, setOnlyLow] = useState(false);
+  const [sortBy, setSortBy] = useState("default");
+  const searchRef = useRef(null);
+  // true once an edit was committed/cancelled, so the blur fired by unmounting
+  // the input cannot commit a second time (or commit a cancelled edit).
+  const editFinishedRef = useRef(true);
 
   // Scaner Function
   const [lastScanned, setLastScanned] = useState(null);
@@ -32,6 +98,13 @@ export const Anbar = () => {
 
     if (scanned) {
       toast.success(`${scanned.name}: stok +1`);
+      api
+        .patch(`/products/${encodeURIComponent(scanned.sku)}/stock`, {
+          delta: 1,
+        })
+        .catch(() => {
+          // server əlçatan deyilsə, lokal dəyişiklik qalır
+        });
     } else {
       toast.error(`Məhsul tapılmadı: ${code}`);
     }
@@ -67,6 +140,21 @@ export const Anbar = () => {
       cancelled = true;
     };
   }, [dispatch]);
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
+      const target = e.target;
+      const tag = target?.tagName;
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(tag)) return;
+      if (target?.isContentEditable) return;
+      e.preventDefault();
+      searchRef.current?.focus();
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const products = Array.isArray(state?.anbar) ? state.anbar : [];
   const rawCategories = Array.isArray(state?.categories)
     ? state.categories
@@ -156,9 +244,68 @@ export const Anbar = () => {
       const matchesSubcategory =
         selectedSubcategory === "all" || subcategory === selectedSubcategory;
 
-      return matchesSearch && matchesCategory && matchesSubcategory;
+      const matchesLow =
+        !onlyLow ||
+        ["asagi", "kritik"].includes(
+          getStatus(
+            Number(item?.stockCurrent || 0),
+            Number(item?.stockMin || 0),
+          ),
+        );
+
+      return (
+        matchesSearch && matchesCategory && matchesSubcategory && matchesLow
+      );
     });
-  }, [products, searchTerm, selectedCategory, selectedSubcategory]);
+  }, [products, searchTerm, selectedCategory, selectedSubcategory, onlyLow]);
+
+  const sortedProducts = useMemo(() => {
+    const list = [...filteredProducts];
+    const num = (v) => Number(v || 0);
+
+    switch (sortBy) {
+      case "name":
+        return list.sort((a, b) =>
+          String(a.name).localeCompare(String(b.name), "az"),
+        );
+      case "stock":
+        return list.sort((a, b) => num(a.stockCurrent) - num(b.stockCurrent));
+      case "price":
+        return list.sort((a, b) => num(b.price) - num(a.price));
+      case "value":
+        return list.sort(
+          (a, b) =>
+            num(b.stockCurrent) * num(b.price) -
+            num(a.stockCurrent) * num(a.price),
+        );
+      default:
+        return list;
+    }
+  }, [filteredProducts, sortBy]);
+
+  const exportCsv = () => {
+    if (!sortedProducts.length) {
+      toast.error("İxrac üçün məhsul yoxdur");
+      return;
+    }
+
+    const csv = toCsv(sortedProducts, [
+      { label: "SKU", value: (p) => p.sku },
+      { label: "Məhsul adı", value: (p) => p.name },
+      { label: "Kateqoriya", value: (p) => p.category },
+      { label: "Alt kateqoriya", value: (p) => p.subcategory },
+      { label: "Stok", value: (p) => Number(p.stockCurrent || 0) },
+      { label: "Min. stok", value: (p) => Number(p.stockMin || 0) },
+      { label: "Qiymət", value: (p) => Number(p.price || 0) },
+      {
+        label: "Dəyər",
+        value: (p) => Number(p.stockCurrent || 0) * Number(p.price || 0),
+      },
+      { label: "Təchizatçı", value: (p) => p.supplier },
+    ]);
+
+    downloadCsv(`anbar-${new Date().toISOString().slice(0, 10)}.csv`, csv);
+  };
 
   const addProduct = async (data) => {
     const newItem = {
@@ -178,6 +325,18 @@ export const Anbar = () => {
     };
 
     if (!newItem.sku || !newItem.name) return;
+
+    const duplicate = products.find(
+      (p) => sameText(p.sku, newItem.sku) || sameText(p.name, newItem.name),
+    );
+    if (duplicate) {
+      toast.error(
+        sameText(duplicate.sku, newItem.sku)
+          ? "Bu SKU artıq mövcuddur"
+          : "Bu adlı məhsul artıq mövcuddur",
+      );
+      return;
+    }
 
     let savedProduct = newItem;
 
@@ -200,7 +359,15 @@ export const Anbar = () => {
     setOpenNewProduct(false);
   };
 
+  const restoreProduct = (item) => {
+    dispatch({ type: "ADD_ANBAR_ITEM", payload: item });
+    api.post("/products", item).catch(() => {
+      // server əlçatan deyilsə, məhsul lokal bərpa olunur
+    });
+  };
+
   const deleteProduct = (sku) => {
+    const item = products.find((p) => p.sku === sku);
     setDeletingSku(sku);
 
     api.delete(`/products/${encodeURIComponent(sku)}`).catch(() => {
@@ -214,6 +381,26 @@ export const Anbar = () => {
       });
 
       setDeletingSku(null);
+
+      if (item) {
+        toast(
+          (t) => (
+            <span>
+              {item.name} silindi{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  restoreProduct(item);
+                }}
+              >
+                Geri qaytar
+              </button>
+            </span>
+          ),
+          { duration: 6000 },
+        );
+      }
     }, 220);
   };
 
@@ -228,6 +415,7 @@ export const Anbar = () => {
 
     if (nonEditableFields.includes(field)) return;
 
+    editFinishedRef.current = false;
     setEditing({
       sku,
       field,
@@ -245,7 +433,7 @@ export const Anbar = () => {
   };
 
   const commitEdit = () => {
-    if (!editing) return;
+    if (!editing || editFinishedRef.current) return;
 
     const { sku, field, value } = editing;
 
@@ -271,6 +459,40 @@ export const Anbar = () => {
       normalizedValue = String(value || "").trim();
     }
 
+    const current = products.find((p) => p.sku === sku);
+
+    // nothing changed -> no dispatch and no server request
+    if (current && String(current[field] ?? "") === String(normalizedValue)) {
+      editFinishedRef.current = true;
+      stopEdit();
+      return;
+    }
+
+    if (field === "sku" || field === "name") {
+      if (!normalizedValue) {
+        toast.error("Bu sahə boş ola bilməz");
+        editFinishedRef.current = true;
+        stopEdit();
+        return;
+      }
+
+      const clash = products.some(
+        (p) => p.sku !== sku && sameText(p[field], normalizedValue),
+      );
+      if (clash) {
+        toast.error(
+          field === "sku"
+            ? "Bu SKU artıq mövcuddur"
+            : "Bu adlı məhsul artıq mövcuddur",
+        );
+        editFinishedRef.current = true;
+        stopEdit();
+        return;
+      }
+    }
+
+    editFinishedRef.current = true;
+
     dispatch({
       type: "UPDATE_ANBAR_ITEM",
       payload: {
@@ -290,7 +512,10 @@ export const Anbar = () => {
     stopEdit();
   };
 
-  const cancelEdit = () => stopEdit();
+  const cancelEdit = () => {
+    editFinishedRef.current = true;
+    stopEdit();
+  };
 
   const onEditKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -302,45 +527,6 @@ export const Anbar = () => {
       e.preventDefault();
       cancelEdit();
     }
-  };
-
-  const EditableCell = ({
-    sku,
-    field,
-    value,
-    type = "text",
-    editing,
-    startEdit,
-    setEditValue,
-    commitEdit,
-    onEditKeyDown,
-    className = "",
-  }) => {
-    const active = editing && editing.sku === sku && editing.field === field;
-
-    if (active) {
-      return (
-        <input
-          className={`EC-Input ${className}`}
-          value={editing.value}
-          type={type}
-          onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={onEditKeyDown}
-          onBlur={commitEdit}
-          autoFocus
-        />
-      );
-    }
-
-    return (
-      <div
-        className={`EC-Text ${className}`}
-        onClick={() => startEdit(sku, field, value)}
-        title="Click to edit"
-      >
-        {value}
-      </div>
-    );
   };
 
   return (
@@ -355,6 +541,13 @@ export const Anbar = () => {
           </div>
 
           <div className="Anbar-Header-Button">
+            <button
+              className="button-opis secondary"
+              onClick={exportCsv}
+              type="button"
+            >
+              <div className="button-text">⬇ CSV ixrac</div>
+            </button>
             <button
               className="button-opis"
               onClick={() => setOpenNewProduct(true)}
@@ -374,7 +567,20 @@ export const Anbar = () => {
             </div>
           </div>
 
-          <div className="Stats-Card">
+          <div
+            className={`Stats-Card clickable ${onlyLow ? "active" : ""}`}
+            onClick={() => setOnlyLow((v) => !v)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setOnlyLow((v) => !v);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-pressed={onlyLow}
+            title="Yalnız aşağı stoku göstər"
+          >
             <div className="Stats-Icon orange">⚠️</div>
             <div className="Stats-Text">
               <div className="Stats-Title">Aşağı Stok</div>
@@ -386,9 +592,7 @@ export const Anbar = () => {
             <div className="Stats-Icon green">✅</div>
             <div className="Stats-Text">
               <div className="Stats-Title">Ümumi Dəyər</div>
-              <div className="Stats-Value">
-                ₼{totalStockValue.toLocaleString()}
-              </div>
+              <div className="Stats-Value">{formatMoney(totalStockValue)}</div>
             </div>
           </div>
         </div>
@@ -396,7 +600,8 @@ export const Anbar = () => {
         <div className="Anbar-Filters">
           <input
             type="text"
-            placeholder="SKU, məhsul adı, kateqoriya ilə axtar..."
+            ref={searchRef}
+            placeholder="SKU, məhsul adı, kateqoriya ilə axtar...  ( / )"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -428,6 +633,14 @@ export const Anbar = () => {
               </option>
             ))}
           </select>
+
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="Anbar-Objects-Saves">
@@ -442,8 +655,8 @@ export const Anbar = () => {
             <div className="row-Title">DƏYƏR</div>
           </div>
 
-          {filteredProducts.length > 0 ? (
-            filteredProducts.map((item) => {
+          {sortedProducts.length > 0 ? (
+            sortedProducts.map((item) => {
               const total =
                 Number(item?.stockCurrent || 0) * Number(item?.price || 0);
 
@@ -513,7 +726,7 @@ export const Anbar = () => {
                     </span>
                   </div>
 
-                  <div className="cell total">₼{total.toLocaleString()}</div>
+                  <div className="cell total">{formatMoney(total)}</div>
 
                   <button
                     type="button"

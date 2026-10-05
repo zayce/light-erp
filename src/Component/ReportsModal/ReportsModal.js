@@ -10,6 +10,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useApp } from "../../AppContext";
 import toast from "react-hot-toast";
+import { useEscapeKey } from "../../hooks/useEscapeKey";
 
 export const ReportsModal = ({
   open,
@@ -18,6 +19,7 @@ export const ReportsModal = ({
   editOperation,
 }) => {
   const { state } = useApp();
+  useEscapeKey(open, onClose);
   const [product, setProduct] = useState("");
   const [category, setCategory] = useState("");
   const [operationType, setOperationType] = useState("Satış");
@@ -176,6 +178,7 @@ export const ReportsModal = ({
 
     const operationData = {
       product: product.trim(),
+      sku: operationType === "Xərc" ? "" : selectedProduct?.sku || "",
       category,
       operationType,
       amount: normalizedAmount,

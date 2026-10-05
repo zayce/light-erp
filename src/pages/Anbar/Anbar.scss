@@ -693,3 +693,32 @@
     }
   }
 }
+
+/* --- additions: CSV button, clickable low-stock card --- */
+.Anbar-Wrapper .Anbar-Header-Button {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .button-opis.secondary {
+    background: #fff;
+    color: #334155;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow: none;
+  }
+}
+
+.Anbar-Wrapper .Stats-Card.clickable {
+  cursor: pointer;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &.active {
+    box-shadow: 0 0 0 2px #f59e0b;
+  }
+}

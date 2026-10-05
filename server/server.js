@@ -142,6 +142,24 @@ app.put("/products/:sku", (req, res) => {
   res.json(products[index]);
 });
 
+// Atomic stock change (used by barcode scans): body { delta: number }
+app.patch("/products/:sku/stock", (req, res) => {
+  const index = products.findIndex((p) => sameSku(p.sku, req.params.sku));
+  if (index === -1) return res.status(404).json({ error: "Məhsul tapılmadı" });
+
+  const delta = Number((req.body || {}).delta);
+  if (!Number.isFinite(delta) || !Number.isInteger(delta) || delta === 0) {
+    return res
+      .status(400)
+      .json({ error: '"delta" sıfırdan fərqli tam ədəd olmalıdır' });
+  }
+
+  const next = Number(products[index].stockCurrent || 0) + delta;
+  products[index] = { ...products[index], stockCurrent: Math.max(0, next) };
+  saveProducts();
+  res.json(products[index]);
+});
+
 app.delete("/products/:sku", (req, res) => {
   const before = products.length;
   products = products.filter((p) => !sameSku(p.sku, req.params.sku));
@@ -152,6 +170,24 @@ app.delete("/products/:sku", (req, res) => {
   res.status(204).end();
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} (data: ${DATA_FILE})`);
+// Malformed JSON and other errors answer with JSON instead of an HTML stack trace.
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  if (err && err.type === "entity.parse.failed") {
+    return res.status(400).json({ error: "JSON formatı yanlışdır" });
+  }
+  if (err && err.type === "entity.too.large") {
+    return res.status(413).json({ error: "Sorğu çox böyükdür" });
+  }
+  console.error(err);
+  res.status(500).json({ error: "Daxili server xətası" });
 });
+
+// Tests import the app; only listen when run directly (node server.js).
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT} (data: ${DATA_FILE})`);
+  });
+}
+
+module.exports = app;

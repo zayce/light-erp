@@ -1,21 +1,25 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import { Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { NewProductModal } from "../../Component/NewProductModal/NewProductModal";
+import { EditProductModal } from "../../Component/EditProductModal/EditProductModal";
+import { InventoryCountModal } from "../../Component/InventoryCountModal/InventoryCountModal";
 import { useApp } from "../../AppContext";
 import "./Anbar.scss";
 import { CameraScanner } from "../../Component/CameraScaner/CameraScaner";
 import toast from "react-hot-toast";
-import { api } from "../../shared/api/axios";
 import { formatMoney } from "../../utils/format";
+import {
+  getStockStatus,
+  stockPercent,
+  isLowStatus,
+  STATUS_LABELS,
+} from "../../utils/stock";
 import { toCsv, downloadCsv } from "../../utils/csv";
 
 const sameText = (a, b) =>
-  String(a ?? "")
-    .trim()
-    .toLowerCase() ===
-  String(b ?? "")
-    .trim()
-    .toLowerCase();
+  String(a ?? "").trim().toLowerCase() === String(b ?? "").trim().toLowerCase();
+
+const PAGE_SIZE = 30;
 
 const SORT_OPTIONS = [
   { value: "default", label: "Sıralama: standart" },
@@ -76,6 +80,9 @@ export const Anbar = () => {
   const [deletingSku, setDeletingSku] = useState(null);
   const [editing, setEditing] = useState(null);
   const [onlyLow, setOnlyLow] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [openCount, setOpenCount] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [sortBy, setSortBy] = useState("default");
   const searchRef = useRef(null);
   // true once an edit was committed/cancelled, so the blur fired by unmounting
@@ -87,9 +94,7 @@ export const Anbar = () => {
 
   const [flash, setFlash] = useState(false);
   const handleScan = (code) => {
-    const normalized = String(code || "")
-      .trim()
-      .toLowerCase();
+    const normalized = String(code || "").trim().toLowerCase();
     const scanned = (state.anbar || []).find((item) =>
       [item.sku, item.barcode, item.name].some(
         (value) => String(value || "").toLowerCase() === normalized,
@@ -98,13 +103,6 @@ export const Anbar = () => {
 
     if (scanned) {
       toast.success(`${scanned.name}: stok +1`);
-      api
-        .patch(`/products/${encodeURIComponent(scanned.sku)}/stock`, {
-          delta: 1,
-        })
-        .catch(() => {
-          // server əlçatan deyilsə, lokal dəyişiklik qalır
-        });
     } else {
       toast.error(`Məhsul tapılmadı: ${code}`);
     }
@@ -122,24 +120,6 @@ export const Anbar = () => {
     });
   };
 
-  useEffect(() => {
-    let cancelled = false;
-
-    api
-      .get("/products")
-      .then((res) => {
-        if (cancelled || !Array.isArray(res.data)) return;
-        // lokal məlumatı əvəz etmirik, yalnız yeni məhsulları əlavə edirik
-        dispatch({ type: "MERGE_ANBAR", payload: res.data });
-      })
-      .catch((err) => {
-        console.error("Server-dən yükləmə xətası:", err);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [dispatch]);
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
@@ -200,13 +180,6 @@ export const Anbar = () => {
 
   const visibleSubcategories = selectedCategoryObj?.subcategories || [];
 
-  const getStatus = (current, min) => {
-    if (current <= min * 0.3) return "kritik";
-    if (current < min) return "asagi";
-    if (current > min * 2) return "yuksek";
-    return "normal";
-  };
-
   const totalStockValue = useMemo(() => {
     return products.reduce((sum, item) => {
       return sum + Number(item?.stockCurrent || 0) * Number(item?.price || 0);
@@ -216,7 +189,7 @@ export const Anbar = () => {
   const lowStockCount = useMemo(() => {
     return products.filter((item) =>
       ["asagi", "kritik"].includes(
-        getStatus(Number(item?.stockCurrent || 0), Number(item?.stockMin || 0)),
+        getStockStatus(Number(item?.stockCurrent || 0), Number(item?.stockMin || 0)),
       ),
     ).length;
   }, [products]);
@@ -246,12 +219,7 @@ export const Anbar = () => {
 
       const matchesLow =
         !onlyLow ||
-        ["asagi", "kritik"].includes(
-          getStatus(
-            Number(item?.stockCurrent || 0),
-            Number(item?.stockMin || 0),
-          ),
-        );
+        isLowStatus(getStockStatus(item?.stockCurrent, item?.stockMin));
 
       return (
         matchesSearch && matchesCategory && matchesSubcategory && matchesLow
@@ -283,6 +251,28 @@ export const Anbar = () => {
     }
   }, [filteredProducts, sortBy]);
 
+  // a new search/filter/sort starts again from the first page
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [searchTerm, selectedCategory, selectedSubcategory, onlyLow, sortBy]);
+
+  const pagedProducts = sortedProducts.slice(0, visibleCount);
+  const hiddenCount = sortedProducts.length - pagedProducts.length;
+
+  const applyStockCount = (counts, changed) => {
+    dispatch({ type: "STOCK_COUNT", payload: counts });
+    setOpenCount(false);
+    toast.success(`İnventarizasiya tətbiq olundu: ${changed} məhsul`);
+  };
+
+  const resetFilters = () => {
+    setSearchTerm("");
+    setSelectedCategory("all");
+    setSelectedSubcategory("all");
+    setOnlyLow(false);
+    setSortBy("default");
+  };
+
   const exportCsv = () => {
     if (!sortedProducts.length) {
       toast.error("İxrac üçün məhsul yoxdur");
@@ -307,7 +297,7 @@ export const Anbar = () => {
     downloadCsv(`anbar-${new Date().toISOString().slice(0, 10)}.csv`, csv);
   };
 
-  const addProduct = async (data) => {
+  const addProduct = (data) => {
     const newItem = {
       sku: String(data?.sku || "").trim(),
       name: String(data?.name || "").trim(),
@@ -338,41 +328,30 @@ export const Anbar = () => {
       return;
     }
 
-    let savedProduct = newItem;
-
-    try {
-      const res = await api.post("/products", newItem);
-      savedProduct = res.data;
-    } catch (err) {
-      if (err?.response?.status === 409) {
-        toast.error("Bu SKU artıq mövcuddur");
-        return;
-      }
-      toast.error("Server əlçatan deyil, məhsul yalnız lokal saxlanıldı");
-    }
-
     dispatch({
       type: "ADD_ANBAR_ITEM",
-      payload: savedProduct,
+      payload: newItem,
     });
 
     setOpenNewProduct(false);
   };
 
+  const saveEditedProduct = (originalSku, data) => {
+    dispatch({
+      type: "UPDATE_ANBAR_ITEM",
+      payload: { sku: originalSku, data },
+    });
+    setEditingProduct(null);
+    toast.success("Məhsul yeniləndi");
+  };
+
   const restoreProduct = (item) => {
     dispatch({ type: "ADD_ANBAR_ITEM", payload: item });
-    api.post("/products", item).catch(() => {
-      // server əlçatan deyilsə, məhsul lokal bərpa olunur
-    });
   };
 
   const deleteProduct = (sku) => {
     const item = products.find((p) => p.sku === sku);
     setDeletingSku(sku);
-
-    api.delete(`/products/${encodeURIComponent(sku)}`).catch(() => {
-      // server-də yoxdursa və ya əlçatan deyilsə, lokal silmə davam edir
-    });
 
     setTimeout(() => {
       dispatch({
@@ -503,12 +482,6 @@ export const Anbar = () => {
       },
     });
 
-    api
-      .put(`/products/${encodeURIComponent(sku)}`, { [field]: normalizedValue })
-      .catch(() => {
-        // server-də yoxdursa və ya əlçatan deyilsə, lokal dəyişiklik qalır
-      });
-
     stopEdit();
   };
 
@@ -541,6 +514,13 @@ export const Anbar = () => {
           </div>
 
           <div className="Anbar-Header-Button">
+            <button
+              className="button-opis secondary"
+              onClick={() => setOpenCount(true)}
+              type="button"
+            >
+              <div className="button-text">📋 İnventarizasiya</div>
+            </button>
             <button
               className="button-opis secondary"
               onClick={exportCsv}
@@ -592,7 +572,9 @@ export const Anbar = () => {
             <div className="Stats-Icon green">✅</div>
             <div className="Stats-Text">
               <div className="Stats-Title">Ümumi Dəyər</div>
-              <div className="Stats-Value">{formatMoney(totalStockValue)}</div>
+              <div className="Stats-Value">
+                {formatMoney(totalStockValue)}
+              </div>
             </div>
           </div>
         </div>
@@ -656,11 +638,11 @@ export const Anbar = () => {
           </div>
 
           {sortedProducts.length > 0 ? (
-            sortedProducts.map((item) => {
+            pagedProducts.map((item) => {
               const total =
                 Number(item?.stockCurrent || 0) * Number(item?.price || 0);
 
-              const status = getStatus(
+              const status = getStockStatus(
                 Number(item?.stockCurrent || 0),
                 Number(item?.stockMin || 0),
               );
@@ -669,7 +651,7 @@ export const Anbar = () => {
 
               return (
                 <div
-                  className={`row body ${isDeleting ? "is-deleting" : ""}`}
+                  className={`row body ${isDeleting ? "is-deleting" : ""} ${status === "kritik" ? "is-critical" : ""}`}
                   key={item?.sku}
                 >
                   <EditableCell
@@ -713,20 +695,36 @@ export const Anbar = () => {
                     </span>
                     <span className="min"> / </span>
                     <span>{item?.stockMin}</span>
+                    <div className="stock-bar">
+                      <span
+                        className={status}
+                        style={{
+                          width: `${stockPercent(item?.stockCurrent, item?.stockMin)}%`,
+                        }}
+                      />
+                    </div>
                   </div>
 
                   <div className="cell price">{item?.price}</div>
 
                   <div className="cell">
                     <span className={`status ${status}`}>
-                      {status === "normal" && "Normal"}
-                      {status === "asagi" && "Aşağı"}
-                      {status === "kritik" && "Kritik"}
-                      {status === "yuksek" && "Yüksək"}
+                      {STATUS_LABELS[status]}
                     </span>
                   </div>
 
                   <div className="cell total">{formatMoney(total)}</div>
+
+                  <button
+                    type="button"
+                    className="row-edit"
+                    onClick={() => setEditingProduct(item)}
+                    aria-label="edit"
+                    title="Redaktə et"
+                    disabled={isDeleting}
+                  >
+                    <Pencil size={18} />
+                  </button>
 
                   <button
                     type="button"
@@ -742,9 +740,44 @@ export const Anbar = () => {
               );
             })
           ) : (
-            <div className="Anbar-Empty">Məhsul tapılmadı</div>
+            <div className="Anbar-Empty">
+              <div className="Anbar-Empty-icon">📦</div>
+              <div className="Anbar-Empty-title">Məhsul tapılmadı</div>
+              <div className="Anbar-Empty-hint">
+                {products.length === 0
+                  ? "Anbar boşdur. İlk məhsulu əlavə edin."
+                  : "Axtarış və ya filtrlərə uyğun məhsul yoxdur."}
+              </div>
+              {products.length === 0 ? (
+                <button
+                  type="button"
+                  className="Anbar-Empty-btn"
+                  onClick={() => setOpenNewProduct(true)}
+                >
+                  + Yeni Məhsul
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="Anbar-Empty-btn"
+                  onClick={resetFilters}
+                >
+                  Filtrləri sıfırla
+                </button>
+              )}
+            </div>
           )}
         </div>
+
+        {hiddenCount > 0 && (
+          <button
+            type="button"
+            className="Anbar-LoadMore"
+            onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+          >
+            Daha çox göstər ({hiddenCount} qalıb)
+          </button>
+        )}
 
         <div className={`scanner-box ${flash ? "scan-success" : ""}`}>
           <div className="scanner-header">
@@ -765,6 +798,22 @@ export const Anbar = () => {
           <button className="scanner-btn">Kamera icazə ver</button>
         </div>
       </div>
+
+      <InventoryCountModal
+        open={openCount}
+        products={products}
+        onClose={() => setOpenCount(false)}
+        onApply={applyStockCount}
+      />
+
+      <EditProductModal
+        open={Boolean(editingProduct)}
+        product={editingProduct}
+        products={products}
+        categories={state.categories}
+        onClose={() => setEditingProduct(null)}
+        onSave={saveEditedProduct}
+      />
 
       <NewProductModal
         open={openNewProduct}

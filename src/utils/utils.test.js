@@ -1,5 +1,5 @@
 import { createId } from "./id";
-import { formatMoney, formatSignedMoney } from "./format";
+import { formatMoney, formatSignedMoney, setCurrency } from "./format";
 import { toCsv } from "./csv";
 import { readStorage, writeStorage } from "./storage";
 
@@ -8,6 +8,15 @@ test("createId is strictly increasing", () => {
   for (let i = 1; i < ids.length; i += 1) {
     expect(ids[i]).toBeGreaterThan(ids[i - 1]);
   }
+});
+
+test("currency symbol follows the setting and ignores unknown codes", () => {
+  setCurrency("USD");
+  expect(formatMoney(5)).toBe("$5");
+  setCurrency("???");
+  expect(formatMoney(5)).toBe("$5");
+  setCurrency("AZN");
+  expect(formatMoney(5)).toBe("₼5");
 });
 
 test("money formatting", () => {
@@ -34,24 +43,18 @@ describe("toCsv", () => {
   });
 
   test("empty values become empty cells", () => {
-    expect(
-      toCsv([{ name: null, qty: undefined }], columns).split("\r\n")[1],
-    ).toBe(";");
+    expect(toCsv([{ name: null, qty: undefined }], columns).split("\r\n")[1]).toBe(";");
   });
 });
 
 describe("storage helpers", () => {
   test("never throw when localStorage fails", () => {
-    const get = jest
-      .spyOn(Storage.prototype, "getItem")
-      .mockImplementation(() => {
-        throw new Error("denied");
-      });
-    const set = jest
-      .spyOn(Storage.prototype, "setItem")
-      .mockImplementation(() => {
-        throw new Error("quota");
-      });
+    const get = jest.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("denied");
+    });
+    const set = jest.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("quota");
+    });
     const warn = jest.spyOn(console, "warn").mockImplementation(() => {});
 
     expect(readStorage("k")).toBeNull();

@@ -128,3 +128,67 @@
     color: #6b7280;
   }
 }
+
+/* low-stock badge next to "Anbar" */
+.sidebar__menu a.menu-item {
+  position: relative;
+}
+
+.sidebar__menu .menu-badge {
+  margin-left: auto;
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* sync status + logout */
+.sidebar {
+  .sync-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 16px 8px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 14px;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    &.saving .dot,
+    &.loading .dot { background: #3b82f6; }
+    &.offline .dot { background: #f59e0b; }
+    &.error .dot { background: #ef4444; }
+  }
+
+  .sidebar__user-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .sidebar__user { flex: 1; min-width: 0; }
+
+    .logout-btn {
+      border: 0;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      padding: 10px;
+      border-radius: 10px;
+
+      &:hover { background: #fee2e2; color: #dc2626; }
+    }
+  }
+}

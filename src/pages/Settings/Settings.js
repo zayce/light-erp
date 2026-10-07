@@ -1,7 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
-import { User, Save, Loader2, Bell, Lock, Database } from "lucide-react";
+import {
+  User,
+  Save,
+  Loader2,
+  Bell,
+  Lock,
+  Database,
+  Users,
+  Download,
+  Upload,
+  Trash2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
+import { api, errorMessage } from "../../shared/api/axios";
+import { useAuth } from "../../AuthContext";
+import { useApp } from "../../AppContext";
+import { buildBackup, parseBackup } from "../../utils/backup";
+import { downloadFile } from "../../utils/csv";
 import "./Settings.scss";
 
 /* ===== Initials (лучше снаружи компонента) ===== */
@@ -32,6 +48,8 @@ const initialSystem = {
 
 export const Settings = () => {
   const { t } = useTranslation();
+  const { user, updateUser } = useAuth();
+  const { state, dispatch } = useApp();
   // profile
   const [profile, setProfile] = useState(initialProfile);
   const [profileInitial, setProfileInitial] = useState(initialProfile);
@@ -56,18 +74,6 @@ export const Settings = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  // endpoints (поменяешь под backend)
-  const API_PROFILE_GET = "/api/profile";
-  const API_PROFILE_UPDATE = "/api/profile";
-
-  const API_NOTIF_GET = "/api/settings/notifications";
-  const API_NOTIF_UPDATE = "/api/settings/notifications";
-
-  const API_PASSWORD_UPDATE = "/api/settings/password";
-
-  const API_SYSTEM_GET = "/api/settings/system";
-  const API_SYSTEM_UPDATE = "/api/settings/system";
 
   // dirty checks
   const profileDirty = useMemo(
@@ -116,64 +122,30 @@ export const Settings = () => {
     setSystem((prev) => ({ ...prev, [key]: e.target.value }));
   };
 
-  // load all
-  const loadAll = async () => {
-    try {
-      setLoading(true);
-      setError("");
+  // Profile and notifications come from the signed-in user, system settings from the shared data.
+  useEffect(() => {
+    if (!user) return;
 
-      // ---- BACKEND ВАРИАНТ ----
-      // const [pRes, nRes, sRes] = await Promise.all([
-      //   fetch(API_PROFILE_GET, { credentials: "include" }),
-      //   fetch(API_NOTIF_GET, { credentials: "include" }),
-      //   fetch(API_SYSTEM_GET, { credentials: "include" }),
-      // ]);
-      // if (!pRes.ok) throw new Error("Profil yüklənmədi");
-      // if (!nRes.ok) throw new Error("Bildiriş parametrləri yüklənmədi");
-      // if (!sRes.ok) throw new Error("Sistem parametrləri yüklənmədi");
-      // const pData = await pRes.json();
-      // const nData = await nRes.json();
-      // const sData = await sRes.json();
+    const pData = {
+      firstName: user.firstName || "",
+      lastName: user.lastName || "",
+      email: user.email || "",
+      phone: user.phone || "",
+    };
+    const nData = { ...initialNotifications, ...(user.notifications || {}) };
 
-      // ✅ MOCK (чтобы UI сразу работал)
-      const pData = {
-        firstName: "İstifadəçi",
-        lastName: "Adminov",
-        email: "admin@hesabla.az",
-        phone: "+994 50 123 45 67",
-      };
-
-      const nData = {
-        emailNotifications: true,
-        lowStockAlerts: true,
-        reportNotifications: false,
-      };
-
-      const sData = {
-        currency: "AZN",
-        language: "az",
-        timezone: "Asia/Baku",
-      };
-
-      setProfile(pData);
-      setProfileInitial(pData);
-
-      setNotif(nData);
-      setNotifInitial(nData);
-
-      setSystem(sData);
-      setSystemInitial(sData);
-    } catch (e) {
-      setError(e?.message || "Xəta baş verdi");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setProfile(pData);
+    setProfileInitial(pData);
+    setNotif(nData);
+    setNotifInitial(nData);
+    setLoading(false);
+  }, [user]);
 
   useEffect(() => {
-    loadAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const sData = { ...initialSystem, ...(state.settings || {}) };
+    setSystem(sData);
+    setSystemInitial(sData);
+  }, [state.settings]);
 
   // validations
   const validateProfile = () => {
@@ -205,23 +177,11 @@ export const Settings = () => {
 
     try {
       setSavingProfile(true);
-
-      // ---- BACKEND ----
-      // const res = await fetch(API_PROFILE_UPDATE, {
-      //   method: "PUT",
-      //   headers: { "Content-Type": "application/json" },
-      //   credentials: "include",
-      //   body: JSON.stringify(profile),
-      // });
-      // if (!res.ok) throw new Error("Profil yadda saxlanılmadı");
-      // const updated = await res.json();
-
-      const updated = { ...profile }; // mock
-      setProfile(updated);
-      setProfileInitial(updated);
+      const res = await api.put("/auth/profile", profile);
+      updateUser(res.data.user);
       setSuccess("Profil yadda saxlanıldı ✅");
     } catch (e) {
-      setError(e?.message || "Profil yadda saxlanılmadı");
+      setError(errorMessage(e, "Profil yadda saxlanılmadı"));
     } finally {
       setSavingProfile(false);
     }
@@ -233,23 +193,11 @@ export const Settings = () => {
 
     try {
       setSavingNotif(true);
-
-      // ---- BACKEND ----
-      // const res = await fetch(API_NOTIF_UPDATE, {
-      //   method: "PUT",
-      //   headers: { "Content-Type": "application/json" },
-      //   credentials: "include",
-      //   body: JSON.stringify(notif),
-      // });
-      // if (!res.ok) throw new Error("Bildirişlər yadda saxlanılmadı");
-      // const updated = await res.json();
-
-      const updated = { ...notif }; // mock
-      setNotif(updated);
-      setNotifInitial(updated);
+      const res = await api.put("/auth/notifications", notif);
+      updateUser(res.data.user);
       setSuccess("Bildiriş parametrləri yadda saxlanıldı ✅");
     } catch (e) {
-      setError(e?.message || "Bildirişlər yadda saxlanılmadı");
+      setError(errorMessage(e, "Bildirişlər yadda saxlanılmadı"));
     } finally {
       setSavingNotif(false);
     }
@@ -264,23 +212,16 @@ export const Settings = () => {
 
     try {
       setSavingPwd(true);
-
-      // ---- BACKEND ----
-      // const res = await fetch(API_PASSWORD_UPDATE, {
-      //   method: "PUT",
-      //   headers: { "Content-Type": "application/json" },
-      //   credentials: "include",
-      //   body: JSON.stringify({
-      //     currentPassword: pwd.currentPassword,
-      //     newPassword: pwd.newPassword,
-      //   }),
-      // });
-      // if (!res.ok) throw new Error("Şifrə dəyişdirilmədi");
-
+      const res = await api.put("/auth/password", {
+        currentPassword: pwd.currentPassword,
+        newPassword: pwd.newPassword,
+      });
+      // the server revoked every old token and issued a new one for this device
+      updateUser(res.data.user, res.data.token);
       setPwd(initialPassword);
       setSuccess("Şifrə uğurla dəyişdirildi ✅");
     } catch (e) {
-      setError(e?.message || "Şifrə dəyişdirilmədi");
+      setError(errorMessage(e, "Şifrə dəyişdirilmədi"));
     } finally {
       setSavingPwd(false);
     }
@@ -290,27 +231,99 @@ export const Settings = () => {
     setSuccess("");
     setError("");
 
+    setSavingSystem(true);
+    dispatch({ type: "UPDATE_SETTINGS", payload: system });
+    setSavingSystem(false);
+    setSuccess(
+      "Sistem parametrləri yadda saxlanıldı ✅ (valyuta yalnız simvolu dəyişir, məbləğlər çevrilmir)",
+    );
+  };
+
+  // ---- backup ----
+  const exportBackup = () => {
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadFile(
+      `hesabla-ehtiyat-${stamp}.json`,
+      JSON.stringify(buildBackup(state), null, 2),
+      "application/json",
+    );
+  };
+
+  const importBackup = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allows choosing the same file again
+    if (!file) return;
+
+    setSuccess("");
+    setError("");
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = parseBackup(String(reader.result));
+        const ok = window.confirm(
+          `Fayldan ${data.anbar.length} məhsul, ${data.report.length} hesabat və ${data.cashflow.length} pul axını qeydi yüklənəcək.\n\nCari məlumatların hamısı əvəz olunacaq. Davam edilsin?`,
+        );
+        if (!ok) return;
+        dispatch({ type: "REPLACE_DATA", payload: data });
+        setSuccess("Ehtiyat nüsxə yükləndi ✅");
+      } catch (err) {
+        setError(err.message || "Fayl oxunmadı");
+      }
+    };
+    reader.onerror = () => setError("Fayl oxunmadı");
+    reader.readAsText(file);
+  };
+
+  // ---- users (admin only) ----
+  const isAdmin = user?.role === "admin";
+  const [team, setTeam] = useState([]);
+  const [newUser, setNewUser] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    role: "staff",
+  });
+  const [addingUser, setAddingUser] = useState(false);
+
+  const loadTeam = () =>
+    api
+      .get("/users")
+      .then((res) => setTeam(res.data))
+      .catch((e) => setError(errorMessage(e, "İstifadəçilər yüklənmədi")));
+
+  useEffect(() => {
+    if (isAdmin) loadTeam();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin]);
+
+  const addUser = async () => {
+    setSuccess("");
+    setError("");
     try {
-      setSavingSystem(true);
-
-      // ---- BACKEND ----
-      // const res = await fetch(API_SYSTEM_UPDATE, {
-      //   method: "PUT",
-      //   headers: { "Content-Type": "application/json" },
-      //   credentials: "include",
-      //   body: JSON.stringify(system),
-      // });
-      // if (!res.ok) throw new Error("Sistem parametrləri yadda saxlanılmadı");
-      // const updated = await res.json();
-
-      const updated = { ...system }; // mock
-      setSystem(updated);
-      setSystemInitial(updated);
-      setSuccess("Sistem parametrləri yadda saxlanıldı ✅");
+      setAddingUser(true);
+      await api.post("/users", newUser);
+      setNewUser({ firstName: "", lastName: "", email: "", password: "", role: "staff" });
+      await loadTeam();
+      setSuccess("İstifadəçi əlavə olundu ✅");
     } catch (e) {
-      setError(e?.message || "Sistem parametrləri yadda saxlanılmadı");
+      setError(errorMessage(e, "İstifadəçi əlavə olunmadı"));
     } finally {
-      setSavingSystem(false);
+      setAddingUser(false);
+    }
+  };
+
+  const removeUser = async (u) => {
+    if (!window.confirm(`${u.firstName} ${u.lastName} silinsin?`)) return;
+    setSuccess("");
+    setError("");
+    try {
+      await api.delete(`/users/${u.id}`);
+      await loadTeam();
+      setSuccess("İstifadəçi silindi ✅");
+    } catch (e) {
+      setError(errorMessage(e, "İstifadəçi silinmədi"));
     }
   };
 
@@ -610,26 +623,14 @@ export const Settings = () => {
                   <select
                     className="Select"
                     value={system.language}
-                    onChange={onSystemChange("language")}
+                    onChange={(e) => {
+                      onSystemChange("language")(e);
+                      i18n.changeLanguage(e.target.value);
+                    }}
                   >
-                    <option
-                      className={i18n.language === "az" ? "active" : ""}
-                      onClick={() => i18n.changeLanguage("az")}
-                    >
-                      Azərbaycan dili
-                    </option>
-                    <option
-                      className={i18n.language === "ru" ? "active" : ""}
-                      onClick={() => i18n.changeLanguage("ru")}
-                    >
-                      Русский
-                    </option>
-                    <option
-                      className={i18n.language === "en" ? "active" : ""}
-                      onClick={() => i18n.changeLanguage("en")}
-                    >
-                      English
-                    </option>
+                    <option value="az">Azərbaycan dili</option>
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
                   </select>
                 </div>
 
@@ -670,6 +671,150 @@ export const Settings = () => {
             )}
           </div>
         </div>
+
+        {/* ===== BACKUP CARD ===== */}
+        <div className="CardShell" style={{ marginTop: 18 }}>
+          <div className="CardHeader">
+            <div className="CardHeader-Left">
+              <div className="CardHeader-Icon">
+                <Download size={18} />
+              </div>
+              <div className="CardHeader-Title">Ehtiyat nüsxə</div>
+            </div>
+          </div>
+          <div className="CardBody">
+            <div className="ProfileForm">
+              <p style={{ margin: 0, color: "#64748b" }}>
+                Bütün məlumatları (anbar, hesabatlar, pul axını, alışlar) JSON faylına saxlayın və ya əvvəlki
+                fayldan bərpa edin. Bərpa cari məlumatları əvəz edir.
+              </p>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <button className="PrimaryBtn" type="button" onClick={exportBackup}>
+                  <Download size={18} />
+                  <span>Yüklə (JSON)</span>
+                </button>
+                <label className="PrimaryBtn" style={{ cursor: "pointer" }}>
+                  <Upload size={18} />
+                  <span>Fayldan bərpa et</span>
+                  <input
+                    type="file"
+                    accept="application/json,.json"
+                    onChange={importBackup}
+                    style={{ display: "none" }}
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ===== USERS CARD (admin) ===== */}
+        {isAdmin && (
+          <div className="CardShell" style={{ marginTop: 18 }}>
+            <div className="CardHeader">
+              <div className="CardHeader-Left">
+                <div className="CardHeader-Icon">
+                  <Users size={18} />
+                </div>
+                <div className="CardHeader-Title">İstifadəçilər</div>
+              </div>
+            </div>
+            <div className="CardBody">
+              <div className="ProfileForm">
+                {team.map((u) => (
+                  <div
+                    key={u.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      padding: "8px 0",
+                      borderBottom: "1px solid #f1f5f9",
+                    }}
+                  >
+                    <div>
+                      <strong>
+                        {u.firstName} {u.lastName}
+                      </strong>{" "}
+                      <span style={{ color: "#64748b" }}>
+                        ({u.role === "admin" ? "admin" : "işçi"})
+                      </span>
+                      <div style={{ color: "#64748b", fontSize: 14 }}>{u.email}</div>
+                    </div>
+                    {u.id !== user.id && (
+                      <button
+                        type="button"
+                        onClick={() => removeUser(u)}
+                        title="Sil"
+                        aria-label="Sil"
+                        style={{ border: 0, background: "transparent", cursor: "pointer", color: "#94a3b8" }}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+
+                <div className="Grid2" style={{ marginTop: 12 }}>
+                  <div className="Field">
+                    <label className="Label">Ad</label>
+                    <input
+                      className="Input"
+                      value={newUser.firstName}
+                      onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
+                    />
+                  </div>
+                  <div className="Field">
+                    <label className="Label">Soyad</label>
+                    <input
+                      className="Input"
+                      value={newUser.lastName}
+                      onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
+                    />
+                  </div>
+                  <div className="Field">
+                    <label className="Label">E-poçt</label>
+                    <input
+                      className="Input"
+                      type="email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="Field">
+                    <label className="Label">Şifrə (ən az 6 simvol)</label>
+                    <input
+                      className="Input"
+                      type="password"
+                      autoComplete="new-password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                    />
+                  </div>
+                  <div className="Field">
+                    <label className="Label">Rol</label>
+                    <select
+                      className="Select"
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                    >
+                      <option value="staff">İşçi</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="SystemFooter">
+                  <button className="SaveBigBtn" type="button" onClick={addUser} disabled={addingUser}>
+                    {addingUser ? <Loader2 className="Spin" size={18} /> : <Save size={18} />}
+                    <span>{addingUser ? "Əlavə olunur..." : "İstifadəçi əlavə et"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

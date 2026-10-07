@@ -63,5 +63,10 @@
     "path": "^0.12.7",
     "prettier": "^3.7.4",
     "vite-plugin-svgr": "^4.5.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
+    }
   }
 }

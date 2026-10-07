@@ -1,0 +1,103 @@
+.Login-Wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+  box-sizing: border-box;
+}
+
+.Login-Card {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 36px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
+  box-sizing: border-box;
+
+  .Login-Logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2563eb;
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  h1 { margin: 0; font-size: 28px; color: #0f172a; }
+  .Login-Sub { margin: -8px 0 4px; color: #64748b; font-size: 16px; }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #334155;
+    flex: 1;
+  }
+
+  input {
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+
+    &:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+  }
+
+  .Login-Row { display: flex; gap: 12px; }
+
+  .Login-Alert {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 15px;
+
+    &.error { background: #fee2e2; color: #991b1b; }
+
+    button {
+      border: 0;
+      background: transparent;
+      color: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: inherit;
+    }
+  }
+
+  .Login-Submit {
+    margin-top: 4px;
+    padding: 14px;
+    border: 0;
+    border-radius: 12px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #1d4ed8; }
+    &:disabled { opacity: 0.6; cursor: default; }
+  }
+}
+
+.Auth-Loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: #64748b;
+  font-size: 20px;
+}
+
+@media (max-width: 480px) {
+  .Login-Card { padding: 24px; .Login-Row { flex-direction: column; } }
+}

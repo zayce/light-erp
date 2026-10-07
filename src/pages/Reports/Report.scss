@@ -508,3 +508,17 @@
   font-size: 16px;
   color: #64748b;
 }
+
+/* CSV export button next to the primary action */
+.Report-Header-Button {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .button-opis.secondary {
+    background: #fff;
+    color: #334155;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow: none;
+  }
+}

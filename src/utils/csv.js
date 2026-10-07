@@ -20,7 +20,9 @@ export const toCsv = (rows, columns, delimiter = ";") => {
     .map((col) => escapeCell(col.label, delimiter))
     .join(delimiter);
   const body = rows.map((row) =>
-    columns.map((col) => escapeCell(col.value(row), delimiter)).join(delimiter),
+    columns
+      .map((col) => escapeCell(col.value(row), delimiter))
+      .join(delimiter),
   );
   return [header, ...body].join("\r\n");
 };
@@ -28,6 +30,19 @@ export const toCsv = (rows, columns, delimiter = ";") => {
 export const downloadCsv = (filename, csv) => {
   // BOM so Excel opens the file as UTF-8 (ə, ı, ş ...).
   const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
+// Generic download used by the JSON backup.
+export const downloadFile = (filename, content, type = "text/plain") => {
+  const blob = new Blob([content], { type: `${type};charset=utf-8` });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;

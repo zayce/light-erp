@@ -11,6 +11,7 @@
 /build
 
 # local data and env
+/server/data/
 /server/data.json
 /server/data.json.tmp
 .env

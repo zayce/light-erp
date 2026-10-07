@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer } from "react";
 import toast from "react-hot-toast";
 import { createId } from "./utils/id";
-import { formatSignedMoney } from "./utils/format";
+import { formatSignedMoney, setCurrency } from "./utils/format";
 import { readStorage, writeStorage } from "./utils/storage";
 
 const AppContext = createContext(null);
@@ -173,6 +173,19 @@ const normalizeAnbar = (anbar) => {
   }));
 };
 
+const defaultSettings = () => ({
+  currency: "AZN",
+  language: "az",
+  timezone: "Asia/Baku",
+});
+
+const normalizeSettings = (settings) => ({
+  ...defaultSettings(),
+  ...(settings && typeof settings === "object" && !Array.isArray(settings)
+    ? settings
+    : {}),
+});
+
 export const normalizeState = (data) => {
   return {
     report: Array.isArray(data?.report) ? data.report : [],
@@ -180,26 +193,30 @@ export const normalizeState = (data) => {
     users: Array.isArray(data?.users) ? data.users : [],
     anbar: normalizeAnbar(data?.anbar),
     categories: normalizeCategories(data?.categories),
+    purchases: Array.isArray(data?.purchases) ? data.purchases : [],
+    settings: normalizeSettings(data?.settings),
   };
 };
+
+const round2 = (n) => Math.round(Number(n || 0) * 100) / 100;
 
 const formatCashflowAmount = (type, value) => formatSignedMoney(type, value);
 
 const sameText = (a, b) =>
-  String(a ?? "")
-    .trim()
-    .toLowerCase() ===
-  String(b ?? "")
-    .trim()
-    .toLowerCase();
+  String(a ?? "").trim().toLowerCase() === String(b ?? "").trim().toLowerCase();
 
 // delta < 0 takes stock out (sale), delta > 0 puts it back.
 // Matches by SKU first; falls back to name for reports created before SKU was stored.
-const adjustStock = (anbar, ref, delta) => {
+const findProductIndex = (anbar, ref) => {
   let index = ref?.sku ? anbar.findIndex((i) => sameText(i.sku, ref.sku)) : -1;
   if (index === -1 && ref?.name) {
     index = anbar.findIndex((i) => sameText(i.name, ref.name));
   }
+  return index;
+};
+
+const adjustStock = (anbar, ref, delta) => {
+  const index = findProductIndex(anbar, ref);
   if (index === -1) return anbar;
 
   return anbar.map((item, i) =>
@@ -244,6 +261,28 @@ export const reducer = (state, action) => {
         ...action.payload,
       });
 
+    // Replaces everything (used when data arrives from the server or a backup).
+    case "REPLACE_DATA":
+      return normalizeState(action.payload);
+
+    case "RESET_DATA":
+      return normalizeState({
+        report: [],
+        cashflow: [],
+        users: [],
+        anbar: [],
+        purchases: [],
+      });
+
+    case "UPDATE_SETTINGS":
+      return {
+        ...safeState,
+        settings: normalizeSettings({
+          ...safeState.settings,
+          ...action.payload,
+        }),
+      };
+
     case "ADD_REPORT_ITEM": {
       const revenue = Number(action.payload.amount || 0);
       const salesCount = Number(action.payload.salesCount || 0);
@@ -253,12 +292,26 @@ export const reducer = (state, action) => {
       const reportId = createId();
       const cashflowId = createId();
 
+      // cost of goods sold, frozen at the moment of the sale
+      const soldIndex =
+        operationType !== "Xərc"
+          ? findProductIndex(safeState.anbar, {
+              sku: action.payload.sku,
+              name: action.payload.product,
+            })
+          : -1;
+      const cogs =
+        soldIndex === -1
+          ? 0
+          : round2(salesCount * Number(safeState.anbar[soldIndex].cost || 0));
+
       const newReportItem = {
         id: reportId,
         name: action.payload.product,
         sku: action.payload.sku || "",
         salesCount,
         revenue,
+        cogs,
         performance: calcPerformance(revenue, safeState.report),
         category: action.payload.category,
         operationType,
@@ -308,6 +361,18 @@ export const reducer = (state, action) => {
       const cashflowType =
         action.payload.data.operationType === "Xərc" ? "expense" : "income";
 
+      const soldIndex =
+        action.payload.data.operationType !== "Xərc"
+          ? findProductIndex(safeState.anbar, {
+              sku: action.payload.data.sku,
+              name: action.payload.data.product,
+            })
+          : -1;
+      const cogs =
+        soldIndex === -1
+          ? 0
+          : round2(salesCount * Number(safeState.anbar[soldIndex].cost || 0));
+
       const updatedReport = safeState.report.map((item) =>
         item.id === action.payload.id
           ? {
@@ -316,6 +381,7 @@ export const reducer = (state, action) => {
               sku: action.payload.data.sku || item.sku || "",
               salesCount,
               revenue,
+              cogs,
               performance: calcPerformance(
                 revenue,
                 safeState.report,
@@ -475,24 +541,6 @@ export const reducer = (state, action) => {
         anbar: action.payload,
       };
 
-    // Server-dən gələn məhsulları əlavə edir, lokal məlumatları silmir
-    case "MERGE_ANBAR": {
-      const incoming = Array.isArray(action.payload) ? action.payload : [];
-      const known = new Set(
-        safeState.anbar.map((item) => String(item.sku).toLowerCase()),
-      );
-      const fresh = incoming.filter(
-        (item) => item?.sku && !known.has(String(item.sku).toLowerCase()),
-      );
-
-      if (!fresh.length) return safeState;
-
-      return {
-        ...safeState,
-        anbar: [...fresh, ...safeState.anbar],
-      };
-    }
-
     case "UPDATE_ANBAR_ITEM": {
       const newSku = action.payload.data?.sku;
       const skuChanged = newSku !== undefined && newSku !== action.payload.sku;
@@ -509,6 +557,11 @@ export const reducer = (state, action) => {
               r.sku === action.payload.sku ? { ...r, sku: newSku } : r,
             )
           : safeState.report,
+        purchases: skuChanged
+          ? safeState.purchases.map((p) =>
+              p.sku === action.payload.sku ? { ...p, sku: newSku } : p,
+            )
+          : safeState.purchases,
       };
     }
 
@@ -593,6 +646,117 @@ export const reducer = (state, action) => {
         users: safeState.users.filter((user) => user.id !== action.payload.id),
       };
 
+    // Stock-take: sets the real counted quantity. payload: [{ sku, counted }]
+    case "STOCK_COUNT": {
+      const counts = new Map(
+        (Array.isArray(action.payload) ? action.payload : [])
+          .filter((c) => c && Number.isFinite(Number(c.counted)) && Number(c.counted) >= 0)
+          .map((c) => [String(c.sku).trim().toLowerCase(), Number(c.counted)]),
+      );
+      if (counts.size === 0) return safeState;
+
+      return {
+        ...safeState,
+        anbar: safeState.anbar.map((item) => {
+          const key = String(item.sku).trim().toLowerCase();
+          return counts.has(key)
+            ? { ...item, stockCurrent: counts.get(key) }
+            : item;
+        }),
+      };
+    }
+
+    case "ADD_PURCHASE": {
+      const qty = Number(action.payload?.qty);
+      const unitCost = Number(action.payload?.unitCost);
+      if (!(qty > 0) || !(unitCost >= 0)) return safeState;
+
+      const index = findProductIndex(safeState.anbar, {
+        sku: action.payload.sku,
+        name: action.payload.name,
+      });
+      if (index === -1) return safeState;
+
+      const product = safeState.anbar[index];
+      const total = round2(qty * unitCost);
+      const purchaseId = createId();
+      const cashflowId = createId();
+      const date = action.payload.date || new Date().toISOString().slice(0, 10);
+
+      const oldStock = Number(product.stockCurrent || 0);
+      const oldCost = Number(product.cost || 0);
+      // Weighted average cost. An old cost of 0 means "unknown", so it is not averaged in.
+      const newCost =
+        oldCost > 0 && oldStock > 0
+          ? round2((oldStock * oldCost + qty * unitCost) / (oldStock + qty))
+          : round2(unitCost);
+
+      const supplier = String(action.payload.supplier || "").trim();
+
+      const purchase = {
+        id: purchaseId,
+        sku: product.sku,
+        name: product.name,
+        qty,
+        unitCost: round2(unitCost),
+        total,
+        supplier,
+        date,
+        note: String(action.payload.note || "").trim(),
+        linkedCashflowId: cashflowId,
+      };
+
+      const cashflowItem = {
+        id: cashflowId,
+        date,
+        category: "Alış",
+        desc: `Alış: ${product.name} ×${qty}`,
+        type: "expense",
+        amountRaw: total,
+        amount: formatCashflowAmount("expense", total),
+        source: "purchase",
+        sourceId: purchaseId,
+      };
+
+      return {
+        ...safeState,
+        anbar: safeState.anbar.map((item, i) =>
+          i === index
+            ? {
+                ...item,
+                stockCurrent: oldStock + qty,
+                cost: newCost,
+                supplier: item.supplier || supplier,
+              }
+            : item,
+        ),
+        purchases: [purchase, ...safeState.purchases],
+        cashflow: [cashflowItem, ...safeState.cashflow],
+      };
+    }
+
+    // Removes the purchase and its expense and takes the received stock back out.
+    // The averaged cost is not rolled back (history of older costs is not kept).
+    case "DELETE_PURCHASE": {
+      const purchase = safeState.purchases.find(
+        (p) => p.id === action.payload.id,
+      );
+      if (!purchase) return safeState;
+
+      return {
+        ...safeState,
+        purchases: safeState.purchases.filter((p) => p.id !== purchase.id),
+        cashflow: safeState.cashflow.filter(
+          (c) => c.id !== purchase.linkedCashflowId,
+        ),
+        anbar: adjustStock(
+          safeState.anbar,
+          { sku: purchase.sku, name: purchase.name },
+          -Number(purchase.qty || 0),
+        ),
+      };
+    }
+
     case "SCAN_PRODUCT": {
       const code = String(action.payload).trim().toLowerCase();
 
@@ -640,6 +804,9 @@ export const AppProvider = ({ children }) => {
       return normalizeState(parsed);
     },
   );
+
+  // Keep the money formatter in sync with the saved currency (idempotent).
+  setCurrency(state.settings?.currency);
 
   useEffect(() => {
     const ok = writeStorage("global-data", JSON.stringify(state));

@@ -22,6 +22,8 @@ import {
 } from "recharts";
 import { useApp } from "../../AppContext";
 import "./Report.scss";
+import toast from "react-hot-toast";
+import { exportReport } from "../../utils/exports";
 import { ReportsModal } from "../../Component/ReportsModal/ReportsModal";
 
 export const Report = () => {
@@ -270,6 +272,17 @@ export const Report = () => {
             </div>
 
             <div className="Report-Header-Button">
+              <button
+                className="button-opis secondary"
+                onClick={() => {
+                  if (!exportReport(state.report)) {
+                    toast.error("İxrac üçün əməliyyat yoxdur");
+                  }
+                }}
+                type="button"
+              >
+                <div className="button-text">⬇ CSV ixrac</div>
+              </button>
               <button
                 className="button-opis"
                 onClick={() => {

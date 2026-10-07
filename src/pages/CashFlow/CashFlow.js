@@ -1,4 +1,8 @@
 import "./CashFlow.scss";
+import toast from "react-hot-toast";
+import { exportCashflow } from "../../utils/exports";
+import { formatMoney, formatSignedMoney } from "../../utils/format";
+import { amountOf } from "../../utils/dashboard";
 import {
   TrendingUp,
   TrendingDown,
@@ -44,10 +48,6 @@ export const CashFlow = () => {
 
   const { state, dispatch } = useApp();
   const operations = state.cashflow;
-
-  const formatMoney = (value) => {
-    return `₼${Number(value || 0).toLocaleString("az-AZ")}`;
-  };
 
   const totalIncome = useMemo(() => {
     return operations
@@ -194,6 +194,17 @@ export const CashFlow = () => {
 
           <div className="CashFlow-Header-Button">
             <button
+              className="button-opis secondary"
+              onClick={() => {
+                if (!exportCashflow(state.cashflow)) {
+                  toast.error("İxrac üçün əməliyyat yoxdur");
+                }
+              }}
+              type="button"
+            >
+              <div className="button-text">⬇ CSV ixrac</div>
+            </button>
+            <button
               className="button-opis"
               onClick={() => {
                 setEditOperation(null);
@@ -319,7 +330,7 @@ export const CashFlow = () => {
                   </div>
 
                   <div className={`Amount ${op.type} Right`}>
-                    {op.amount}
+                    {formatSignedMoney(op.type, amountOf(op))}
                   </div>
 
                   <div className="Row-Actions">

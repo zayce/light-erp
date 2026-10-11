@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Trash2 } from "lucide-react";
+import { Trash2, Download, ShoppingCart } from "lucide-react";
 import { useApp } from "../../AppContext";
 import { PurchaseModal } from "../../Component/PurchaseModal/PurchaseModal";
 import { formatMoney } from "../../utils/format";
@@ -74,7 +74,7 @@ export const Purchases = () => {
                 if (!exportPurchases(purchases)) toast.error("İxrac üçün alış yoxdur");
               }}
             >
-              ⬇ CSV ixrac
+              <Download size={18} /> CSV ixrac
             </button>
             <button type="button" onClick={() => openModal()}>
               + Yeni alış
@@ -113,7 +113,7 @@ export const Purchases = () => {
                   if (!exportReorderList(suggestions)) toast.error("Siyahı boşdur");
                 }}
               >
-                ⬇ Siyahını CSV
+                <Download size={16} /> Siyahını CSV
               </button>
             </div>
 
@@ -161,7 +161,9 @@ export const Purchases = () => {
 
           {visible.length === 0 ? (
             <div className="Purchases-Empty">
-              <div className="icon">🛒</div>
+              <div className="icon">
+                <ShoppingCart size={44} strokeWidth={1.5} />
+              </div>
               <div>{purchases.length ? "Axtarışa uyğun alış yoxdur" : "Hələ alış qeydi yoxdur"}</div>
               {purchases.length === 0 && (
                 <button type="button" onClick={() => openModal()}>

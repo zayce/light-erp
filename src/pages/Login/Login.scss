@@ -1,94 +1,257 @@
-.Login-Wrapper {
+.Login-Page {
+  --concrete: #dde1e4;
+  --sheet: #fdfdfc;
+  --steel: #2d3e4d;
+  --muted: #55646f;
+  --forklift: #f2b705;
+  --forklift-dark: #d9a203;
+  --marker: #c8352b;
+  --rule: rgba(45, 62, 77, 0.09);
+
   min-height: 100vh;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr) minmax(360px, 460px);
   align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+  gap: clamp(32px, 7vw, 120px);
+  padding: clamp(24px, 6vw, 96px);
   box-sizing: border-box;
-}
+  font-family: "Archivo Variable", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  font-stretch: 100%;
+  color: var(--steel);
+  background-color: var(--concrete);
+  /* faint ledger rules, the paper notebook this replaces */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    var(--rule) 31px,
+    var(--rule) 32px
+  );
 
-.Login-Card {
-  width: 100%;
-  max-width: 440px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 36px;
-  border-radius: 24px;
-  background: #fff;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
-  box-sizing: border-box;
+  /* ---------- left: wordmark and a plain sentence ---------- */
+  .Login-Intro { max-width: 520px; }
 
-  .Login-Logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #2563eb;
-    font-size: 26px;
-    font-weight: 700;
+  .Login-Date {
+    margin-bottom: 18px;
+    font-size: 16px;
+    color: var(--muted);
+    text-transform: capitalize;
   }
 
-  h1 { margin: 0; font-size: 28px; color: #0f172a; }
-  .Login-Sub { margin: -8px 0 4px; color: #64748b; font-size: 16px; }
+  .Login-Wordmark {
+    font-size: clamp(60px, 9vw, 120px);
+    line-height: 0.92;
+    font-weight: 800;
+    font-stretch: 125%;
+    letter-spacing: -0.02em;
+  }
 
-  label {
+  .Tally {
+    display: block;
+    width: clamp(150px, 20vw, 230px);
+    margin: 14px 0 26px;
+    overflow: visible;
+
+    path {
+      fill: none;
+      stroke: var(--marker);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: tally-draw 420ms cubic-bezier(0.3, 0.6, 0.3, 1) calc(250ms + var(--i) * 170ms) forwards;
+    }
+  }
+
+  .Login-Lead {
+    margin: 0 0 10px;
+    max-width: 22ch;
+    font-size: clamp(22px, 2.3vw, 28px);
+    line-height: 1.25;
+    font-weight: 600;
+    font-stretch: 108%;
+  }
+
+  .Login-Note {
+    margin: 0;
+    font-size: 16px;
+    color: var(--muted);
+  }
+
+  /* ---------- right: the form, a sheet of paper ---------- */
+  .Login-Sheet {
+    background: var(--sheet);
+    border: 2px solid var(--steel);
+    border-radius: 3px;
+    padding: clamp(24px, 3.4vw, 40px);
+    box-sizing: border-box;
+  }
+
+  .Login-Form {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #334155;
-    flex: 1;
+    gap: 20px;
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.1;
+      font-weight: 700;
+      font-stretch: 112%;
+    }
   }
 
-  input {
-    padding: 12px 14px;
-    border: 1px solid #cbd5e1;
-    border-radius: 12px;
+  .Login-Sub {
+    margin: -10px 0 0;
     font-size: 16px;
-    outline: none;
-
-    &:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+    line-height: 1.45;
+    color: var(--muted);
   }
 
-  .Login-Row { display: flex; gap: 12px; }
+  .Login-Row { display: flex; gap: 16px; }
+
+  .Login-Field {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label { font-size: 15px; font-weight: 600; }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      height: 44px;
+      padding: 0 2px;
+      border: 0;
+      border-bottom: 2px solid var(--steel);
+      border-radius: 0;
+      background: transparent;
+      color: var(--steel);
+      font: inherit;
+      font-size: 18px;
+      outline: none;
+
+      &::placeholder { color: #98a4ad; }
+
+      &:focus {
+        background: rgba(242, 183, 5, 0.16);
+        box-shadow: inset 0 -3px 0 var(--forklift);
+      }
+    }
+  }
+
+  .Login-Password {
+    position: relative;
+    input { padding-right: 76px; }
+  }
+
+  .Login-Show {
+    position: absolute;
+    right: 0;
+    bottom: 8px;
+    padding: 2px 4px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    font-size: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover { color: var(--steel); }
+    &:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; }
+  }
+
+  .Login-Hint { font-size: 14px; color: var(--muted); }
 
   .Login-Alert {
     padding: 10px 14px;
-    border-radius: 12px;
-    background: #fef3c7;
-    color: #92400e;
+    border-left: 4px solid var(--steel);
+    background: #eef0f1;
     font-size: 15px;
+    line-height: 1.4;
 
-    &.error { background: #fee2e2; color: #991b1b; }
+    &.warn { border-left-color: var(--forklift-dark); background: #fbf1cf; }
+    &.error { border-left-color: var(--marker); background: #f8e1de; color: #6f1a14; }
 
     button {
       border: 0;
       background: transparent;
       color: inherit;
       text-decoration: underline;
+      font: inherit;
       cursor: pointer;
-      font-size: inherit;
     }
   }
 
   .Login-Submit {
-    margin-top: 4px;
-    padding: 14px;
-    border: 0;
-    border-radius: 12px;
-    background: #2563eb;
-    color: #fff;
-    font-size: 17px;
-    font-weight: 600;
+    height: 52px;
+    margin-top: 6px;
+    border: 2px solid var(--steel);
+    border-radius: 3px;
+    background: var(--forklift);
+    color: var(--steel);
+    font: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    font-stretch: 108%;
+    box-shadow: 4px 4px 0 var(--steel);
     cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
 
-    &:hover:not(:disabled) { background: #1d4ed8; }
-    &:disabled { opacity: 0.6; cursor: default; }
+    &:hover:not(:disabled) { background: var(--forklift-dark); }
+    &:active:not(:disabled) {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 var(--steel);
+    }
+    &:focus-visible { outline: 3px solid var(--steel); outline-offset: 3px; }
+    &:disabled { opacity: 0.55; cursor: default; box-shadow: 2px 2px 0 var(--steel); }
+  }
+
+  .Login-Back {
+    align-self: flex-start;
+    color: var(--muted);
+    font-size: 15px;
+
+    &:hover { color: var(--steel); }
   }
 }
 
+@keyframes tally-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .Login-Page .Tally path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .Login-Page .Login-Submit { transition: none; }
+}
+
+@media (max-width: 860px) {
+  .Login-Page {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 28px;
+    padding: 28px 20px 40px;
+
+    .Login-Intro { max-width: none; }
+    .Login-Wordmark { font-size: clamp(52px, 16vw, 84px); }
+    .Tally { margin: 10px 0 18px; }
+    .Login-Lead { max-width: none; }
+    .Login-Sheet { width: 100%; }
+  }
+}
+
+@media (max-width: 480px) {
+  .Login-Page .Login-Row { flex-direction: column; gap: 20px; }
+  .Login-Page .Login-Form h1 { font-size: 28px; }
+}
+
+/* shown by the route guard while the session is being restored */
 .Auth-Loading {
   display: flex;
   align-items: center;
@@ -96,8 +259,4 @@
   min-height: 60vh;
   color: #64748b;
   font-size: 20px;
-}
-
-@media (max-width: 480px) {
-  .Login-Card { padding: 24px; .Login-Row { flex-direction: column; } }
 }

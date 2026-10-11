@@ -71,6 +71,10 @@ const publicUser = (u) => ({
   email: u.email,
   phone: u.phone || "",
   role: u.role,
+  // accounts created before this field existed count as active
+  active: u.active !== false,
+  createdAt: u.createdAt || null,
+  lastLoginAt: u.lastLoginAt || null,
   notifications: u.notifications,
 });
 

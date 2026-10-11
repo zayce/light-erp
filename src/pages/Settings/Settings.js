@@ -9,8 +9,8 @@ import {
   Users,
   Download,
   Upload,
-  Trash2,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
 import { api, errorMessage } from "../../shared/api/axios";
@@ -18,6 +18,7 @@ import { useAuth } from "../../AuthContext";
 import { useApp } from "../../AppContext";
 import { buildBackup, parseBackup } from "../../utils/backup";
 import { downloadFile } from "../../utils/csv";
+import { canManageSystem } from "../../utils/access";
 import "./Settings.scss";
 
 /* ===== Initials (лучше снаружи компонента) ===== */
@@ -179,7 +180,7 @@ export const Settings = () => {
       setSavingProfile(true);
       const res = await api.put("/auth/profile", profile);
       updateUser(res.data.user);
-      setSuccess("Profil yadda saxlanıldı ✅");
+      setSuccess("Profil yadda saxlanıldı");
     } catch (e) {
       setError(errorMessage(e, "Profil yadda saxlanılmadı"));
     } finally {
@@ -195,7 +196,7 @@ export const Settings = () => {
       setSavingNotif(true);
       const res = await api.put("/auth/notifications", notif);
       updateUser(res.data.user);
-      setSuccess("Bildiriş parametrləri yadda saxlanıldı ✅");
+      setSuccess("Bildiriş parametrləri yadda saxlanıldı");
     } catch (e) {
       setError(errorMessage(e, "Bildirişlər yadda saxlanılmadı"));
     } finally {
@@ -219,7 +220,7 @@ export const Settings = () => {
       // the server revoked every old token and issued a new one for this device
       updateUser(res.data.user, res.data.token);
       setPwd(initialPassword);
-      setSuccess("Şifrə uğurla dəyişdirildi ✅");
+      setSuccess("Şifrə uğurla dəyişdirildi");
     } catch (e) {
       setError(errorMessage(e, "Şifrə dəyişdirilmədi"));
     } finally {
@@ -235,7 +236,7 @@ export const Settings = () => {
     dispatch({ type: "UPDATE_SETTINGS", payload: system });
     setSavingSystem(false);
     setSuccess(
-      "Sistem parametrləri yadda saxlanıldı ✅ (valyuta yalnız simvolu dəyişir, məbləğlər çevrilmir)",
+      "Sistem parametrləri yadda saxlanıldı (valyuta yalnız simvolu dəyişir, məbləğlər çevrilmir)",
     );
   };
 
@@ -266,7 +267,7 @@ export const Settings = () => {
         );
         if (!ok) return;
         dispatch({ type: "REPLACE_DATA", payload: data });
-        setSuccess("Ehtiyat nüsxə yükləndi ✅");
+        setSuccess("Ehtiyat nüsxə yükləndi");
       } catch (err) {
         setError(err.message || "Fayl oxunmadı");
       }
@@ -275,57 +276,7 @@ export const Settings = () => {
     reader.readAsText(file);
   };
 
-  // ---- users (admin only) ----
   const isAdmin = user?.role === "admin";
-  const [team, setTeam] = useState([]);
-  const [newUser, setNewUser] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    role: "staff",
-  });
-  const [addingUser, setAddingUser] = useState(false);
-
-  const loadTeam = () =>
-    api
-      .get("/users")
-      .then((res) => setTeam(res.data))
-      .catch((e) => setError(errorMessage(e, "İstifadəçilər yüklənmədi")));
-
-  useEffect(() => {
-    if (isAdmin) loadTeam();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin]);
-
-  const addUser = async () => {
-    setSuccess("");
-    setError("");
-    try {
-      setAddingUser(true);
-      await api.post("/users", newUser);
-      setNewUser({ firstName: "", lastName: "", email: "", password: "", role: "staff" });
-      await loadTeam();
-      setSuccess("İstifadəçi əlavə olundu ✅");
-    } catch (e) {
-      setError(errorMessage(e, "İstifadəçi əlavə olunmadı"));
-    } finally {
-      setAddingUser(false);
-    }
-  };
-
-  const removeUser = async (u) => {
-    if (!window.confirm(`${u.firstName} ${u.lastName} silinsin?`)) return;
-    setSuccess("");
-    setError("");
-    try {
-      await api.delete(`/users/${u.id}`);
-      await loadTeam();
-      setSuccess("İstifadəçi silindi ✅");
-    } catch (e) {
-      setError(errorMessage(e, "İstifadəçi silinmədi"));
-    }
-  };
 
   return (
     <div className="Settings-Wrapper">
@@ -585,130 +536,141 @@ export const Settings = () => {
           </div>
         </div>
 
-        {/* ===== SYSTEM CARD ===== */}
-        <div className="CardShell" style={{ marginTop: 18 }}>
-          <div className="CardHeader">
-            <div className="CardHeader-Left">
-              <div className="CardHeader-Icon">
-                <Database size={18} />
-              </div>
-              <div className="CardHeader-Title">Sistem Parametrləri</div>
-            </div>
-          </div>
-
-          <div className="CardBody">
-            {loading ? (
-              <div className="LoadingState">
-                <Loader2 className="Spin" size={20} />
-                <span>Yüklənir...</span>
-              </div>
-            ) : (
-              <div className="ProfileForm">
-                <div className="Field">
-                  <label className="Label">Valyuta</label>
-                  <select
-                    className="Select"
-                    value={system.currency}
-                    onChange={onSystemChange("currency")}
-                  >
-                    <option value="AZN">Azərbaycan Manatı (₼)</option>
-                    <option value="USD">US Dollar ($)</option>
-                    <option value="EUR">Euro (€)</option>
-                    <option value="TRY">Türk Lirəsi (₺)</option>
-                  </select>
-                </div>
-
-                <div className="Field">
-                  <label className="Label">Dil</label>
-                  <select
-                    className="Select"
-                    value={system.language}
-                    onChange={(e) => {
-                      onSystemChange("language")(e);
-                      i18n.changeLanguage(e.target.value);
-                    }}
-                  >
-                    <option value="az">Azərbaycan dili</option>
-                    <option value="ru">Русский</option>
-                    <option value="en">English</option>
-                  </select>
-                </div>
-
-                <div className="Field">
-                  <label className="Label">Zaman Zonası</label>
-                  <select
-                    className="Select"
-                    value={system.timezone}
-                    onChange={onSystemChange("timezone")}
-                  >
-                    <option value="Asia/Baku">Bakı (UTC+4)</option>
-                    <option value="Europe/Moscow">Moskva (UTC+3)</option>
-                    <option value="Europe/Istanbul">İstanbul (UTC+3)</option>
-                    <option value="Europe/London">London (UTC+0)</option>
-                  </select>
-                </div>
-
-                <div className="SystemFooter">
-                  <button
-                    className="SaveBigBtn"
-                    type="button"
-                    onClick={saveSystem}
-                    disabled={savingSystem || !systemDirty}
-                  >
-                    {savingSystem ? (
-                      <Loader2 className="Spin" size={18} />
-                    ) : (
-                      <Save size={18} />
-                    )}
-                    <span>
-                      {savingSystem
-                        ? "Yadda saxlanılır..."
-                        : "Dəyişiklikləri Yadda Saxla"}
-                    </span>
-                  </button>
+        {canManageSystem(user?.role) && (
+          <>
+            {/* ===== SYSTEM CARD ===== */}
+            <div className="CardShell" style={{ marginTop: 18 }}>
+              <div className="CardHeader">
+                <div className="CardHeader-Left">
+                  <div className="CardHeader-Icon">
+                    <Database size={18} />
+                  </div>
+                  <div className="CardHeader-Title">Sistem Parametrləri</div>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* ===== BACKUP CARD ===== */}
-        <div className="CardShell" style={{ marginTop: 18 }}>
-          <div className="CardHeader">
-            <div className="CardHeader-Left">
-              <div className="CardHeader-Icon">
-                <Download size={18} />
-              </div>
-              <div className="CardHeader-Title">Ehtiyat nüsxə</div>
-            </div>
-          </div>
-          <div className="CardBody">
-            <div className="ProfileForm">
-              <p style={{ margin: 0, color: "#64748b" }}>
-                Bütün məlumatları (anbar, hesabatlar, pul axını, alışlar) JSON faylına saxlayın və ya əvvəlki
-                fayldan bərpa edin. Bərpa cari məlumatları əvəz edir.
-              </p>
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <button className="PrimaryBtn" type="button" onClick={exportBackup}>
-                  <Download size={18} />
-                  <span>Yüklə (JSON)</span>
-                </button>
-                <label className="PrimaryBtn" style={{ cursor: "pointer" }}>
-                  <Upload size={18} />
-                  <span>Fayldan bərpa et</span>
-                  <input
-                    type="file"
-                    accept="application/json,.json"
-                    onChange={importBackup}
-                    style={{ display: "none" }}
-                  />
-                </label>
+              <div className="CardBody">
+                {loading ? (
+                  <div className="LoadingState">
+                    <Loader2 className="Spin" size={20} />
+                    <span>Yüklənir...</span>
+                  </div>
+                ) : (
+                  <div className="ProfileForm">
+                    <div className="Field">
+                      <label className="Label">Valyuta</label>
+                      <select
+                        className="Select"
+                        value={system.currency}
+                        onChange={onSystemChange("currency")}
+                      >
+                        <option value="AZN">Azərbaycan Manatı (₼)</option>
+                        <option value="USD">US Dollar ($)</option>
+                        <option value="EUR">Euro (€)</option>
+                        <option value="TRY">Türk Lirəsi (₺)</option>
+                      </select>
+                    </div>
+
+                    <div className="Field">
+                      <label className="Label">Dil</label>
+                      <select
+                        className="Select"
+                        value={system.language}
+                        onChange={(e) => {
+                          onSystemChange("language")(e);
+                          i18n.changeLanguage(e.target.value);
+                        }}
+                      >
+                        <option value="az">Azərbaycan dili</option>
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                      </select>
+                    </div>
+
+                    <div className="Field">
+                      <label className="Label">Zaman Zonası</label>
+                      <select
+                        className="Select"
+                        value={system.timezone}
+                        onChange={onSystemChange("timezone")}
+                      >
+                        <option value="Asia/Baku">Bakı (UTC+4)</option>
+                        <option value="Europe/Moscow">Moskva (UTC+3)</option>
+                        <option value="Europe/Istanbul">
+                          İstanbul (UTC+3)
+                        </option>
+                        <option value="Europe/London">London (UTC+0)</option>
+                      </select>
+                    </div>
+
+                    <div className="SystemFooter">
+                      <button
+                        className="SaveBigBtn"
+                        type="button"
+                        onClick={saveSystem}
+                        disabled={savingSystem || !systemDirty}
+                      >
+                        {savingSystem ? (
+                          <Loader2 className="Spin" size={18} />
+                        ) : (
+                          <Save size={18} />
+                        )}
+                        <span>
+                          {savingSystem
+                            ? "Yadda saxlanılır..."
+                            : "Dəyişiklikləri Yadda Saxla"}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* ===== USERS CARD (admin) ===== */}
+            {/* ===== BACKUP CARD ===== */}
+            <div className="CardShell" style={{ marginTop: 18 }}>
+              <div className="CardHeader">
+                <div className="CardHeader-Left">
+                  <div className="CardHeader-Icon">
+                    <Download size={18} />
+                  </div>
+                  <div className="CardHeader-Title">Ehtiyat nüsxə</div>
+                </div>
+              </div>
+              <div className="CardBody">
+                <div className="ProfileForm">
+                  <p style={{ margin: 0, color: "#64748b" }}>
+                    Bütün məlumatları (anbar, hesabatlar, pul axını, alışlar)
+                    JSON faylına saxlayın və ya əvvəlki fayldan bərpa edin.
+                    Bərpa cari məlumatları əvəz edir.
+                  </p>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    <button
+                      className="PrimaryBtn"
+                      type="button"
+                      onClick={exportBackup}
+                    >
+                      <Download size={18} />
+                      <span>Yüklə (JSON)</span>
+                    </button>
+                    <label className="PrimaryBtn" style={{ cursor: "pointer" }}>
+                      <Upload size={18} />
+                      <span>Fayldan bərpa et</span>
+                      <input
+                        type="file"
+                        accept="application/json,.json"
+                        onChange={importBackup}
+                        style={{ display: "none" }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ===== TEAM (admin): user management lives on its own page ===== */}
         {isAdmin && (
           <div className="CardShell" style={{ marginTop: 18 }}>
             <div className="CardHeader">
@@ -716,100 +678,21 @@ export const Settings = () => {
                 <div className="CardHeader-Icon">
                   <Users size={18} />
                 </div>
-                <div className="CardHeader-Title">İstifadəçilər</div>
+                <div className="CardHeader-Title">
+                  {t("users_settings_title")}
+                </div>
               </div>
             </div>
             <div className="CardBody">
               <div className="ProfileForm">
-                {team.map((u) => (
-                  <div
-                    key={u.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: 12,
-                      padding: "8px 0",
-                      borderBottom: "1px solid #f1f5f9",
-                    }}
-                  >
-                    <div>
-                      <strong>
-                        {u.firstName} {u.lastName}
-                      </strong>{" "}
-                      <span style={{ color: "#64748b" }}>
-                        ({u.role === "admin" ? "admin" : "işçi"})
-                      </span>
-                      <div style={{ color: "#64748b", fontSize: 14 }}>{u.email}</div>
-                    </div>
-                    {u.id !== user.id && (
-                      <button
-                        type="button"
-                        onClick={() => removeUser(u)}
-                        title="Sil"
-                        aria-label="Sil"
-                        style={{ border: 0, background: "transparent", cursor: "pointer", color: "#94a3b8" }}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    )}
-                  </div>
-                ))}
-
-                <div className="Grid2" style={{ marginTop: 12 }}>
-                  <div className="Field">
-                    <label className="Label">Ad</label>
-                    <input
-                      className="Input"
-                      value={newUser.firstName}
-                      onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
-                    />
-                  </div>
-                  <div className="Field">
-                    <label className="Label">Soyad</label>
-                    <input
-                      className="Input"
-                      value={newUser.lastName}
-                      onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
-                    />
-                  </div>
-                  <div className="Field">
-                    <label className="Label">E-poçt</label>
-                    <input
-                      className="Input"
-                      type="email"
-                      value={newUser.email}
-                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                    />
-                  </div>
-                  <div className="Field">
-                    <label className="Label">Şifrə (ən az 6 simvol)</label>
-                    <input
-                      className="Input"
-                      type="password"
-                      autoComplete="new-password"
-                      value={newUser.password}
-                      onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                    />
-                  </div>
-                  <div className="Field">
-                    <label className="Label">Rol</label>
-                    <select
-                      className="Select"
-                      value={newUser.role}
-                      onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-                    >
-                      <option value="staff">İşçi</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </div>
-                </div>
-
+                <p style={{ margin: "0 0 14px", color: "#64748b" }}>
+                  {t("users_settings_desc")}
+                </p>
                 <div className="SystemFooter">
-                  <button className="SaveBigBtn" type="button" onClick={addUser} disabled={addingUser}>
-                    {addingUser ? <Loader2 className="Spin" size={18} /> : <Save size={18} />}
-                    <span>{addingUser ? "Əlavə olunur..." : "İstifadəçi əlavə et"}</span>
-                  </button>
+                  <Link className="SaveBigBtn" to="/usepanels">
+                    <Users size={18} />
+                    <span>{t("users_settings_open")}</span>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -17,7 +17,7 @@
   padding: 28px;
   border-radius: 22px;
   background: #fff;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.3);
+  box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
   box-sizing: border-box;
 
   .EP-Head {
@@ -26,7 +26,7 @@
     justify-content: space-between;
     margin-bottom: 18px;
 
-    h2 { margin: 0; font-size: 24px; color: #0f172a; }
+    h2 { margin: 0; font-size: 24px; color: #1f2d3a; }
   }
 
   .EP-Close {
@@ -34,7 +34,7 @@
     background: transparent;
     font-size: 30px;
     line-height: 1;
-    color: #64748b;
+    color: #596874;
     cursor: pointer;
   }
 
@@ -51,27 +51,27 @@
     gap: 6px;
     font-size: 14px;
     font-weight: 600;
-    color: #334155;
+    color: #3b4a57;
 
     input,
     select,
     textarea {
       padding: 10px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
+      border: 1px solid #c3cbd1;
+      border-radius: 4px;
       font: inherit;
       font-weight: 400;
       outline: none;
       background: #fff;
 
-      &:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18); }
+      &:focus { border-color: #2d3e4d; box-shadow: 0 0 0 3px rgba(242, 183, 5, 0.18); }
     }
 
-    em { color: #dc2626; font-size: 13px; font-style: normal; font-weight: 400; }
-    &.has-error input { border-color: #ef4444; }
+    em { color: #c8352b; font-size: 13px; font-style: normal; font-weight: 400; }
+    &.has-error input { border-color: #c8352b; }
   }
 
-  .EP-Hint { margin: 10px 0 0; color: #64748b; font-size: 13px; }
+  .EP-Hint { margin: 10px 0 0; color: #596874; font-size: 13px; }
 
   .EP-Actions {
     display: flex;
@@ -81,15 +81,15 @@
 
     button {
       padding: 11px 20px;
-      border-radius: 12px;
+      border-radius: 4px;
       border: 0;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
     }
 
-    .EP-Cancel { background: #f1f5f9; color: #334155; }
-    .EP-Save { background: #2563eb; color: #fff; &:hover { background: #1d4ed8; } }
+    .EP-Cancel { background: #e6e9ec; color: #3b4a57; }
+    .EP-Save { background: #2d3e4d; color: #fff; &:hover { background: #1f2c38; } }
   }
 }
 

@@ -36,6 +36,9 @@ export const NewProductModal = ({
   const [newSubcat, setNewSubcat] = useState("");
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
+  // latest preview URL for the reset effect below, without making it a dependency
+  const previewRef = useRef("");
+  previewRef.current = preview;
   const [drag, setDrag] = useState(false);
 
   const inputRef = useRef(null);
@@ -119,7 +122,7 @@ export const NewProductModal = ({
 
     setFile(null);
 
-    if (preview) URL.revokeObjectURL(preview);
+    if (previewRef.current) URL.revokeObjectURL(previewRef.current);
     setPreview("");
 
     setDrag(false);

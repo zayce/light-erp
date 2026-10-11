@@ -1,12 +1,4 @@
-import {
-  Percent,
-  ShoppingCart,
-  Package,
-  Users,
-  Pencil,
-  Trash2,
-  Search,
-} from "lucide-react";
+import { Percent, ShoppingCart, Package, Users, Pencil, Trash2, Search, Download } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   ResponsiveContainer,
@@ -281,7 +273,9 @@ export const Report = () => {
                 }}
                 type="button"
               >
-                <div className="button-text">⬇ CSV ixrac</div>
+                <div className="button-text">
+                <Download size={18} /> CSV ixrac
+              </div>
               </button>
               <button
                 className="button-opis"

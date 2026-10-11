@@ -3,7 +3,10 @@
 Anbar (inventar), alışlar və pul axını idarəetməsi üçün veb tətbiq. Dillər: Azərbaycan, Rus, İngilis.
 
 ## Mümkünlüklər
-- **Giriş və rollar**: e-poçt + şifrə, admin və işçi. İlk qeydiyyatdan keçən istifadəçi admin olur, digərlərini admin əlavə edir (Parametrlər → İstifadəçilər).
+- **Giriş və rollar**: e-poçt + şifrə; rollar: admin, işçi, anbarçı, mühasibatçı. İlk qeydiyyatdan keçən istifadəçi admin olur, digərlərini admin əlavə edir (sol menyu → İstifadəçilər, `/usepanels`).
+- **İstifadəçilər səhifəsi** (admin): axtarış, rol/status filtri, sıralama, səhifələmə, toplu aktiv/deaktiv/silmə, silməni geri qaytarma (6 san.), şifrə dəyişmə, CSV ixrac. Deaktiv edilən istifadəçi daxil ola bilməz və açıq sessiyaları bağlanır.
+- **Rollar bölmələrə girişi idarə edir**: admin hər şeyi və istifadəçiləri görür; işçi istifadəçilərdən başqa hər şeyi; anbarçı yalnız Anbar və Alışları; mühasibatçı İdarə Paneli, Alışlar, Pul Axını və Hesabatları. Sistem parametrləri və ehtiyat nüsxə yalnız admin və işçiyə açıqdır. **Diqqət:** bu giriş nəzarətidir, məlumat izolyasiyası deyil. Anbar, kassa və hesabatlar bir-biri ilə bağlıdır (satış stoku azaldır və kassaya yazılır), buna görə məlumatlar bütün komanda üçün ortaq bir sahədə saxlanılır (`/data`). Əsl məlumat səviyyəsində məhdudiyyət üçün `/data` bölmələrə ayrılmalıdır.
+- **Fəaliyyət jurnalı** (admin): kim kimi yaratdı, dəyişdi, aktiv/deaktiv etdi, şifrəsini dəyişdi və ya sildi. Son 1000 qeyd saxlanılır, şifrələr jurnala düşmür.
 - **Anbar**: məhsul əlavə etmə, tam redaktə formu (qiymət, maya, stok, kateqoriya...), cədvəldə sürətli redaktə, silmə + geri qaytarma, stok xəbərdarlığı, kamera ilə barkod skaneri, CSV ixrac.
 - **Alışlar**: mal qəbulu. Stok artır, məbləğ Pul Axınına xərc kimi yazılır, maya dəyəri orta çəkili hesablanır.
 - **Pul axını və hesabatlar**: satışlar anbar və pul axını ilə avtomatik əlaqəlidir; hər satışda maya dəyəri (COGS) saxlanılır.
@@ -64,12 +67,15 @@ Bütün marşrutlar (`/health` və `/auth/status|register|login` istisna) `Autho
 | POST | `/auth/login` | giriş (10 uğursuz cəhddən sonra 15 dəq blok) |
 | GET | `/auth/me` | cari istifadəçi |
 | PUT | `/auth/profile`, `/auth/notifications`, `/auth/password` | profil, bildirişlər, şifrə (şifrə dəyişəndə köhnə tokenlər ləğv olunur) |
-| GET/POST/DELETE | `/users`, `/users/:id` | istifadəçilər (yalnız admin) |
+| GET | `/users/activity?limit&offset` | fəaliyyət jurnalı, ən yenisi birinci (yalnız admin) |
+| GET/POST | `/users` | istifadəçilər siyahısı / yeni istifadəçi (yalnız admin) |
+| PUT | `/users/:id` | ad, e-poçt, telefon, rol, `active` (deaktiv etmə). Admin öz rolunu dəyişə və özünü deaktiv edə bilməz (yalnız admin) |
+| DELETE | `/users/:id` | istifadəçini sil (yalnız admin, özünü silmək olmaz) |
+| PUT | `/users/:id/password` | admin həmkarına yeni şifrə təyin edir (yalnız admin) |
 | GET | `/data` | ortaq məlumatlar + `version` |
 | PUT | `/data` | `{ baseVersion, data }`. Versiya köhnədirsə `409` və cari məlumat qaytarılır |
 
 ## Məlum məhdudiyyətlər
 - Valyuta parametri yalnız simvolu dəyişir, məbləğləri çevirmir.
 - Eyni anda iki cihazda dəyişiklik olarsa, serverdəki son versiya qalır (digər cihaz yenilənir).
-- “İstifadəçi profili” (`/usepanels`) səhifəsi hələ yerli demo məlumatla işləyir.
 - Məhsul şəkli yalnız fayl adı kimi saxlanılır.

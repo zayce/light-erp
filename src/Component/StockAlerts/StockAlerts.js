@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
+import { AlertTriangle } from "lucide-react";
 import { useApp } from "../../AppContext";
 import { useAuth } from "../../AuthContext";
 import { useSync } from "../../SyncContext";
@@ -33,7 +34,7 @@ export const StockAlerts = () => {
   useEffect(() => {
     if (enabled && loaded && low > 0 && !announced.current) {
       announced.current = true;
-      toast(`${low} məhsulun stoku azdır`, { id: "low-stock", icon: "⚠️", duration: 5000 });
+      toast(`${low} məhsulun stoku azdır`, { id: "low-stock", icon: <AlertTriangle size={20} color="#b97d00" />, duration: 5000 });
     }
   }, [enabled, loaded, low]);
 

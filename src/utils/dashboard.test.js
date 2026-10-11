@@ -175,3 +175,57 @@ test("reorderSuggestions lists low items, most urgent first, with a target of 2x
   expect(list[0]).toMatchObject({ qty: 19, estimate: 95, supplier: "S" });
   expect(list[1]).toMatchObject({ qty: 12, estimate: 24 });
 });
+
+describe("product history", () => {
+  const { productHistory } = require("./history");
+  const product = { sku: "A-1", name: "Alpha" };
+
+  test("combines purchases and sales, newest first, with totals", () => {
+    const h = productHistory(
+      {
+        purchases: [
+          { id: 1, sku: "a-1", qty: 10, total: 40, date: "2026-10-01", supplier: "S" },
+          { id: 2, sku: "OTHER", qty: 5, total: 5, date: "2026-10-02" },
+        ],
+        report: [
+          { id: 3, sku: "A-1", name: "Alpha", salesCount: 3, revenue: 30, date: "2026-10-03", operationType: "Satış" },
+          { id: 4, name: "Alpha", salesCount: 1, revenue: 10, date: "2026-10-02", operationType: "Satış" }, // old record, no sku
+          { id: 5, name: "Alpha", salesCount: 9, revenue: 99, date: "2026-10-04", operationType: "Xərc" },
+        ],
+      },
+      product,
+    );
+    expect(h.entries.map((e) => e.id)).toEqual(["r3", "r4", "p1"]);
+    expect(h.bought).toBe(10);
+    expect(h.sold).toBe(4);
+  });
+
+  test("a product without records has an empty history", () => {
+    expect(productHistory({ purchases: [], report: [] }, product).entries).toEqual([]);
+    expect(productHistory({}, null).entries).toEqual([]);
+  });
+});
+
+describe("label printing page", () => {
+  const { buildLabelsHtml, escapeHtml } = require("./labels");
+
+  test("user-controlled text is escaped", () => {
+    expect(escapeHtml('<script>alert("x")</script>')).toBe("&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;");
+    const html = buildLabelsHtml([{ name: "<img src=x onerror=alert(1)>", sku: "A&B", price: 5, qr: "" }]);
+    expect(html).not.toContain("<img src=x");
+    expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
+    expect(html).toContain("A&amp;B");
+  });
+
+  test("only a PNG data URL is accepted as the QR image", () => {
+    const good = "data:image/png;base64,iVBORw0KGgo=";
+    expect(buildLabelsHtml([{ name: "a", sku: "1", price: 1, qr: good }])).toContain(`src="${good}"`);
+    // eslint-disable-next-line no-script-url
+    expect(buildLabelsHtml([{ name: "a", sku: "1", price: 1, qr: 'javascript:alert(1)" onerror="x' }])).not.toContain("<img");
+  });
+
+  test("one cell per label", () => {
+    const html = buildLabelsHtml([{ name: "a", sku: "1", price: 1, qr: "" }, { name: "b", sku: "2", price: 2, qr: "" }]);
+    expect(html.match(/class="label"/g)).toHaveLength(2);
+  });
+});

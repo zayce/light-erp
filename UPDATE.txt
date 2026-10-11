@@ -1,0 +1,7 @@
+1) Unzip this folder over your lightexp project (replace files).
+2) DELETE these old files (no longer used):
+   src/pages/UsersPanel/UsersPanel.js
+   src/pages/UsersPanel/UsersPanel.css
+   src/pages/Useprofile/            (old demo page, optional)
+3) Restart the server (cd server && npm start) and the frontend (npm start).
+No new npm packages are needed.

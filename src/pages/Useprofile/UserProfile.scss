@@ -24,7 +24,7 @@
       font-size: 30px;
       font-weight: 700;
       line-height: 1.2;
-      color: #1f2937;
+      color: #1f2d3a;
     }
 
     .UsersBreadcrumb {
@@ -32,14 +32,14 @@
       align-items: center;
       gap: 6px;
       flex-wrap: wrap;
-      color: #9ca3af;
+      color: #8896a1;
 
       .crumb {
         font-size: 14px;
       }
 
       .active {
-        color: #1f2937;
+        color: #1f2d3a;
         font-weight: 600;
       }
     }
@@ -53,9 +53,9 @@
     .TopIconBlock {
       width: 40px;
       height: 40px;
-      border-radius: 12px;
+      border-radius: 4px;
       background: #ffffff;
-      border: 1px solid #e5e7eb;
+      border: 1px solid #cdd3d8;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -64,7 +64,7 @@
       transition: 0.2s ease;
 
       &:hover {
-        background: #f8fafc;
+        background: #eef0f2;
       }
 
       .NotifyDot {
@@ -73,7 +73,7 @@
         right: -5px;
         width: 17px;
         height: 17px;
-        background: #ef4444;
+        background: #c8352b;
         border-radius: 50%;
         font-size: 10px;
         color: #ffffff;
@@ -88,16 +88,16 @@
       align-items: center;
       gap: 10px;
       background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
+      border: 1px solid #cdd3d8;
+      border-radius: 6px;
       padding: 6px 10px;
 
       .TopUserAvatar {
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: #dbeafe;
-        color: #2563eb;
+        background: #e3e9ee;
+        color: #2d3e4d;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -108,7 +108,7 @@
       .TopUserName {
         font-weight: 600;
         font-size: 15px;
-        color: #374151;
+        color: #3b4a57;
       }
     }
   }
@@ -118,7 +118,7 @@
     border-radius: 22px;
     padding: 22px;
     border: 1px solid #edf0f5;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
   }
 
   .UsersContentHeader {
@@ -137,13 +137,13 @@
     .UsersContentTitle {
       font-size: 24px;
       font-weight: 700;
-      color: #111827;
+      color: #1f2d3a;
       line-height: 1.2;
     }
 
     .UsersContentDesc {
       font-size: 15px;
-      color: #6b7280;
+      color: #596874;
       line-height: 1.5;
     }
 
@@ -152,9 +152,9 @@
       align-items: center;
       gap: 8px;
       padding: 12px 16px;
-      background: #3b82f6;
+      background: #2d3e4d;
       color: #ffffff;
-      border-radius: 12px;
+      border-radius: 4px;
       cursor: pointer;
       font-size: 15px;
       font-weight: 600;
@@ -162,7 +162,7 @@
       white-space: nowrap;
 
       &:hover {
-        background: #2563eb;
+        background: #2d3e4d;
         transform: translateY(-1px);
       }
     }
@@ -177,13 +177,13 @@
 
   .RoleCard {
     border: 1px solid #edf0f5;
-    border-radius: 18px;
+    border-radius: 6px;
     padding: 16px;
     background: #fafcff;
     transition: 0.2s ease;
 
     &:hover {
-      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+      box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
     }
 
     .RoleCard-Top {
@@ -196,12 +196,12 @@
       .RoleCard-Title {
         font-size: 17px;
         font-weight: 700;
-        color: #111827;
+        color: #1f2d3a;
       }
 
       .RoleCard-SeeAll {
         font-size: 12px;
-        color: #3b82f6;
+        color: #2d3e4d;
         cursor: pointer;
         font-weight: 600;
       }
@@ -220,12 +220,12 @@
       align-items: center;
       gap: 12px;
       padding: 8px;
-      border-radius: 12px;
+      border-radius: 4px;
       cursor: pointer;
       transition: 0.2s ease;
 
       &:hover {
-        background: #f1f5f9;
+        background: #e6e9ec;
       }
 
       .RoleUserItem-Left {
@@ -241,12 +241,12 @@
         height: 38px;
         min-width: 38px;
         border-radius: 50%;
-        background: #e5e7eb;
+        background: #cdd3d8;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
-        color: #374151;
+        color: #3b4a57;
         overflow: hidden;
 
         img {
@@ -263,13 +263,13 @@
       .RoleUserName {
         font-size: 15px;
         font-weight: 600;
-        color: #111827;
+        color: #1f2d3a;
         margin-bottom: 2px;
       }
 
       .RoleUserEmail {
         font-size: 13px;
-        color: #9ca3af;
+        color: #8896a1;
         word-break: break-word;
       }
 
@@ -290,35 +290,35 @@
       gap: 8px;
       font-size: 14px;
       font-weight: 600;
-      background: #f1f5f9;
+      background: #e6e9ec;
       padding: 10px;
-      border-radius: 12px;
+      border-radius: 4px;
       cursor: pointer;
       transition: 0.2s ease;
 
       &:hover {
-        background: #e2e8f0;
+        background: #cdd3d8;
       }
     }
   }
 
   .RoleUserStatus.disabled,
   .StatusPill.disabled {
-    background: #fee2e2;
-    color: #dc2626;
+    background: #f7e0dd;
+    color: #c8352b;
   }
 
   .RoleUserStatus.enabled,
   .StatusPill.enabled {
-    background: #dcfce7;
-    color: #16a34a;
+    background: #dcefe5;
+    color: #2e7d5b;
   }
 
   .RoleCard-Empty,
   .EmptyUsers {
     padding: 20px;
     text-align: center;
-    color: #9ca3af;
+    color: #8896a1;
     font-size: 14px;
   }
 
@@ -342,7 +342,7 @@
     .UsersTableTitle {
       font-size: 18px;
       font-weight: 700;
-      color: #111827;
+      color: #1f2d3a;
     }
 
     .UsersTabs {
@@ -356,18 +356,18 @@
         padding: 6px 12px;
         border-radius: 999px;
         cursor: pointer;
-        background: #f1f5f9;
-        color: #475569;
+        background: #e6e9ec;
+        color: #3b4a57;
         transition: 0.2s ease;
 
         &:hover {
-          background: #e2e8f0;
+          background: #cdd3d8;
         }
       }
 
       .active {
-        background: #dbeafe;
-        color: #2563eb;
+        background: #e3e9ee;
+        color: #2d3e4d;
       }
     }
 
@@ -383,10 +383,10 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
+      background: #eef0f2;
+      border: 1px solid #cdd3d8;
       padding: 0 12px;
-      border-radius: 10px;
+      border-radius: 4px;
       min-width: 220px;
 
       input {
@@ -395,7 +395,7 @@
         outline: none;
         background: transparent;
         font-size: 14px;
-        color: #111827;
+        color: #1f2d3a;
       }
     }
 
@@ -403,19 +403,19 @@
     .FilterButton {
       height: 42px;
       padding: 0 14px;
-      background: #f1f5f9;
-      border-radius: 10px;
+      background: #e6e9ec;
+      border-radius: 4px;
       cursor: pointer;
       font-size: 14px;
       font-weight: 600;
-      color: #475569;
+      color: #3b4a57;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: 0.2s ease;
 
       &:hover {
-        background: #e2e8f0;
+        background: #cdd3d8;
       }
     }
 
@@ -427,8 +427,8 @@
 
   .UsersTable {
     width: 100%;
-    border: 1px solid #eef2f7;
-    border-radius: 18px;
+    border: 1px solid #e6e9ec;
+    border-radius: 6px;
     overflow: hidden;
     background: #ffffff;
 
@@ -444,16 +444,16 @@
     .UsersTable-Head {
       font-size: 13px;
       font-weight: 700;
-      color: #9ca3af;
-      background: #f8fafc;
-      border-bottom: 1px solid #eef2f7;
+      color: #8896a1;
+      background: #eef0f2;
+      border-bottom: 1px solid #e6e9ec;
     }
 
     .UsersTable-Body {
       .UsersTable-Row {
         font-size: 15px;
-        color: #374151;
-        border-bottom: 1px solid #f1f5f9;
+        color: #3b4a57;
+        border-bottom: 1px solid #e6e9ec;
         transition: 0.2s ease;
 
         &:last-child {
@@ -461,7 +461,7 @@
         }
 
         &:hover {
-          background: #f9fafb;
+          background: #eef0f2;
         }
       }
     }
@@ -475,12 +475,12 @@
       width: 38px;
       height: 38px;
       border-radius: 50%;
-      background: #e5e7eb;
+      background: #cdd3d8;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      color: #374151;
+      color: #3b4a57;
       overflow: hidden;
 
       img {
@@ -492,11 +492,11 @@
 
     .name {
       font-weight: 600;
-      color: #111827;
+      color: #1f2d3a;
     }
 
     .email {
-      color: #6b7280;
+      color: #596874;
     }
 
     .StatusPill {
@@ -517,7 +517,7 @@
   .ActionIcon {
     width: 34px;
     height: 34px;
-    border-radius: 10px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -526,20 +526,20 @@
   }
 
   .ActionIcon.edit {
-    background: #dbeafe;
-    color: #2563eb;
+    background: #e3e9ee;
+    color: #2d3e4d;
 
     &:hover {
-      background: #bfdbfe;
+      background: #c9d4dd;
     }
   }
 
   .ActionIcon.delete {
-    background: #fee2e2;
-    color: #dc2626;
+    background: #f7e0dd;
+    color: #c8352b;
 
     &:hover {
-      background: #fecaca;
+      background: #efc4be;
     }
   }
 
@@ -550,7 +550,7 @@
   .MoreButton {
     width: 34px;
     height: 34px;
-    border-radius: 10px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -558,7 +558,7 @@
     transition: 0.2s ease;
 
     &:hover {
-      background: #f1f5f9;
+      background: #e6e9ec;
     }
   }
 
@@ -568,9 +568,9 @@
     right: 0;
     min-width: 150px;
     background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    border: 1px solid #cdd3d8;
+    border-radius: 4px;
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
     z-index: 30;
     overflow: hidden;
   }
@@ -585,18 +585,18 @@
     transition: 0.2s ease;
     font-size: 14px;
     font-weight: 500;
-    color: #374151;
+    color: #3b4a57;
 
     &:hover {
-      background: #f8fafc;
+      background: #eef0f2;
     }
   }
 
   .MoreMenuItem.danger {
-    color: #dc2626;
+    color: #c8352b;
 
     &:hover {
-      background: #fef2f2;
+      background: #fbefed;
     }
   }
 
@@ -613,8 +613,8 @@
     min-width: 84px;
     height: 40px;
     padding: 0 14px;
-    border-radius: 10px;
-    background: #f1f5f9;
+    border-radius: 4px;
+    background: #e6e9ec;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -622,10 +622,10 @@
     transition: 0.2s ease;
     font-size: 14px;
     font-weight: 600;
-    color: #334155;
+    color: #3b4a57;
 
     &:hover {
-      background: #e2e8f0;
+      background: #cdd3d8;
     }
   }
 
@@ -644,9 +644,9 @@
   .PageNumber {
     width: 40px;
     height: 40px;
-    border-radius: 10px;
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    background: #eef0f2;
+    border: 1px solid #cdd3d8;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -654,17 +654,17 @@
     font-size: 14px;
     font-weight: 600;
     transition: 0.2s ease;
-    color: #334155;
+    color: #3b4a57;
 
     &:hover {
-      background: #eff6ff;
-      border-color: #bfdbfe;
+      background: #e3e9ee;
+      border-color: #c9d4dd;
     }
   }
 
   .PageNumber.active {
-    background: #3b82f6;
-    border-color: #3b82f6;
+    background: #2d3e4d;
+    border-color: #2d3e4d;
     color: #ffffff;
   }
 
@@ -683,9 +683,9 @@
     width: 100%;
     max-width: 560px;
     background: #ffffff;
-    border-radius: 20px;
+    border-radius: 8px;
     border: 1px solid #edf0f5;
-    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
     overflow: hidden;
   }
 
@@ -694,20 +694,20 @@
     align-items: center;
     justify-content: space-between;
     padding: 18px 20px;
-    border-bottom: 1px solid #eef2f7;
+    border-bottom: 1px solid #e6e9ec;
   }
 
   .UserModalTitle {
     font-size: 22px;
     font-weight: 700;
-    color: #111827;
+    color: #1f2d3a;
   }
 
   .UserModalClose {
     width: 36px;
     height: 36px;
-    border-radius: 10px;
-    background: #f8fafc;
+    border-radius: 4px;
+    background: #eef0f2;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -715,7 +715,7 @@
     transition: 0.2s ease;
 
     &:hover {
-      background: #eef2f7;
+      background: #e6e9ec;
     }
   }
 
@@ -738,17 +738,17 @@
     input,
     select {
       height: 48px;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
+      border: 1px solid #cdd3d8;
+      border-radius: 4px;
       outline: none;
       padding: 0 14px;
       font-size: 15px;
       background: #ffffff;
-      color: #111827;
+      color: #1f2d3a;
 
       &:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #2d3e4d;
+        box-shadow: 0 0 0 3px rgba(242, 183, 5, 0.1);
       }
     }
   }
@@ -756,7 +756,7 @@
   .FormLabel {
     font-size: 14px;
     font-weight: 600;
-    color: #374151;
+    color: #3b4a57;
   }
 
   .UserModalFooter {
@@ -764,13 +764,13 @@
     justify-content: flex-end;
     gap: 10px;
     padding: 18px 20px;
-    border-top: 1px solid #eef2f7;
+    border-top: 1px solid #e6e9ec;
   }
 
   .ModalBtn {
     height: 44px;
     padding: 0 16px;
-    border-radius: 12px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -781,20 +781,20 @@
   }
 
   .ModalBtn.cancel {
-    background: #f1f5f9;
-    color: #475569;
+    background: #e6e9ec;
+    color: #3b4a57;
 
     &:hover {
-      background: #e2e8f0;
+      background: #cdd3d8;
     }
   }
 
   .ModalBtn.save {
-    background: #3b82f6;
+    background: #2d3e4d;
     color: #ffffff;
 
     &:hover {
-      background: #2563eb;
+      background: #2d3e4d;
     }
   }
 
@@ -845,7 +845,7 @@
   @media (max-width: 600px) {
     .UsersContentCard {
       padding: 16px;
-      border-radius: 18px;
+      border-radius: 6px;
     }
 
     .UsersTopbar-Title {
@@ -858,7 +858,7 @@
 
     .UserModal {
       max-width: 100%;
-      border-radius: 18px;
+      border-radius: 6px;
     }
 
     .UsersPagination {

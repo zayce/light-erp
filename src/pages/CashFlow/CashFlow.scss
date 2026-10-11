@@ -1,5 +1,5 @@
 .CashFlow-Wrapper {
-  background-color: #f9fafb;
+  background-color: transparent;
 
   .CashFlow-Inner {
     width: 1200px;
@@ -17,13 +17,13 @@
   .CashFlow-Header-Name {
     font-size: 38px;
     font-weight: 600;
-    color: #1f2937;
+    color: #1f2d3a;
     margin-bottom: 4px;
   }
 
   .CashFlow-Header-Desc {
     font-size: 25px;
-    color: #6b7280;
+    color: #596874;
     margin-bottom: 24px;
   }
 
@@ -32,29 +32,29 @@
     align-items: center;
     gap: 10px;
     padding: 24px;
-    background: #2563eb;
+    background: #2d3e4d;
     color: #ffffff;
     border: none;
-    border-radius: 14px;
+    border-radius: 6px;
     font-size: 18px;
     font-weight: 500;
     cursor: pointer;
     outline: none;
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
     transition:
       background 0.25s ease,
       transform 0.2s ease,
       box-shadow 0.2s ease;
 
     &:hover {
-      background: #1d4ed8;
+      background: #1f2c38;
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+      box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
     }
 
     &:active {
       transform: translateY(0);
-      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
     }
 
     .plus {
@@ -76,12 +76,12 @@
 
   .CashFlow-Count {
     background: #fff;
-    border-radius: 14px;
+    border-radius: 6px;
     padding: 20px 22px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
   }
 
   .CashFlow-Count-Title {
@@ -98,7 +98,7 @@
   .CashFlow-Icon {
     width: 54px;
     height: 54px;
-    border-radius: 12px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -106,43 +106,43 @@
 
   .CashFlow-Count.income {
     .CashFlow-Count-Price {
-      color: #16a34a;
+      color: #2e7d5b;
     }
 
     .CashFlow-Icon {
-      background: #dcfce7;
-      color: #16a34a;
+      background: #dcefe5;
+      color: #2e7d5b;
     }
   }
 
   .CashFlow-Count.expense {
     .CashFlow-Count-Price {
-      color: #dc2626;
+      color: #c8352b;
     }
 
     .CashFlow-Icon {
-      background: #fee2e2;
-      color: #dc2626;
+      background: #f7e0dd;
+      color: #c8352b;
     }
   }
 
   .CashFlow-Count.balance {
     .CashFlow-Count-Price {
-      color: #2563eb;
+      color: #2d3e4d;
     }
 
     .CashFlow-Icon {
-      background: #dbeafe;
-      color: #2563eb;
+      background: #e3e9ee;
+      color: #2d3e4d;
     }
   }
 
   .CashFlow-Statics {
     margin-top: 50px;
     background: #fff;
-    border-radius: 16px;
+    border-radius: 6px;
     padding: 20px 24px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
   }
 
   .CashFlow-Statics-Title {
@@ -154,8 +154,8 @@
   .CashFlow-CashCount {
     margin-top: 30px;
     background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
     overflow: hidden;
   }
 
@@ -164,7 +164,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #cdd3d8;
     gap: 16px;
   }
 
@@ -185,12 +185,12 @@
     height: 42px;
     padding: 0 14px;
     border: 1px solid #dbe3ef;
-    border-radius: 12px;
+    border-radius: 4px;
     background: #fff;
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #6b7280;
+    color: #596874;
 
     input {
       border: none;
@@ -198,7 +198,7 @@
       width: 100%;
       font-size: 14px;
       background: transparent;
-      color: #111827;
+      color: #1f2d3a;
     }
   }
 
@@ -206,16 +206,16 @@
     height: 42px;
     padding: 0 14px;
     border: 1px solid #dbe3ef;
-    border-radius: 12px;
+    border-radius: 4px;
     background: #fff;
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #6b7280;
+    color: #596874;
 
     &:focus-within {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+      border-color: #2d3e4d;
+      box-shadow: 0 0 0 2px rgba(242, 183, 5, 0.15);
     }
 
     select {
@@ -223,7 +223,7 @@
       outline: none;
       background: transparent;
       font-size: 14px;
-      color: #111827;
+      color: #1f2d3a;
       cursor: pointer;
       min-width: 120px;
     }
@@ -243,17 +243,17 @@
   }
 
   .CashFlow-Table.Head {
-    background: #f9fafb;
-    color: #6b7280;
+    background: #eef0f2;
+    color: #596874;
     font-weight: 500;
   }
 
   .CashFlow-Table.Row {
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid #cdd3d8;
     transition: background 0.2s;
 
     &:hover {
-      background: #f9fafb;
+      background: #eef0f2;
     }
   }
 
@@ -276,13 +276,13 @@
     font-weight: 600;
 
     &.income {
-      background: #dcfce7;
-      color: #15803d;
+      background: #dcefe5;
+      color: #1f5c42;
     }
 
     &.expense {
-      background: #fee2e2;
-      color: #dc2626;
+      background: #f7e0dd;
+      color: #c8352b;
     }
   }
 
@@ -290,11 +290,11 @@
     font-weight: 700;
 
     &.income {
-      color: #16a34a;
+      color: #2e7d5b;
     }
 
     &.expense {
-      color: #dc2626;
+      color: #c8352b;
     }
   }
 
@@ -308,7 +308,7 @@
       width: 34px;
       height: 34px;
       border: none;
-      border-radius: 10px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -326,11 +326,11 @@
     }
 
     .Delete {
-      background: #fee2e2;
-      color: #dc2626;
+      background: #f7e0dd;
+      color: #c8352b;
 
       &:hover {
-        background: #fecaca;
+        background: #efc4be;
       }
     }
   }
@@ -338,31 +338,31 @@
   .EmptyState {
     padding: 28px 16px;
     text-align: center;
-    color: #6b7280;
+    color: #596874;
     font-size: 15px;
   }
 
   .Chart-Tooltip {
     background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
+    border: 1px solid #cdd3d8;
+    border-radius: 6px;
     padding: 12px 14px;
-    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
   }
 
   .Tooltip-Title {
     font-weight: 700;
-    color: #111827;
+    color: #1f2d3a;
     margin-bottom: 8px;
   }
 
   .Tooltip-Income {
-    color: #16a34a;
+    color: #2e7d5b;
     font-size: 14px;
   }
 
   .Tooltip-Expense {
-    color: #dc2626;
+    color: #c8352b;
     font-size: 14px;
     margin-top: 4px;
   }
@@ -437,7 +437,7 @@
 
   .button-opis.secondary {
     background: #fff;
-    color: #334155;
+    color: #3b4a57;
     border: 1px solid rgba(226, 232, 240, 0.95);
     box-shadow: none;
   }

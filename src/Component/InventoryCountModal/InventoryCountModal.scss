@@ -6,19 +6,19 @@
     box-sizing: border-box;
     padding: 10px 12px;
     margin-bottom: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
+    border: 1px solid #c3cbd1;
+    border-radius: 4px;
     font: inherit;
     outline: none;
 
-    &:focus { border-color: #3b82f6; }
+    &:focus { border-color: #2d3e4d; }
   }
 
   .IC-Table {
     max-height: 46vh;
     overflow-y: auto;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border: 1px solid #cdd3d8;
+    border-radius: 4px;
   }
 
   .IC-Row {
@@ -27,36 +27,35 @@
     align-items: center;
     gap: 10px;
     padding: 8px 14px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #e6e9ec;
 
     &.head {
       position: sticky;
       top: 0;
-      background: #f8fafc;
+      background: #eef0f2;
       font-size: 12px;
       font-weight: 700;
-      text-transform: uppercase;
-      color: #94a3b8;
+      color: #8896a1;
     }
 
-    .name small { display: block; color: #94a3b8; font-size: 12px; }
+    .name small { display: block; color: #8896a1; font-size: 12px; }
 
     input {
       width: 100%;
       box-sizing: border-box;
       padding: 7px 8px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
+      border: 1px solid #c3cbd1;
+      border-radius: 3px;
       font: inherit;
     }
 
-    .plus { color: #16a34a; font-weight: 700; }
-    .minus { color: #dc2626; font-weight: 700; }
+    .plus { color: #2e7d5b; font-weight: 700; }
+    .minus { color: #c8352b; font-weight: 700; }
   }
 
-  .IC-Empty { padding: 24px; text-align: center; color: #94a3b8; }
+  .IC-Empty { padding: 24px; text-align: center; color: #8896a1; }
 
-  .IC-Summary { margin-right: auto; align-self: center; color: #64748b; }
+  .IC-Summary { margin-right: auto; align-self: center; color: #596874; }
 
   .EP-Save:disabled { opacity: 0.5; cursor: default; }
 }

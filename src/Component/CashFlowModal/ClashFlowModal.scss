@@ -16,8 +16,8 @@
   background: #ffffff;
   border-radius: 28px;
   overflow: hidden;
-  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.18);
-  border: 1px solid #eef2f7;
+  box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
+  border: 1px solid #e6e9ec;
 }
 
 .ClashFlowModal-Header {
@@ -26,7 +26,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 34px 34px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #cdd3d8;
 }
 
 .ClashFlowModal-HeaderText {
@@ -40,14 +40,14 @@
   font-size: 28px;
   line-height: 1.2;
   font-weight: 700;
-  color: #111827;
+  color: #1f2d3a;
 }
 
 .ClashFlowModal-Subtitle {
   margin: 0;
   font-size: 18px;
   line-height: 1.4;
-  color: #6b7280;
+  color: #596874;
 }
 
 .ClashFlowModal-Close {
@@ -56,8 +56,8 @@
   height: 48px;
   border: none;
   border-radius: 50%;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: #e6e9ec;
+  color: #596874;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,8 +66,8 @@
 }
 
 .ClashFlowModal-Close:hover {
-  background: #e5e7eb;
-  color: #374151;
+  background: #cdd3d8;
+  color: #3b4a57;
 }
 
 .ClashFlowModal-Body {
@@ -87,7 +87,7 @@
 .ClashFlowModal-Field label {
   font-size: 18px;
   font-weight: 600;
-  color: #111827;
+  color: #1f2d3a;
 }
 
 .ClashFlowModal-Field input,
@@ -95,11 +95,11 @@
   width: 100%;
   height: 56px;
   border: 1px solid #d9dee7;
-  border-radius: 14px;
+  border-radius: 6px;
   background: #ffffff;
   padding: 0 18px;
   font-size: 17px;
-  color: #111827;
+  color: #1f2d3a;
   outline: none;
   transition: 0.2s ease;
 }
@@ -110,25 +110,25 @@
 
 .ClashFlowModal-Field input:focus,
 .ClashFlowModal-Field select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+  border-color: #2d3e4d;
+  box-shadow: 0 0 0 4px rgba(242, 183, 5, 0.08);
 }
 
 .ClashFlowModal-DateWrap input[type="date"] {
   width: 100%;
   height: 56px;
   border: 1px solid #d9dee7;
-  border-radius: 14px;
+  border-radius: 6px;
   padding: 0 16px;
   font-size: 17px;
-  color: #111827;
+  color: #1f2d3a;
   outline: none;
   background: #fff;
 }
 
 .ClashFlowModal-DateWrap input[type="date"]:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+  border-color: #2d3e4d;
+  box-shadow: 0 0 0 4px rgba(242, 183, 5, 0.08);
 }
 
 .ClashFlowModal-SelectWrap {
@@ -162,7 +162,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   border: 1px solid #d9dee7;
-  border-radius: 14px;
+  border-radius: 6px;
   overflow: hidden;
   height: 56px;
   background: #fff;
@@ -182,12 +182,12 @@
 }
 
 .ClashFlowModal-TypeSwitch button.income.active {
-  background: linear-gradient(180deg, #2fbc87 0%, #1fa971 100%);
+  background: #2fbc87;
   color: #fff;
 }
 
 .ClashFlowModal-TypeSwitch button.expense.active {
-  background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+  background: #c8352b;
   color: #fff;
 }
 
@@ -196,7 +196,7 @@
 }
 
 .ClashFlowModal-TypeSwitch button:first-child:not(.active) {
-  color: #111827;
+  color: #1f2d3a;
 }
 
 .ClashFlowModal-AmountWrap {
@@ -219,7 +219,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4b5563;
+  color: #3b4a57;
   font-size: 18px;
   font-weight: 600;
   z-index: 1;
@@ -230,13 +230,13 @@
   grid-template-columns: 1fr 1fr;
   gap: 18px;
   padding: 24px 34px 34px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #cdd3d8;
 }
 
 .ClashFlowModal-Submit,
 .ClashFlowModal-Cancel {
   height: 58px;
-  border-radius: 16px;
+  border-radius: 6px;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -246,8 +246,8 @@
 .ClashFlowModal-Submit {
   border: none;
   color: #fff;
-  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+  background: #2d3e4d;
+  box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
 }
 
 .ClashFlowModal-Submit:hover {
@@ -256,12 +256,12 @@
 
 .ClashFlowModal-Cancel {
   border: 1px solid #d9dee7;
-  color: #6b7280;
+  color: #596874;
   background: #ffffff;
 }
 
 .ClashFlowModal-Cancel:hover {
-  background: #f9fafb;
+  background: #eef0f2;
 }
 
 @media (max-width: 768px) {

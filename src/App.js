@@ -21,13 +21,15 @@ import { Login } from "./pages/Login/Login";
 import { Purchases } from "./pages/Purchases/Purchases";
 import { Report } from "./pages/Reports/Report";
 import { Settings } from "./pages/Settings/Settings";
-import { UserProfile } from "./pages/Useprofile/UserProfile";
+import UsersPage from "./pages/UsersPanel/UsersPage";
+import { canAccess, homePath } from "./utils/access";
 
 const PUBLIC_PATHS = ["/", "/login"];
 
 // Sends visitors without a session to the login page and back afterwards.
-const RequireAuth = ({ children }) => {
-  const { status } = useAuth();
+// With `page`, a signed-in user who may not open that section goes to their own home.
+const RequireAuth = ({ children, page }) => {
+  const { status, user } = useAuth();
   const location = useLocation();
 
   if (status === "loading") {
@@ -35,6 +37,9 @@ const RequireAuth = ({ children }) => {
   }
   if (status !== "authenticated") {
     return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+  if (page && !canAccess(user?.role, page)) {
+    return <Navigate to={homePath(user?.role)} replace />;
   }
   return children;
 };
@@ -52,13 +57,62 @@ const Layout = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
 
-          <Route path="/usepanels" element={<RequireAuth><UserProfile /></RequireAuth>} />
-          <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
-          <Route path="/report" element={<RequireAuth><Report /></RequireAuth>} />
-          <Route path="/dashboard" element={<RequireAuth><ControlPanel /></RequireAuth>} />
-          <Route path="/warehouse" element={<RequireAuth><Anbar /></RequireAuth>} />
-          <Route path="/purchases" element={<RequireAuth><Purchases /></RequireAuth>} />
-          <Route path="/cashflow" element={<RequireAuth><CashFlow /></RequireAuth>} />
+          <Route
+            path="/usepanels"
+            element={
+              <RequireAuth page="users">
+                <UsersPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <RequireAuth>
+                <Settings />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/report"
+            element={
+              <RequireAuth page="report">
+                <Report />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <RequireAuth page="dashboard">
+                <ControlPanel />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/warehouse"
+            element={
+              <RequireAuth page="warehouse">
+                <Anbar />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/purchases"
+            element={
+              <RequireAuth page="purchases">
+                <Purchases />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/cashflow"
+            element={
+              <RequireAuth page="cashflow">
+                <CashFlow />
+              </RequireAuth>
+            }
+          />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -1,0 +1,120 @@
+/* Global look: concrete floor, steel text, forklift-yellow actions, marker-red alerts.
+   Same palette as the login page. Loaded after every component stylesheet. */
+:root {
+  --concrete: #dde1e4;
+  --steel: #2d3e4d;
+  --steel-ink: #1f2d3a;
+  --muted: #596874;
+  --forklift: #f2b705;
+  --forklift-dark: #d9a203;
+  --marker: #c8352b;
+  --rule: rgba(45, 62, 77, 0.06);
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--concrete);
+}
+
+body {
+  font-family: "Archivo Variable", "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  color: var(--steel-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--forklift);
+  outline-offset: 2px;
+}
+
+/* the app area keeps the faint ledger lines from the login page */
+.App-Wrapper {
+  gap: 0;
+  min-height: 100vh;
+  background-color: var(--concrete);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 31px,
+    var(--rule) 31px,
+    var(--rule) 32px
+  );
+}
+
+/* page titles: wide and heavy, like stencilled crate labels */
+.App-Content [class$="-Title"]:not([class*="Stats"]):not([class*="Tooltip"]):not([class*="CardHeader"]):not([class*="RoleCard"]):not([class*="row-"]),
+.App-Content .Anbar-Title,
+.App-Content .Anbar-Header h1 {
+  font-stretch: 118%;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  color: var(--steel-ink);
+}
+
+/* inline icons inside buttons */
+.button-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* the main action of a page: yellow with a hard shadow that presses in */
+.App-Wrapper .button-opis:not(.secondary),
+.App-Wrapper .SaveBigBtn,
+.App-Wrapper .EP-Save,
+.App-Wrapper .Purchases-Actions button:not(.secondary) {
+  background: var(--forklift);
+  color: var(--steel-ink);
+  border: 2px solid var(--steel);
+  box-shadow: 3px 3px 0 var(--steel);
+  font-weight: 700;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--forklift-dark);
+  }
+  &:active:not(:disabled) {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--steel);
+  }
+}
+
+.App-Wrapper .button-opis:not(.secondary) .button-text {
+  color: var(--steel-ink);
+}
+
+/* secondary actions: plain outlined */
+.App-Wrapper .button-opis.secondary {
+  background: #fff;
+  color: var(--steel-ink);
+  border: 2px solid var(--steel);
+  box-shadow: none;
+
+  &:hover { background: #f1f3f4; }
+}
+
+/* surfaces keep a visible edge instead of a soft glow */
+.App-Wrapper .card,
+.App-Wrapper .chart-card,
+.App-Wrapper .operations-card,
+.App-Wrapper .Stats-Card,
+.App-Wrapper .CardShell,
+.App-Wrapper .Purchases-Stat,
+.App-Wrapper .Purchases-Table {
+  border: 1px solid #c3cbd1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

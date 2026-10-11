@@ -36,6 +36,9 @@ const requireAuth = (req, res, next) => {
     if (!user || (user.tokenVersion || 0) !== payload.tv) {
       return res.status(401).json({ error: "Sessiya etibarsızdır" });
     }
+    if (user.active === false) {
+      return res.status(401).json({ error: "Hesab deaktiv edilib" });
+    }
     req.user = user;
     next();
   } catch {
@@ -119,6 +122,12 @@ app.post("/auth/login", async (req, res) => {
   }
 
   auth.clearFails(key);
+  if (user.active === false) {
+    return res.status(403).json({ error: "Hesab deaktiv edilib. Adminlə əlaqə saxlayın" });
+  }
+
+  user.lastLoginAt = Date.now();
+  store.save();
   respondSession(res, 200, user);
 });
 
@@ -180,6 +189,40 @@ app.put("/auth/password", requireAuth, async (req, res) => {
 });
 
 // ---------- users (admin) ----------
+// Roles decide which sections of the app a user sees (the data itself is one shared
+// workspace, see README). admin also manages users.
+const ROLES = ["admin", "staff", "warehouse", "accountant"];
+
+const AUDIT_LIMIT = 1000;
+const fullName = (u) => `${u.firstName || ""} ${u.lastName || ""}`.trim();
+
+// Appends to the audit trail; the caller saves the store right after.
+const logAudit = (actor, action, target, meta = {}) => {
+  const audit = store.db.audit;
+  audit.push({
+    id: crypto.randomUUID(),
+    at: Date.now(),
+    actorId: actor.id,
+    actorName: fullName(actor),
+    action,
+    targetId: target.id,
+    targetName: fullName(target),
+    meta,
+  });
+  if (audit.length > AUDIT_LIMIT) audit.splice(0, audit.length - AUDIT_LIMIT);
+};
+
+// Newest first. ?limit=1..200 (default 50) and ?offset=N for paging.
+app.get("/users/activity", requireAuth, requireAdmin, (req, res) => {
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 50, 1), 200);
+  const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+  const newestFirst = [...store.db.audit].reverse();
+  res.json({
+    total: newestFirst.length,
+    items: newestFirst.slice(offset, offset + limit),
+  });
+});
+
 app.get("/users", requireAuth, requireAdmin, (req, res) =>
   res.json(store.db.users.map(auth.publicUser)),
 );
@@ -197,6 +240,9 @@ app.post("/users", requireAuth, requireAdmin, async (req, res) => {
   if (String(password || "").length < 6) {
     return res.status(400).json({ error: "Şifrə ən az 6 simvol olmalıdır" });
   }
+  if (role !== undefined && !ROLES.includes(role)) {
+    return res.status(400).json({ error: "Rol yanlışdır" });
+  }
   if (store.db.users.some((u) => u.email === email)) {
     return res.status(409).json({ error: "Bu e-poçt artıq istifadə olunur" });
   }
@@ -207,15 +253,115 @@ app.post("/users", requireAuth, requireAdmin, async (req, res) => {
     lastName: text(lastName),
     email,
     phone: "",
-    role: role === "admin" ? "admin" : "staff",
+    role: role === undefined ? "staff" : role,
+    active: true,
     passwordHash: await auth.hashPassword(String(password)),
     tokenVersion: 0,
     notifications: auth.defaultNotifications(),
     createdAt: Date.now(),
   };
   store.db.users.push(user);
+  logAudit(req.user, "user.create", user, { role: user.role });
   store.save();
   res.status(201).json(auth.publicUser(user));
+});
+
+// Admin edits a colleague: name, e-mail, phone, role, active. Partial updates are fine.
+// An admin cannot change their own role or disable themselves, so the workspace always
+// keeps at least one active admin (the caller is always one).
+app.put("/users/:id", requireAuth, requireAdmin, (req, res) => {
+  const target = store.db.users.find((u) => u.id === req.params.id);
+  if (!target) return res.status(404).json({ error: "İstifadəçi tapılmadı" });
+
+  const body = req.body || {};
+  const has = (k) => body[k] !== undefined;
+  const isSelf = target.id === req.user.id;
+
+  if (has("firstName") && !text(body.firstName)) {
+    return res.status(400).json({ error: "Ad boş ola bilməz" });
+  }
+  if (has("lastName") && !text(body.lastName)) {
+    return res.status(400).json({ error: "Soyad boş ola bilməz" });
+  }
+
+  let email = target.email;
+  if (has("email")) {
+    email = normEmail(body.email);
+    if (!isEmail(email)) {
+      return res.status(400).json({ error: "E-poçt formatı düzgün deyil" });
+    }
+    if (store.db.users.some((u) => u.id !== target.id && u.email === email)) {
+      return res.status(409).json({ error: "Bu e-poçt artıq istifadə olunur" });
+    }
+  }
+
+  if (has("role") && !ROLES.includes(body.role)) {
+    return res.status(400).json({ error: "Rol yanlışdır" });
+  }
+  if (has("active") && typeof body.active !== "boolean") {
+    return res.status(400).json({ error: "Status yanlışdır" });
+  }
+
+  const nextRole = has("role") ? body.role : target.role;
+  const nextActive = has("active") ? body.active : target.active !== false;
+
+  if (isSelf && nextRole !== target.role) {
+    return res.status(400).json({ error: "Öz rolunuzu dəyişə bilməzsiniz" });
+  }
+  if (isSelf && !nextActive) {
+    return res.status(400).json({ error: "Özünüzü deaktiv edə bilməzsiniz" });
+  }
+
+  const before = { ...target };
+  if (has("firstName")) target.firstName = text(body.firstName);
+  if (has("lastName")) target.lastName = text(body.lastName);
+  if (has("phone")) target.phone = text(body.phone);
+  target.email = email;
+  target.role = nextRole;
+
+  const fields = ["firstName", "lastName", "email", "phone"].filter(
+    (k) => before[k] !== target[k],
+  );
+  if (fields.length || before.role !== target.role) {
+    const meta = { fields };
+    if (before.role !== target.role) meta.role = { from: before.role, to: target.role };
+    logAudit(req.user, "user.update", target, meta);
+  }
+  if ((before.active !== false) !== nextActive) {
+    logAudit(req.user, nextActive ? "user.enable" : "user.disable", target);
+  }
+
+  // disabling ends every open session; re-enabling does not bring old tokens back
+  if (target.active !== false && !nextActive) {
+    target.tokenVersion = (target.tokenVersion || 0) + 1;
+  }
+  target.active = nextActive;
+
+  store.save();
+  res.json(auth.publicUser(target));
+});
+
+// Admin sets a new password for a colleague (there is no e-mail reset). The colleague's
+// existing sessions are revoked so they must sign in again with the new password.
+app.put("/users/:id/password", requireAuth, requireAdmin, async (req, res) => {
+  if (req.params.id === req.user.id) {
+    return res
+      .status(400)
+      .json({ error: "Öz şifrənizi Parametrlər bölməsindən dəyişin" });
+  }
+  const target = store.db.users.find((u) => u.id === req.params.id);
+  if (!target) return res.status(404).json({ error: "İstifadəçi tapılmadı" });
+
+  const newPassword = String(req.body?.newPassword || "");
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: "Yeni şifrə ən az 6 simvol olmalıdır" });
+  }
+
+  target.passwordHash = await auth.hashPassword(newPassword);
+  target.tokenVersion = (target.tokenVersion || 0) + 1;
+  logAudit(req.user, "user.password", target);
+  store.save();
+  res.status(204).end();
 });
 
 app.delete("/users/:id", requireAuth, requireAdmin, (req, res) => {
@@ -225,6 +371,8 @@ app.delete("/users/:id", requireAuth, requireAdmin, (req, res) => {
   const index = store.db.users.findIndex((u) => u.id === req.params.id);
   if (index === -1) return res.status(404).json({ error: "İstifadəçi tapılmadı" });
 
+  const removed = store.db.users[index];
+  logAudit(req.user, "user.delete", removed, { email: removed.email, role: removed.role });
   store.db.users.splice(index, 1);
   store.save();
   res.status(204).end();

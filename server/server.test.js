@@ -241,3 +241,206 @@ test("malformed JSON returns a JSON 400, not an HTML error page", async () => {
   assert.equal(res.status, 400);
   assert.match(res.headers.get("content-type"), /json/);
 });
+
+test("admin can reset a colleague's password; the old session is revoked", async () => {
+  const created = await call(
+    "POST",
+    "/users",
+    { firstName: "Nigar", lastName: "Staff", email: "nigar@test.az", password: "oldpass1", role: "staff" },
+    adminToken,
+  );
+  const oldLogin = await call("POST", "/auth/login", { email: "nigar@test.az", password: "oldpass1" });
+
+  assert.equal((await call("PUT", `/users/${created.body.id}/password`, { newPassword: "123" }, adminToken)).status, 400);
+  assert.equal((await call("PUT", `/users/${created.body.id}/password`, { newPassword: "brandnew1" }, oldLogin.body.token)).status, 403);
+  assert.equal((await call("PUT", `/users/${created.body.id}/password`, { newPassword: "brandnew1" }, adminToken)).status, 204);
+
+  assert.equal((await call("GET", "/auth/me", undefined, oldLogin.body.token)).status, 401);
+  assert.equal((await call("POST", "/auth/login", { email: "nigar@test.az", password: "oldpass1" })).status, 401);
+  assert.equal((await call("POST", "/auth/login", { email: "nigar@test.az", password: "brandnew1" })).status, 200);
+
+  const me = await call("GET", "/auth/me", undefined, adminToken);
+  assert.equal((await call("PUT", `/users/${me.body.user.id}/password`, { newPassword: "whatever1" }, adminToken)).status, 400);
+  assert.equal((await call("PUT", "/users/nope/password", { newPassword: "whatever1" }, adminToken)).status, 404);
+});
+
+test("a daily backup of the data file is written and old ones are pruned", () => {
+  const { createStore } = require("./db");
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "hesabla-bk-"));
+  const file = path.join(tmp, "hesabla.json");
+  const backups = path.join(tmp, "backups");
+
+  const store = createStore(file, { keep: 2 });
+  store.db.users.push({ id: "1", email: "a@b.az" });
+  store.save(); // file did not exist yet: nothing to back up
+  assert.equal(fs.existsSync(backups), false);
+
+  fs.mkdirSync(backups);
+  ["hesabla-2020-01-01.json", "hesabla-2020-01-02.json", "hesabla-2020-01-03.json"].forEach((n) =>
+    fs.writeFileSync(path.join(backups, n), "{}"),
+  );
+
+  store.db.users.push({ id: "2", email: "c@d.az" });
+  store.save(); // first save of the day with an existing file -> backup + prune
+
+  const today = new Date().toISOString().slice(0, 10);
+  const files = fs.readdirSync(backups).sort();
+  assert.deepEqual(files, ["hesabla-2020-01-03.json", `hesabla-${today}.json`]);
+
+  const saved = JSON.parse(fs.readFileSync(path.join(backups, `hesabla-${today}.json`), "utf8"));
+  assert.equal(saved.users.length, 1); // the state from before the day's change
+
+  store.save(); // same day again: no second backup, nothing breaks
+  assert.equal(fs.readdirSync(backups).length, 2);
+});
+
+test("admin edits a user; validation, duplicate e-mail and permissions are enforced", async () => {
+  const created = await call(
+    "POST",
+    "/users",
+    { firstName: "Leyla", lastName: "Staff", email: "leyla@test.az", password: "leyla123", role: "staff" },
+    adminToken,
+  );
+  const id = created.body.id;
+  assert.equal(created.body.active, true);
+
+  const edited = await call(
+    "PUT",
+    `/users/${id}`,
+    { firstName: "Leyla2", email: "Leyla.New@Test.az", role: "admin", phone: "050" },
+    adminToken,
+  );
+  assert.equal(edited.status, 200);
+  assert.equal(edited.body.firstName, "Leyla2");
+  assert.equal(edited.body.lastName, "Staff"); // untouched fields stay
+  assert.equal(edited.body.email, "leyla.new@test.az");
+  assert.equal(edited.body.role, "admin");
+  assert.equal(edited.body.phone, "050");
+  assert.equal("passwordHash" in edited.body, false);
+
+  assert.equal((await call("PUT", `/users/${id}`, { firstName: " " }, adminToken)).status, 400);
+  assert.equal((await call("PUT", `/users/${id}`, { email: "nope" }, adminToken)).status, 400);
+  assert.equal((await call("PUT", `/users/${id}`, { role: "boss" }, adminToken)).status, 400);
+  assert.equal((await call("PUT", `/users/${id}`, { active: "no" }, adminToken)).status, 400);
+  assert.equal((await call("PUT", `/users/${id}`, { email: "admin@test.az" }, adminToken)).status, 409);
+  assert.equal((await call("PUT", "/users/nope", { firstName: "X" }, adminToken)).status, 404);
+
+  // an admin who was just promoted can manage users, a demoted one cannot
+  const login = await call("POST", "/auth/login", { email: "leyla.new@test.az", password: "leyla123" });
+  assert.equal((await call("GET", "/users", undefined, login.body.token)).status, 200);
+  await call("PUT", `/users/${id}`, { role: "staff" }, adminToken);
+  assert.equal((await call("GET", "/users", undefined, login.body.token)).status, 403);
+  assert.equal((await call("PUT", `/users/${id}`, { firstName: "Hack" }, login.body.token)).status, 403);
+});
+
+test("admin cannot change their own role or disable themselves", async () => {
+  const me = await call("GET", "/auth/me", undefined, adminToken);
+  const id = me.body.user.id;
+  assert.equal((await call("PUT", `/users/${id}`, { role: "staff" }, adminToken)).status, 400);
+  assert.equal((await call("PUT", `/users/${id}`, { active: false }, adminToken)).status, 400);
+  // the same role / active value is not a change
+  assert.equal((await call("PUT", `/users/${id}`, { role: "admin", active: true }, adminToken)).status, 200);
+  assert.equal((await call("GET", "/auth/me", undefined, adminToken)).status, 200);
+});
+
+test("a disabled user is locked out until re-enabled, and old sessions stay dead", async () => {
+  const created = await call(
+    "POST",
+    "/users",
+    { firstName: "Tural", lastName: "Staff", email: "tural@test.az", password: "tural123", role: "staff" },
+    adminToken,
+  );
+  const id = created.body.id;
+  const login = await call("POST", "/auth/login", { email: "tural@test.az", password: "tural123" });
+  assert.equal(login.status, 200);
+  assert.ok(login.body.user.lastLoginAt > 0);
+  assert.equal((await call("GET", "/data", undefined, login.body.token)).status, 200);
+
+  const off = await call("PUT", `/users/${id}`, { active: false }, adminToken);
+  assert.equal(off.body.active, false);
+
+  assert.equal((await call("GET", "/data", undefined, login.body.token)).status, 401);
+  const blocked = await call("POST", "/auth/login", { email: "tural@test.az", password: "tural123" });
+  assert.equal(blocked.status, 403);
+  // wrong password still looks like any other failed login
+  assert.equal((await call("POST", "/auth/login", { email: "tural@test.az", password: "bad" })).status, 401);
+
+  await call("PUT", `/users/${id}`, { active: true }, adminToken);
+  assert.equal((await call("GET", "/data", undefined, login.body.token)).status, 401); // old token stays revoked
+  assert.equal((await call("POST", "/auth/login", { email: "tural@test.az", password: "tural123" })).status, 200);
+});
+
+test("warehouse and accountant roles can be assigned; unknown roles are rejected", async () => {
+  const mk = (email, role) =>
+    call("POST", "/users", { firstName: "R", lastName: "Role", email, password: "secret1", role }, adminToken);
+
+  const w = await mk("wh@test.az", "warehouse");
+  const a = await mk("acc@test.az", "accountant");
+  assert.equal(w.status, 201);
+  assert.equal(w.body.role, "warehouse");
+  assert.equal(a.body.role, "accountant");
+  assert.equal((await mk("bad@test.az", "boss")).status, 400);
+
+  const switched = await call("PUT", `/users/${w.body.id}`, { role: "accountant" }, adminToken);
+  assert.equal(switched.body.role, "accountant");
+
+  // these roles are not admins
+  const login = await call("POST", "/auth/login", { email: "wh@test.az", password: "secret1" });
+  assert.equal((await call("GET", "/users", undefined, login.body.token)).status, 403);
+  assert.equal((await call("GET", "/users/activity", undefined, login.body.token)).status, 403);
+});
+
+test("audit trail records who did what, keeps names after deletion and never leaks secrets", async () => {
+  const before = (await call("GET", "/users/activity?limit=200", undefined, adminToken)).body.total;
+
+  const created = await call(
+    "POST",
+    "/users",
+    { firstName: "Audit", lastName: "Subject", email: "audit@test.az", password: "audit123", role: "staff" },
+    adminToken,
+  );
+  const id = created.body.id;
+  await call("PUT", `/users/${id}`, { firstName: "Audit2", role: "warehouse" }, adminToken);
+  await call("PUT", `/users/${id}`, { firstName: "Audit2" }, adminToken); // no change: no entry
+  await call("PUT", `/users/${id}`, { active: false }, adminToken);
+  await call("PUT", `/users/${id}`, { active: true }, adminToken);
+  await call("PUT", `/users/${id}/password`, { newPassword: "another1" }, adminToken);
+  await call("DELETE", `/users/${id}`, undefined, adminToken);
+
+  const log = await call("GET", "/users/activity?limit=200", undefined, adminToken);
+  assert.equal(log.body.total, before + 6);
+
+  const mine = log.body.items.slice(0, 6).map((e) => e.action); // newest first
+  assert.deepEqual(mine, [
+    "user.delete",
+    "user.password",
+    "user.enable",
+    "user.disable",
+    "user.update",
+    "user.create",
+  ]);
+
+  const me = (await call("GET", "/auth/me", undefined, adminToken)).body.user;
+  const update = log.body.items[4];
+  assert.equal(update.actorName, `${me.firstName} ${me.lastName}`);
+  assert.equal(update.actorId, me.id);
+  assert.equal(update.targetName, "Audit2 Subject");
+  assert.deepEqual(update.meta, { fields: ["firstName"], role: { from: "staff", to: "warehouse" } });
+
+  // the deleted user is still named in the trail
+  assert.equal(log.body.items[0].targetName, "Audit2 Subject");
+  assert.equal(log.body.items[0].meta.email, "audit@test.az");
+
+  const raw = JSON.stringify(log.body);
+  assert.equal(raw.includes("audit123"), false);
+  assert.equal(raw.includes("another1"), false);
+  assert.equal(raw.includes("passwordHash"), false);
+});
+
+test("audit paging: limit and offset", async () => {
+  const all = (await call("GET", "/users/activity?limit=200", undefined, adminToken)).body;
+  const page = (await call("GET", "/users/activity?limit=2&offset=1", undefined, adminToken)).body;
+  assert.equal(page.total, all.total);
+  assert.deepEqual(page.items.map((e) => e.id), all.items.slice(1, 3).map((e) => e.id));
+  assert.equal((await call("GET", "/users/activity?limit=9999", undefined, adminToken)).body.items.length <= 200, true);
+});

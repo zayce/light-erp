@@ -1,5 +1,5 @@
 .Report-Wrapper {
-  background-color: #f9fafb;
+  background-color: transparent;
   .Report-Inner {
     width: 1200px;
     margin: 0;
@@ -11,12 +11,12 @@
         .Report-Title-Name {
           font-size: 38px;
           font-weight: 600;
-          color: #1f2937; /* тёмно-серый */
+          color: #1f2d3a; /* тёмно-серый */
           margin-bottom: 4px;
         }
         .Report-Title-Desc {
           font-size: 25px;
-          color: #6b7280; /* серый */
+          color: #596874; /* серый */
           margin-bottom: 24px;
         }
       }
@@ -27,11 +27,11 @@
           gap: 10px;
 
           padding: 24px;
-          background: #2563eb;
+          background: #2d3e4d;
           color: #ffffff;
 
           border: none;
-          border-radius: 14px;
+          border-radius: 6px;
 
           font-size: 18px;
           font-weight: 500;
@@ -39,7 +39,7 @@
           cursor: pointer;
           outline: none;
 
-          box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+          box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
           transition:
             background 0.25s ease,
             transform 0.2s ease,
@@ -47,15 +47,15 @@
 
           /* HOVER */
           &:hover {
-            background: #1d4ed8;
+            background: #1f2c38;
             transform: translateY(-1px);
-            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+            box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
           }
 
           /* ACTIVE (klik) */
           &:active {
             transform: translateY(0);
-            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+            box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
           }
           .plus {
             font-size: 22px;
@@ -88,9 +88,9 @@
     .Card {
       position: relative;
       height: 170px;
-      border-radius: 18px;
+      border-radius: 6px;
       overflow: hidden;
-      box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
+      box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
       transition:
         transform 0.2s ease,
         box-shadow 0.2s ease;
@@ -98,7 +98,7 @@
 
       &:hover {
         transform: translateY(-2px);
-        box-shadow: 0 16px 30px rgba(17, 24, 39, 0.12);
+        box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
       }
 
       // контент слева
@@ -154,19 +154,19 @@
 
       // ✅ Цвета фона (как карточки на примере)
       .card-info.green {
-        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+        background: #2e7d5b;
       }
 
       .card-info.red {
-        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        background: #c8352b;
       }
 
       .card-info.blue {
-        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        background: #2d3e4d;
       }
 
       .card-info.purple {
-        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+        background: #8a6d3b;
       }
 
       // проценты (если хочешь — можно оставить просто белым, но пусть будет чуть читабельнее)
@@ -189,13 +189,13 @@
       }
       .ChartCard {
         background: #ffffff;
-        border-radius: 18px;
-        box-shadow: 0 10px 22px rgba(17, 24, 39, 0.08);
+        border-radius: 6px;
+        box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
         padding: 18px;
         .ChartTitle {
           font-size: 30px;
           font-weight: 700;
-          color: #111827;
+          color: #1f2d3a;
           margin-bottom: 20px;
         }
         .ChartBody {
@@ -207,8 +207,8 @@
     /* REPORT MANY CARDS */
     .Report-Many-Cards {
       background: #fff;
-      border-radius: 14px;
-      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      border: 1px solid #cdd3d8;
       padding: 16px;
 
       .Report-Many-Cards-Title {
@@ -226,29 +226,28 @@
 
       .Table-Head {
         font-size: 12px;
-        text-transform: uppercase;
-        color: #9ca3af;
+        color: #8896a1;
         padding: 10px 12px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid #cdd3d8;
       }
 
       .Tr {
         padding: 12px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid #e6e9ec;
         transition: 0.2s;
 
         &:hover {
-          background: #f9fafb;
+          background: #eef0f2;
         }
       }
 
       .Td {
         font-size: 14px;
-        color: #111827;
+        color: #1f2d3a;
 
         &.rank {
           font-weight: 600;
-          color: #9ca3af;
+          color: #8896a1;
         }
 
         &.product {
@@ -269,20 +268,20 @@
       .PerfBar {
         flex: 1;
         height: 6px;
-        background: #e5e7eb;
+        background: #cdd3d8;
         border-radius: 999px;
         overflow: hidden;
       }
 
       .PerfFill {
         height: 100%;
-        background: #2563eb;
+        background: #2d3e4d;
         border-radius: 999px;
       }
 
       .PerfText {
         font-size: 12px;
-        color: #6b7280;
+        color: #596874;
         width: 40px;
         text-align: right;
       }
@@ -296,7 +295,7 @@
       .action-btn {
         width: 32px;
         height: 32px;
-        border-radius: 8px;
+        border-radius: 3px;
         border: none;
         display: flex;
         align-items: center;
@@ -306,20 +305,20 @@
       }
 
       .edit-btn {
-        background: #eff6ff;
-        color: #2563eb;
+        background: #e3e9ee;
+        color: #2d3e4d;
 
         &:hover {
-          background: #dbeafe;
+          background: #e3e9ee;
         }
       }
 
       .delete-btn {
-        background: #fef2f2;
-        color: #dc2626;
+        background: #fbefed;
+        color: #c8352b;
 
         &:hover {
-          background: #fee2e2;
+          background: #f7e0dd;
         }
       }
 
@@ -327,7 +326,7 @@
         text-align: center;
         padding: 20px;
         font-size: 14px;
-        color: #9ca3af;
+        color: #8896a1;
       }
     }
   }
@@ -336,9 +335,9 @@
 .KpiCard {
   position: relative;
   height: 155px;
-  border-radius: 18px;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 12px 26px rgba(17, 24, 39, 0.1);
+  box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -346,7 +345,7 @@
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 34px rgba(17, 24, 39, 0.14);
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
   }
 
   .KpiCard-Left {
@@ -397,16 +396,16 @@
 
 /* gradients like screenshot */
 .KpiCard.blue {
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  background: #2d3e4d;
 }
 .KpiCard.green {
-  background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+  background: #2e7d5b;
 }
 .KpiCard.purple {
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  background: #8a6d3b;
 }
 .KpiCard.orange {
-  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  background: #f97316;
 }
 
 .Report-Toolbar {
@@ -427,22 +426,22 @@
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: #64748b;
+    color: #596874;
   }
 
   input {
     width: 640px;
     height: 46px;
     border: 1px solid #d7deea;
-    border-radius: 12px;
+    border-radius: 4px;
     padding: 0 14px 0 42px;
     outline: none;
     font-size: 15px;
     background: #fff;
 
     &:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+      border-color: #2d3e4d;
+      box-shadow: 0 0 0 3px rgba(242, 183, 5, 0.12);
     }
   }
 }
@@ -451,7 +450,7 @@
   height: 46px;
   min-width: 220px;
   border: 1px solid #d7deea;
-  border-radius: 12px;
+  border-radius: 4px;
   padding: 0 14px;
   outline: none;
   font-size: 15px;
@@ -459,8 +458,8 @@
   cursor: pointer;
 
   &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    border-color: #2d3e4d;
+    box-shadow: 0 0 0 3px rgba(242, 183, 5, 0.12);
   }
 }
 
@@ -474,7 +473,7 @@
   width: 36px;
   height: 36px;
   border: none;
-  border-radius: 10px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -483,18 +482,18 @@
 }
 
 .edit-btn {
-  background: rgba(59, 130, 246, 0.12);
-  color: #2563eb;
+  background: rgba(242, 183, 5, 0.12);
+  color: #2d3e4d;
 
   &:hover {
-    background: rgba(59, 130, 246, 0.2);
+    background: rgba(242, 183, 5, 0.2);
     transform: translateY(-1px);
   }
 }
 
 .delete-btn {
   background: rgba(239, 68, 68, 0.12);
-  color: #dc2626;
+  color: #c8352b;
 
   &:hover {
     background: rgba(239, 68, 68, 0.2);
@@ -506,7 +505,7 @@
   padding: 28px 16px;
   text-align: center;
   font-size: 16px;
-  color: #64748b;
+  color: #596874;
 }
 
 /* CSV export button next to the primary action */
@@ -517,7 +516,7 @@
 
   .button-opis.secondary {
     background: #fff;
-    color: #334155;
+    color: #3b4a57;
     border: 1px solid rgba(226, 232, 240, 0.95);
     box-shadow: none;
   }

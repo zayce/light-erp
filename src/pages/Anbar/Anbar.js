@@ -1,8 +1,10 @@
 import { useMemo, useState, useEffect, useRef } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { History, Pencil, Trash2, AlertTriangle, Camera, CheckCircle2, ClipboardList, Download, Package, Tag } from "lucide-react";
 import { NewProductModal } from "../../Component/NewProductModal/NewProductModal";
 import { EditProductModal } from "../../Component/EditProductModal/EditProductModal";
 import { InventoryCountModal } from "../../Component/InventoryCountModal/InventoryCountModal";
+import { HistoryModal } from "../../Component/HistoryModal/HistoryModal";
+import { LabelsModal } from "../../Component/LabelsModal/LabelsModal";
 import { useApp } from "../../AppContext";
 import "./Anbar.scss";
 import { CameraScanner } from "../../Component/CameraScaner/CameraScaner";
@@ -82,6 +84,8 @@ export const Anbar = () => {
   const [onlyLow, setOnlyLow] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [openCount, setOpenCount] = useState(false);
+  const [openLabels, setOpenLabels] = useState(false);
+  const [historyProduct, setHistoryProduct] = useState(null);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [sortBy, setSortBy] = useState("default");
   const searchRef = useRef(null);
@@ -135,10 +139,14 @@ export const Anbar = () => {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const products = Array.isArray(state?.anbar) ? state.anbar : [];
-  const rawCategories = Array.isArray(state?.categories)
-    ? state.categories
-    : [];
+  const products = useMemo(
+    () => (Array.isArray(state?.anbar) ? state.anbar : []),
+    [state?.anbar],
+  );
+  const rawCategories = useMemo(
+    () => (Array.isArray(state?.categories) ? state.categories : []),
+    [state?.categories],
+  );
 
   // Нормализуем категории: и строки, и объекты приводим к одному виду
   const categories = useMemo(() => {
@@ -516,17 +524,30 @@ export const Anbar = () => {
           <div className="Anbar-Header-Button">
             <button
               className="button-opis secondary"
+              onClick={() => setOpenLabels(true)}
+              type="button"
+            >
+              <div className="button-text">
+                <Tag size={18} /> Etiketlər
+              </div>
+            </button>
+            <button
+              className="button-opis secondary"
               onClick={() => setOpenCount(true)}
               type="button"
             >
-              <div className="button-text">📋 İnventarizasiya</div>
+              <div className="button-text">
+                <ClipboardList size={18} /> İnventarizasiya
+              </div>
             </button>
             <button
               className="button-opis secondary"
               onClick={exportCsv}
               type="button"
             >
-              <div className="button-text">⬇ CSV ixrac</div>
+              <div className="button-text">
+                <Download size={18} /> CSV ixrac
+              </div>
             </button>
             <button
               className="button-opis"
@@ -540,7 +561,9 @@ export const Anbar = () => {
 
         <div className="Stats">
           <div className="Stats-Card">
-            <div className="Stats-Icon blue">📦</div>
+            <div className="Stats-Icon blue">
+              <Package size={26} />
+            </div>
             <div className="Stats-Text">
               <div className="Stats-Title">Məhsul Növləri</div>
               <div className="Stats-Value">{totalProductsCount}</div>
@@ -561,7 +584,9 @@ export const Anbar = () => {
             aria-pressed={onlyLow}
             title="Yalnız aşağı stoku göstər"
           >
-            <div className="Stats-Icon orange">⚠️</div>
+            <div className="Stats-Icon orange">
+              <AlertTriangle size={26} />
+            </div>
             <div className="Stats-Text">
               <div className="Stats-Title">Aşağı Stok</div>
               <div className="Stats-Value">{lowStockCount}</div>
@@ -569,7 +594,9 @@ export const Anbar = () => {
           </div>
 
           <div className="Stats-Card">
-            <div className="Stats-Icon green">✅</div>
+            <div className="Stats-Icon green">
+              <CheckCircle2 size={26} />
+            </div>
             <div className="Stats-Text">
               <div className="Stats-Title">Ümumi Dəyər</div>
               <div className="Stats-Value">
@@ -717,6 +744,16 @@ export const Anbar = () => {
 
                   <button
                     type="button"
+                    className="row-history"
+                    onClick={() => setHistoryProduct(item)}
+                    aria-label="history"
+                    title="Hərəkət tarixçəsi"
+                  >
+                    <History size={18} />
+                  </button>
+
+                  <button
+                    type="button"
                     className="row-edit"
                     onClick={() => setEditingProduct(item)}
                     aria-label="edit"
@@ -741,7 +778,9 @@ export const Anbar = () => {
             })
           ) : (
             <div className="Anbar-Empty">
-              <div className="Anbar-Empty-icon">📦</div>
+              <div className="Anbar-Empty-icon">
+                <Package size={44} strokeWidth={1.5} />
+              </div>
               <div className="Anbar-Empty-title">Məhsul tapılmadı</div>
               <div className="Anbar-Empty-hint">
                 {products.length === 0
@@ -781,7 +820,9 @@ export const Anbar = () => {
 
         <div className={`scanner-box ${flash ? "scan-success" : ""}`}>
           <div className="scanner-header">
-            <div className="scanner-title">📷 Scanner</div>
+            <div className="scanner-title">
+            <Camera size={20} /> Scanner
+          </div>
             <div className="scanner-status">Active</div>
           </div>
 
@@ -798,6 +839,19 @@ export const Anbar = () => {
           <button className="scanner-btn">Kamera icazə ver</button>
         </div>
       </div>
+
+      <HistoryModal
+        open={Boolean(historyProduct)}
+        product={historyProduct}
+        state={state}
+        onClose={() => setHistoryProduct(null)}
+      />
+
+      <LabelsModal
+        open={openLabels}
+        products={products}
+        onClose={() => setOpenLabels(false)}
+      />
 
       <InventoryCountModal
         open={openCount}

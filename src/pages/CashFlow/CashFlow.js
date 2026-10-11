@@ -3,15 +3,7 @@ import toast from "react-hot-toast";
 import { exportCashflow } from "../../utils/exports";
 import { formatMoney, formatSignedMoney } from "../../utils/format";
 import { amountOf } from "../../utils/dashboard";
-import {
-  TrendingUp,
-  TrendingDown,
-  Calendar,
-  Filter,
-  Pencil,
-  Trash2,
-  Search,
-} from "lucide-react";
+import { TrendingUp, TrendingDown, Calendar, Filter, Pencil, Trash2, Search, Download } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   BarChart,
@@ -25,26 +17,26 @@ import {
 import { ClashFlowModal } from "../../Component/CashFlowModal/ClashFlowModal";
 import { useApp } from "../../AppContext";
 
+const months = [
+  "Yanvar",
+  "Fevral",
+  "Mart",
+  "Aprel",
+  "May",
+  "İyun",
+  "İyul",
+  "Avqust",
+  "Sentyabr",
+  "Oktyabr",
+  "Noyabr",
+  "Dekabr",
+];
+
 export const CashFlow = () => {
   const [openClashFlow, setOpenClashFlow] = useState(false);
   const [filterType, setFilterType] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [editOperation, setEditOperation] = useState(null);
-
-  const months = [
-    "Yanvar",
-    "Fevral",
-    "Mart",
-    "Aprel",
-    "May",
-    "İyun",
-    "İyul",
-    "Avqust",
-    "Sentyabr",
-    "Oktyabr",
-    "Noyabr",
-    "Dekabr",
-  ];
 
   const { state, dispatch } = useApp();
   const operations = state.cashflow;
@@ -202,7 +194,9 @@ export const CashFlow = () => {
               }}
               type="button"
             >
-              <div className="button-text">⬇ CSV ixrac</div>
+              <div className="button-text">
+                <Download size={18} /> CSV ixrac
+              </div>
             </button>
             <button
               className="button-opis"

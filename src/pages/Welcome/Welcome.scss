@@ -1,5 +1,5 @@
 .Landing {
-  background: #f8fafc;
+  background: #eef0f2;
 }
 
 .container {
@@ -21,23 +21,23 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #64748b;
+    color: #596874;
     margin-bottom: 16px;
   }
 
   .Welcome-Title {
     font-size: 52px;
     font-weight: 700;
-    color: #0f172a;
+    color: #1f2d3a;
 
     span {
-      color: #2563eb;
+      color: #2d3e4d;
     }
   }
 
   .Welcome-Desc {
     margin: 20px 0;
-    color: #475569;
+    color: #3b4a57;
   }
 
   .Welcome-Buttons {
@@ -47,12 +47,12 @@
 
     button {
       padding: 12px 24px;
-      border-radius: 10px;
+      border-radius: 4px;
       cursor: pointer;
     }
 
     .primary {
-      background: #2563eb;
+      background: #2d3e4d;
       color: white;
       border: none;
     }
@@ -77,30 +77,30 @@
 .Feature-Card {
   background: white;
   padding: 30px;
-  border-radius: 20px;
-  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  border: 1px solid #cdd3d8;
   transition: 0.3s;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
   }
 
   .icon {
     width: 48px;
     height: 48px;
-    background: #e0e7ff;
+    background: #e3e9ee;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
+    border-radius: 4px;
     margin-bottom: 16px;
-    color: #2563eb;
+    color: #2d3e4d;
   }
 }
 
 .CTA {
-  background: #2563eb;
+  background: #2d3e4d;
   color: white;
   text-align: center;
   padding: 80px 0;
@@ -113,9 +113,9 @@
   button {
     margin-top: 20px;
     padding: 12px 24px;
-    border-radius: 10px;
+    border-radius: 4px;
     background: white;
-    color: #2563eb;
+    color: #2d3e4d;
     border: none;
   }
 }
@@ -127,10 +127,10 @@
   margin-top: 25px;
 
   button {
-    border: 1px solid #e2e8f0;
+    border: 1px solid #cdd3d8;
     background: white;
     padding: 6px;
-    border-radius: 8px;
+    border-radius: 3px;
     cursor: pointer;
     transition: 0.2s;
 
@@ -147,7 +147,7 @@
 
   .active {
     border: 2px solid #a3a8ae;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 2px rgba(242, 183, 5, 0.2);
   }
 }
 

@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import toast from "react-hot-toast";
+import { RefreshCw } from "lucide-react";
 import { api, isNetworkError } from "./shared/api/axios";
 import { reducer, normalizeState, useApp } from "./AppContext";
 import { useAuth } from "./AuthContext";
@@ -83,7 +84,7 @@ export const SyncProvider = ({ children }) => {
         }
         toast("Məlumat başqa cihazda dəyişdirilmişdi və yeniləndi", {
           id: "sync-conflict",
-          icon: "🔄",
+          icon: <RefreshCw size={18} />,
         });
         setStatus("saved");
       } else if (isNetworkError(err)) {

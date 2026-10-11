@@ -1,0 +1,46 @@
+.HM-Modal {
+  max-width: 620px;
+
+  .HM-Summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 10px 12px;
+      border-radius: 4px;
+      background: #eef0f2;
+    }
+    span { color: #596874; font-size: 13px; }
+    strong { font-size: 22px; }
+  }
+
+  .plus { color: #2e7d5b; }
+  .minus { color: #c8352b; }
+
+  .HM-List {
+    max-height: 44vh;
+    overflow-y: auto;
+    border: 1px solid #cdd3d8;
+    border-radius: 4px;
+  }
+
+  .HM-Row {
+    display: grid;
+    grid-template-columns: 100px 1fr 70px 110px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e6e9ec;
+
+    .type small { display: block; color: #8896a1; font-size: 12px; }
+    .qty { font-weight: 700; text-align: right; }
+    .amount { text-align: right; color: #3b4a57; }
+  }
+
+  .HM-Empty { padding: 28px; text-align: center; color: #8896a1; }
+}

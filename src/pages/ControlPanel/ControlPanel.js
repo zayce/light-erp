@@ -8,6 +8,7 @@ import {
   ArrowUp,
   ArrowDown,
   Minus,
+  CheckCircle2,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
@@ -41,7 +42,7 @@ import {
 import { STATUS_LABELS } from "../../utils/stock";
 import "./ControlPanel.scss";
 
-const PIE_COLORS = ["#3b82f6", "#8b5cf6", "#10b981", "#f59e0b", "#ef4444"];
+const PIE_COLORS = ["#2d3e4d", "#f2b705", "#c8352b", "#8a6d3b", "#6f8796"];
 const PERIODS = [
   { value: 3, label: "3 ay" },
   { value: 6, label: "6 ay" },
@@ -274,15 +275,15 @@ export const ControlPanel = () => {
                   <AreaChart data={lineData}>
                     <defs>
                       <linearGradient id="gGelir" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
-                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#2e7d5b" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="#2e7d5b" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="gXerc" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#c8352b" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#c8352b" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eef2f7" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d6dbdf" />
                     <XAxis dataKey="label" tickLine={false} axisLine={false} />
                     <YAxis tickFormatter={compact} tickLine={false} axisLine={false} width={48} />
                     <Tooltip formatter={moneyTooltip} />
@@ -290,7 +291,7 @@ export const ControlPanel = () => {
                       type="monotone"
                       dataKey="gelir"
                       name="Gəlir"
-                      stroke="#22c55e"
+                      stroke="#2e7d5b"
                       strokeWidth={3}
                       fill="url(#gGelir)"
                     />
@@ -298,7 +299,7 @@ export const ControlPanel = () => {
                       type="monotone"
                       dataKey="xerc"
                       name="Xərc"
-                      stroke="#ef4444"
+                      stroke="#c8352b"
                       strokeWidth={3}
                       fill="url(#gXerc)"
                     />
@@ -366,7 +367,7 @@ export const ControlPanel = () => {
             {best.length > 0 ? (
               <ResponsiveContainer width="100%" height={Math.max(180, best.length * 56)}>
                 <BarChart data={best} layout="vertical" margin={{ left: 8, right: 16 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#eef2f7" />
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#d6dbdf" />
                   <XAxis type="number" tickFormatter={compact} tickLine={false} axisLine={false} />
                   <YAxis
                     type="category"
@@ -376,8 +377,8 @@ export const ControlPanel = () => {
                     axisLine={false}
                   />
                   <Tooltip formatter={moneyTooltip} />
-                  <Bar dataKey="revenue" name="Gəlir" fill="#3b82f6" radius={[0, 8, 8, 0]} />
-                  <Bar dataKey="profit" name="Mənfəət" fill="#22c55e" radius={[0, 8, 8, 0]} />
+                  <Bar dataKey="revenue" name="Gəlir" fill="#2d3e4d" radius={[0, 3, 3, 0]} />
+                  <Bar dataKey="profit" name="Mənfəət" fill="#f2b705" radius={[0, 3, 3, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -389,7 +390,7 @@ export const ControlPanel = () => {
             <div className="chart-head">
               <div className="chart-title">Stok vəziyyəti</div>
               <NavLink to="/warehouse" className="link-more">
-                Anbara keç →
+                Anbara keç
               </NavLink>
             </div>
 
@@ -418,7 +419,9 @@ export const ControlPanel = () => {
                   </div>
                 ))
               ) : (
-                <div className="low-ok">✅ Bütün məhsulların stoku normaldır</div>
+                <div className="low-ok">
+                  <CheckCircle2 size={20} /> Bütün məhsulların stoku normaldır
+                </div>
               )}
             </div>
           </div>

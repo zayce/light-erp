@@ -14,9 +14,9 @@
   width: min(1200px, 100%);
   overflow: hidden;
   background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 18px;
-  box-shadow: 0 30px 80px rgba(17, 24, 39, 0.25);
+  border: 1px solid #cdd3d8;
+  border-radius: 6px;
+  box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
 }
 
 /* ===== Header ===== */
@@ -25,13 +25,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #cdd3d8;
 }
 
 .NPM-HeaderTitle {
   font-size: 22px;
   font-weight: 800;
-  color: #111827;
+  color: #1f2d3a;
 }
 
 .NPM-Close {
@@ -40,12 +40,12 @@
   display: grid;
   place-items: center;
   border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
+  border: 1px solid #cdd3d8;
+  background: #eef0f2;
   cursor: pointer;
 
   &:hover {
-    background: #f3f4f6;
+    background: #e6e9ec;
   }
 }
 
@@ -85,7 +85,7 @@
 
 /* ===== Common form control focus ===== */
 :root {
-  --npm-focus: 0 0 0 4px rgba(37, 99, 235, 0.16);
+  --npm-focus: 0 0 0 4px rgba(242, 183, 5, 0.16);
 }
 
 .NPM-Field {
@@ -96,20 +96,20 @@
   label {
     font-size: 14px;
     font-weight: 800;
-    color: #111827;
+    color: #1f2d3a;
   }
 
   input,
   select,
   textarea {
-    border-radius: 12px;
-    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    border: 1px solid #c3cbd1;
     font-size: 15px;
     outline: none;
     background: #fff;
 
     &:focus {
-      border-color: #2563eb;
+      border-color: #2d3e4d;
       box-shadow: var(--npm-focus);
     }
   }
@@ -135,15 +135,15 @@
   text-align: center;
   display: grid;
   place-items: center;
-  border: 1px dashed #d1d5db;
-  border-radius: 16px;
-  background: #f9fafb;
+  border: 1px dashed #c3cbd1;
+  border-radius: 6px;
+  background: #eef0f2;
   transition: 0.2s ease;
 
   &.drag {
-    border-color: #2563eb;
+    border-color: #2d3e4d;
     box-shadow: var(--npm-focus);
-    background: #eff6ff;
+    background: #e3e9ee;
   }
 
   &.has {
@@ -160,7 +160,7 @@
 }
 
 .NPM-DropIcon {
-  color: #9ca3af;
+  color: #8896a1;
   margin-bottom: 10px;
 }
 
@@ -168,33 +168,33 @@
   margin-bottom: 6px;
   font-size: 22px;
   font-weight: 900;
-  color: #111827;
+  color: #1f2d3a;
 }
 
 .NPM-DropDesc {
   margin-bottom: 14px;
-  color: #6b7280;
+  color: #596874;
 }
 
 .NPM-PickBtn {
   padding: 12px 16px;
   border: none;
-  border-radius: 12px;
+  border-radius: 4px;
   cursor: pointer;
-  background: #2563eb;
+  background: #2d3e4d;
   color: #fff;
   font-weight: 900;
-  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
 
   &:hover {
-    background: #1d4ed8;
+    background: #1f2c38;
   }
 }
 
 .NPM-DropHint {
   margin-top: 12px;
   font-size: 13px;
-  color: #6b7280;
+  color: #596874;
 }
 
 /* ===== Value Card ===== */
@@ -203,8 +203,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
+  border: 1px solid #cdd3d8;
+  border-radius: 6px;
   background: #fff;
 }
 
@@ -219,10 +219,10 @@
   height: 52px;
   display: grid;
   place-items: center;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  border: 1px solid #cdd3d8;
   overflow: hidden;
-  background: #f9fafb;
+  background: #eef0f2;
 
   img {
     width: 100%;
@@ -232,12 +232,12 @@
 }
 
 .NPM-ThumbIcon {
-  color: #9ca3af;
+  color: #8896a1;
 }
 
 .NPM-ThumbName {
   font-weight: 800;
-  color: #111827;
+  color: #1f2d3a;
 }
 
 .NPM-ValueRight {
@@ -247,19 +247,19 @@
 .NPM-ValueLabel {
   font-size: 14px;
   font-weight: 800;
-  color: #6b7280;
+  color: #596874;
 }
 
 .NPM-ValueNum {
   margin-top: 4px;
   font-size: 26px;
   font-weight: 900;
-  color: #111827;
+  color: #1f2d3a;
 }
 
 .NPM-ValueSub {
   font-size: 13px;
-  color: #6b7280;
+  color: #596874;
 }
 
 /* ===== Status Row ===== */
@@ -288,8 +288,8 @@
 
   &.Normal {
     background: #e0ecff;
-    color: #2563eb;
-    border-color: #bfdbfe;
+    color: #2d3e4d;
+    border-color: #c9d4dd;
   }
   &.Aşağı {
     background: #fff7ed;
@@ -297,13 +297,13 @@
     border-color: #fed7aa;
   }
   &.Kritik {
-    background: #fee2e2;
-    color: #ef4444;
-    border-color: #fecaca;
+    background: #f7e0dd;
+    color: #c8352b;
+    border-color: #efc4be;
   }
   &.Yüksək {
-    background: #dcfce7;
-    color: #16a34a;
+    background: #dcefe5;
+    color: #2e7d5b;
     border-color: #bbf7d0;
   }
 }
@@ -316,19 +316,19 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid #cdd3d8;
 }
 
 .NPM-Cancel {
   padding: 12px 18px;
-  border-radius: 14px;
-  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  border: 1px solid #c3cbd1;
   background: #fff;
   cursor: pointer;
   font-weight: 900;
 
   &:hover {
-    background: #f9fafb;
+    background: #eef0f2;
   }
 }
 
@@ -338,15 +338,15 @@
   align-items: center;
   gap: 10px;
   border: none;
-  border-radius: 14px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 900;
-  background: #2563eb;
+  background: #2d3e4d;
   color: #fff;
-  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 2px 0 rgba(45, 62, 77, 0.14);
 
   &:hover {
-    background: #1d4ed8;
+    background: #1f2c38;
   }
 }
 
@@ -361,7 +361,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: #2563eb;
+  color: #2d3e4d;
   font-weight: 800;
   cursor: pointer;
 
@@ -387,26 +387,26 @@
   height: 44px;
   padding: 0 14px;
   border: none;
-  border-radius: 12px;
-  background: #2563eb;
+  border-radius: 4px;
+  background: #2d3e4d;
   color: #fff;
   font-weight: 800;
   cursor: pointer;
   &:hover {
-    background: #1d4ed8;
+    background: #1f2c38;
   }
 }
 
 .NPM-CancelMini {
   height: 44px;
   padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  border: 1px solid #c3cbd1;
   background: #fff;
   font-weight: 800;
   cursor: pointer;
 
   &:hover {
-    background: #f9fafb;
+    background: #eef0f2;
   }
 }

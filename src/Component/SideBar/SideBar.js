@@ -8,9 +8,11 @@ import {
   Box,
   ShoppingCart,
   LogOut,
+  Users,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useApp } from "../../AppContext";
+import { canAccess } from "../../utils/access";
 import { useAuth } from "../../AuthContext";
 import { useSync } from "../../SyncContext";
 import { countLowStock } from "../../utils/stock";
@@ -28,6 +30,7 @@ export const SideBar = () => {
   const { state } = useApp();
   const { user, offline } = useAuth();
   const { status, signOut } = useSync();
+  const can = (page) => canAccess(user?.role, page);
   const fullName =
     [user?.firstName, user?.lastName].filter(Boolean).join(" ") || "İstifadəçi";
   const syncKey = offline ? "offline" : status;
@@ -51,48 +54,67 @@ export const SideBar = () => {
             </NavLink>
           </li>
 
-          <li className="menu-item">
-            <NavLink to="/dashboard" className="menu-item">
-              <BarChart3 size={40} />
-              <div className="Menu-item-text">İdarə Paneli</div>
-            </NavLink>
-          </li>
+          {can("dashboard") && (
+            <li className="menu-item">
+              <NavLink to="/dashboard" className="menu-item">
+                <BarChart3 size={40} />
+                <div className="Menu-item-text">İdarə Paneli</div>
+              </NavLink>
+            </li>
+          )}
 
-          <li className="menu-item">
-            <NavLink to="/warehouse" className="menu-item">
-              <Package size={40} />
-              <div className="Menu-item-text">Anbar</div>
-              {lowStock > 0 && (
-                <span
-                  className="menu-badge"
-                  title={`${lowStock} məhsulun stoku azdır`}
-                >
-                  {lowStock > 99 ? "99+" : lowStock}
-                </span>
-              )}
-            </NavLink>
-          </li>
+          {can("warehouse") && (
+            <li className="menu-item">
+              <NavLink to="/warehouse" className="menu-item">
+                <Package size={40} />
+                <div className="Menu-item-text">Anbar</div>
+                {lowStock > 0 && (
+                  <span
+                    className="menu-badge"
+                    title={`${lowStock} məhsulun stoku azdır`}
+                  >
+                    {lowStock > 99 ? "99+" : lowStock}
+                  </span>
+                )}
+              </NavLink>
+            </li>
+          )}
 
-          <li className="menu-item">
-            <NavLink to="/purchases" className="menu-item">
-              <ShoppingCart size={40} />
-              <div className="Menu-item-text">Alışlar</div>
-            </NavLink>
-          </li>
+          {can("purchases") && (
+            <li className="menu-item">
+              <NavLink to="/purchases" className="menu-item">
+                <ShoppingCart size={40} />
+                <div className="Menu-item-text">Alışlar</div>
+              </NavLink>
+            </li>
+          )}
 
-          <li className="menu-item">
-            <NavLink to="/cashflow" className="menu-item">
-              <DollarSign size={40} />
-              <div className="Menu-item-text">Pul Axını</div>
-            </NavLink>
-          </li>
+          {can("cashflow") && (
+            <li className="menu-item">
+              <NavLink to="/cashflow" className="menu-item">
+                <DollarSign size={40} />
+                <div className="Menu-item-text">Pul Axını</div>
+              </NavLink>
+            </li>
+          )}
 
-          <li className="menu-item">
-            <NavLink to="/report" className="menu-item">
-              <FileText size={40} />
-              <div className="Menu-item-text">Hesabatlar</div>
-            </NavLink>
-          </li>
+          {can("report") && (
+            <li className="menu-item">
+              <NavLink to="/report" className="menu-item">
+                <FileText size={40} />
+                <div className="Menu-item-text">Hesabatlar</div>
+              </NavLink>
+            </li>
+          )}
+
+          {can("users") && (
+            <li className="menu-item">
+              <NavLink to="/usepanels" className="menu-item">
+                <Users size={40} />
+                <div className="Menu-item-text">İstifadəçilər</div>
+              </NavLink>
+            </li>
+          )}
 
           <li className="menu-item">
             <NavLink to="/settings" className="menu-item">
@@ -111,7 +133,7 @@ export const SideBar = () => {
 
       {/* USER */}
       <div className="sidebar__user-row">
-        <NavLink to={"/usepanels"} className="sidebar__user">
+        <NavLink to="/settings" className="sidebar__user">
           <div className="user-avatar">
             {(user?.firstName || "İ").charAt(0).toUpperCase()}
           </div>
